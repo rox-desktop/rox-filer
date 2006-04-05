@@ -159,7 +159,7 @@ gint filer_key_press_event(GtkWidget *widget, GdkEventKey *event,
 void filer_set_autoscroll(FilerWindow *filer_window, gboolean auto_scroll);
 void filer_refresh(FilerWindow *filer_window);
 
-gboolean filer_match_filter(FilerWindow *filer_window, const gchar *filename);
+gboolean filer_match_filter(FilerWindow *filer_window, DirItem *item);
 gboolean filer_set_filter(FilerWindow *filer_window,
 			  FilterType type, const gchar *filter_string);
 void filer_set_hidden(FilerWindow *fwin, gboolean hidden);

@@ -63,6 +63,7 @@
 #include "view_details.h"
 #include "action.h"
 #include "bookmarks.h"
+#include "xtypes.h"
 
 static XMLwrapper *groups = NULL;
 
@@ -2877,18 +2878,51 @@ void filer_refresh(FilerWindow *filer_window)
 	full_refresh();
 }
 
-gboolean filer_match_filter(FilerWindow *filer_window, const gchar *filename)
+static inline gboolean is_hidden(const char *dir, DirItem *item)
 {
-	g_return_val_if_fail(filename != NULL, FALSE);
+	/* If the leaf name starts with '.' then the item is hidden */
+	if(item->leafname[0]=='.')
+		return TRUE;
 
-	if(filename[0]=='.' &&
+	/*** Test disabled for now.  The flags aren't set on the first pass...
+	 */
+#if 0
+	/* Most files will not have extended attributes, so this should
+	* be quick. */
+	if(!o_xattr_ignore.int_value && (item->flags & ITEM_FLAG_HAS_XATTR)) {
+		gchar *path, *val;
+		int len;
+		gboolean hidden=FALSE;
+
+		path=g_build_filename(dir, item->leafname, NULL);
+		val=xattr_get(path, XATTR_HIDDEN, &len);
+		if(val) {
+			hidden=atoi(val) || (strcmp(val, "true")==0);
+			g_free(val);
+		}
+		g_free(path);
+
+		if(hidden)
+			return TRUE;
+	}
+#endif
+
+	/* Otherwise not hidden */
+	return FALSE;
+}
+
+gboolean filer_match_filter(FilerWindow *filer_window, DirItem *item)
+{
+	g_return_val_if_fail(item != NULL, FALSE);
+
+	if(is_hidden(filer_window->real_path, item) &&
 	   (!filer_window->temp_show_hidden && !filer_window->show_hidden))
 		return FALSE;
 
 	switch(filer_window->filter) {
 	case FILER_SHOW_GLOB:
 		return fnmatch(filer_window->filter_string,
-			       filename, 0)==0;
+			       item->leafname, 0)==0;
 		
 	case FILER_SHOW_ALL:
 	default:

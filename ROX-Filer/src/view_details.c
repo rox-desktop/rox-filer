@@ -1222,7 +1222,7 @@ static void view_details_add_items(ViewIface *view, GPtrArray *new_items)
 		char	*leafname = item->leafname;
 		ViewItem *vitem;
 
-		if(!filer_match_filter(filer_window, leafname))
+		if(!filer_match_filter(filer_window, item))
 			continue;
 		if (leafname[0] == '.')
 		{
@@ -1313,7 +1313,7 @@ static void view_details_update_items(ViewIface *view, GPtrArray *items)
 		const gchar *leafname = item->leafname;
 		int j;
 
-		if (!filer_match_filter(filer_window, leafname))
+		if (!filer_match_filter(filer_window, item))
 			continue;
 
 		j = details_find_item(view_details, item);

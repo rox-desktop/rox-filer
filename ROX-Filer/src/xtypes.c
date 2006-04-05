@@ -39,9 +39,7 @@
 #include "xtypes.h"
 #include "options.h"
 
-static Option o_xattr_ignore;
-
-#define XTYPE_ATTR "user.mime_type"
+Option o_xattr_ignore;
 
 #define RETURN_IF_IGNORED(val) if(o_xattr_ignore.int_value) return (val)
 
@@ -90,7 +88,7 @@ int xattr_supported(const char *path)
 
 	if(path) {
 		errno=0;
-		nent=dyn_getxattr(path, XTYPE_ATTR, buf, sizeof(buf));
+		nent=dyn_getxattr(path, XATTR_MIME_TYPE, buf, sizeof(buf));
 
 		if(nent<0 && errno==ENOTSUP)
 			return FALSE;
@@ -308,7 +306,7 @@ MIME_type *xtype_get(const char *path)
 	gchar *buf;
 	char *nl;
 
-	buf = xattr_get(path, XTYPE_ATTR, NULL);
+	buf = xattr_get(path, XATTR_MIME_TYPE, NULL);
 
 	if(buf)
 	{
@@ -333,7 +331,7 @@ int xtype_set(const char *path, const MIME_type *type)
 	}
 
 	ttext = g_strdup_printf("%s/%s", type->media_type, type->subtype);
-	res = xattr_set(path, XTYPE_ATTR, ttext, -1);
+	res = xattr_set(path, XATTR_MIME_TYPE, ttext, -1);
 	g_free(ttext);
 
 	return res;

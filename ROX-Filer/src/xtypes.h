@@ -8,6 +8,13 @@
 #ifndef _XTYPES_H
 #define _XTYPES_H
 
+/* Know attribute names */
+#define XATTR_MIME_TYPE "user.mime_type"
+#define XATTR_HIDDEN    "user.hidden"
+
+/* If set, do not use extended attributes */
+extern Option o_xattr_ignore;    /* Set up in xattr_init() */
+
 /* Prototypes */
 void xattr_init(void);
 
