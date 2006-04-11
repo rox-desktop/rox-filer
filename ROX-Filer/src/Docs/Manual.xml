@@ -2684,12 +2684,12 @@ generated.
    <para>
 
     <orderedlist>
-     <listitem><para>Go into the <filename>src</filename> directory and create
-       the file <filename>messages.pot</filename>:
+     <listitem><para>Go into the <filename>src/po</filename> directory and create
+       the file <filename>src/messages.pot</filename>:
 
        <screen>
-        $ cd ROX-Filer/src
-        $ make messages.pot</screen>
+        $ cd ROX-Filer/src/po
+        $ ./update-po</screen>
 
      </para></listitem>
 
@@ -2698,7 +2698,7 @@ generated.
        <filename>&lt;name&gt;.po</filename>. Eg, if your
        language is referred to as `ml' (`my language'):
 
-       <screen>$ cp messages.pot po/ml.po</screen>
+       <screen>$ cp ../messages.pot ml.po</screen>
      </para></listitem>
 
      <listitem><para>Load the copy into a text editor.</para></listitem>
