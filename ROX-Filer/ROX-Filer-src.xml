@@ -21,6 +21,11 @@
       <environment insert="lib/pkgconfig" name="PKG_CONFIG_PATH"/>
       <environment insert="" name="GLIBHEADERS"/>
     </requires>
+    <requires interface="http://0install.net/2006/interfaces/Pango-dev">
+      <version before='1.5'/>
+      <environment insert="lib/pkgconfig" name="PKG_CONFIG_PATH"/>
+      <environment insert="" name="PANGOHEADERS"/>
+    </requires>
 
     <implementation id="." version="2.4.1.0" released='Snapshot'/>
   </group>

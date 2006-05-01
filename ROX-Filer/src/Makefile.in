@@ -13,7 +13,7 @@ LIBS = @LIBS@ @LFS_LDFLAGS@ -lICE -lSM
 ifeq (${GTKHEADERS},)
   PKG_CONFIG_FLAGS=
 else
-  PKG_CONFIG_FLAGS=--define-variable=gtkprefix="${GTKHEADERS}" --define-variable=glibprefix="${GLIBHEADERS}"
+  PKG_CONFIG_FLAGS=--define-variable=gtkprefix="${GTKHEADERS}" --define-variable=glibprefix="${GLIBHEADERS}" --define-variable=pangoprefix="${PANGOHEADERS}"
 endif
 
 CFLAGS = -I. -I${srcdir} ${PROF} @CFLAGS@ @LFS_CFLAGS@ \
