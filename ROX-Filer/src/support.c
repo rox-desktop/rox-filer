@@ -1511,6 +1511,9 @@ find_key:
 	{
 		const char *nl;
 
+		if (next[1] == '\n')
+			continue; /* Cope with blank lines */
+
 		next++;		/* Skip newline */
 
 		if (next[0] == '[')
