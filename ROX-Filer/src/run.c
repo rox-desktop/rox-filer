@@ -566,6 +566,7 @@ static gboolean run_desktop(const char *full_path,
 	gint argc = 0;
 	gchar **argv = NULL;
 	GPtrArray *expanded = NULL;
+	gboolean inserted_args = FALSE;
 	int i;
 	gboolean success = FALSE;
 
@@ -606,6 +607,7 @@ static gboolean run_desktop(const char *full_path,
 				int j;
 				for (j = 0; args && args[j]; j++)
 					g_ptr_array_add(expanded, g_strdup(args[j]));
+				inserted_args = TRUE;
 			}
 			else
 			{
@@ -618,6 +620,15 @@ static gboolean run_desktop(const char *full_path,
 		{
 			g_ptr_array_add(expanded, g_strdup(src));
 		}
+	}
+	if (!inserted_args)
+	{
+		/* Many .desktop files don't include a % expansion. In that case
+		 * add the arguments here.
+		 */
+		int j;
+		for (j = 0; args && args[j]; j++)
+			g_ptr_array_add(expanded, g_strdup(args[j]));
 	}
 	g_ptr_array_add(expanded, NULL);
 
