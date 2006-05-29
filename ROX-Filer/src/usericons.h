@@ -12,5 +12,7 @@
 void read_globicons(void);
 void check_globicon(const guchar *path, DirItem *item);
 void icon_set_handler_dialog(DirItem *item, const guchar *path);
+void add_globicon(const gchar *path, const gchar *icon);
+void delete_globicon(const gchar *path);
 
 #endif

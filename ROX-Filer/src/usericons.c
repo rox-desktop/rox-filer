@@ -62,13 +62,11 @@ static GHashTable *glob_icons = NULL; /* Pathname -> Icon pathname */
 static const char *process_globicons_line(gchar *line);
 static gboolean free_globicon(gpointer key, gpointer value, gpointer data);
 static void write_globicons(void);
-static void add_globicon(const gchar *path, const gchar *icon);
 static void drag_icon_dropped(GtkWidget	*drop_box,
 				  const guchar	*path,
 				  GtkWidget	*dialog);
 static gboolean set_icon_for_type(MIME_type *type, const gchar *iconpath,
 				  gboolean just_media);
-static void delete_globicon(const gchar *path);
 static gboolean convert_to_png(const gchar *src, const gchar *dest);
 static void radios_changed(Radios *radios, gpointer data);
 
@@ -487,7 +485,7 @@ static const char *process_globicons_line(gchar *line)
  * added to the top of the list (so that it takes precedence over
  * other entries).
  */
-static void add_globicon(const gchar *path, const gchar *icon)
+void add_globicon(const gchar *path, const gchar *icon)
 {
 	g_hash_table_insert(glob_icons, g_strdup(path), g_strdup(icon));
 
@@ -499,7 +497,7 @@ static void add_globicon(const gchar *path, const gchar *icon)
 }
 
 /* Remove the globicon for a certain path */
-static void delete_globicon(const gchar *path)
+void delete_globicon(const gchar *path)
 {
 	gpointer key, value;
 
