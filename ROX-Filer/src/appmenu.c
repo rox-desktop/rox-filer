@@ -167,6 +167,7 @@ static GtkWidget *create_menu_item(xmlNode *node)
 	GtkWidget *item;
 	xmlNode *label_node;
 	guchar	*label, *option = NULL;
+	guchar	*icon_name = NULL;
 	gboolean is_submenu;
 
 	if (node->type != XML_ELEMENT_NODE)
@@ -195,7 +196,19 @@ static GtkWidget *create_menu_item(xmlNode *node)
 		if (!label)
 			label = g_strdup(_("<missing label>"));
 	}
-	item = gtk_menu_item_new_with_label(label);
+	item = gtk_image_menu_item_new_with_label(label);
+	
+	icon_name = xmlGetProp(node, "icon");
+	if (icon_name)
+	{
+		GtkWidget *icon;
+		icon = gtk_image_new_from_icon_name(icon_name,
+						    GTK_ICON_SIZE_MENU);
+		g_free(icon_name);
+		if (icon)
+			gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(item),
+						      GTK_WIDGET(icon));
+	}
 
 	gtk_widget_set_accel_path(item, NULL, NULL);	/* XXX */
 	
