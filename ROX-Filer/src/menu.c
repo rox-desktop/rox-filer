@@ -199,7 +199,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Filter Files..."),   	NULL, mini_buffer, MINI_FILTER, NULL},
 {">" N_("Show Thumbnails"),	NULL, show_thumbs, 0, "<ToggleItem>"},
 {">" N_("Refresh"),		NULL, refresh, 0, "<StockItem>", GTK_STOCK_REFRESH},
-{">" N_("Save Display Settings..."),	       NULL, save_settings, 0, NULL},
+{">" N_("Save Current Display Settings..."),	 NULL, save_settings, 0, NULL},
 {N_("File"),			NULL, NULL, 0, "<Branch>"},
 {">" N_("Copy..."),		"<Ctrl>C", file_op, FILE_COPY_ITEM, "<StockItem>", GTK_STOCK_COPY},
 {">" N_("Rename..."),		NULL, file_op, FILE_RENAME_ITEM, NULL},
