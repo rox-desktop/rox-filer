@@ -63,5 +63,10 @@ char *get_value_from_desktop_file(const char *path,
 				  const char *section,
 				  const char *key,
 				  GError **error);
+gboolean get_values_from_desktop_file(const char *path,
+				      GError **error,
+				      const char *section,
+				      const char *key,
+				      gchar **value, ...);
 
 #endif /* _SUPPORT_H */

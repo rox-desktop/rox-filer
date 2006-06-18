@@ -23,6 +23,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <netdb.h>
 #include <errno.h>
 #include <ctype.h>
@@ -1592,4 +1593,68 @@ err:
 		munmap(start, info.st_size);
 
 	return value;
+}
+
+/* Load .desktop file 'path' and set the value of the named keys in the
+ * NULL terminated list.
+ * Sets error if the desktop file cannot be parsed and returns NULL.
+ * Sets NULL (but does not set error) if the key is not present.
+ * String set must be g_free()d.
+ */
+gboolean get_values_from_desktop_file(const char *path,
+				      GError **error,
+				      const char *section,
+				      const char *key,
+				      gchar **value, ...)
+{
+	struct stat info;
+	int fd = -1;
+	void *start = NULL;
+	va_list list;
+
+	fd = open(path, O_RDONLY);
+	if (fd == -1 || fstat(fd, &info) != 0)
+	{
+                g_set_error(error,
+                             G_FILE_ERROR,
+                             g_file_error_from_errno(errno),
+                             _("Failed to open and stat file '%s': %s"),
+                             path,
+                             g_strerror(errno));
+		goto err;
+	}
+	start = mmap(NULL, info.st_size, PROT_READ, MAP_SHARED, fd, 0);
+	if (start == MAP_FAILED)
+	{
+                g_set_error(error,
+                             G_FILE_ERROR,
+                             g_file_error_from_errno(errno),
+                             _("Failed to mmap file '%s': %s"),
+                             path,
+                             g_strerror(errno));
+		goto err;
+	}
+
+	va_start(list, value);
+	while(section && key && value) {
+		*value = get_value_from_desktop_data((const char *) start,
+						     info.st_size,
+						     section, key,
+						     error);
+		if(*error)
+			break;
+
+		section=va_arg(list, const char *);
+		key=va_arg(list, const char *);
+		value=va_arg(list, char **);
+	}
+		
+err:
+	if (fd != -1)
+		close(fd);
+
+	if (start != NULL && start != MAP_FAILED)
+		munmap(start, info.st_size);
+
+	return (*error==NULL);
 }

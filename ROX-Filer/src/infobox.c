@@ -80,6 +80,7 @@ static GtkWidget *make_vbox(const guchar *path, GObject *window);
 static GtkWidget *make_details(const guchar *path, DirItem *item,
 				GObject *window);
 static GtkWidget *make_about(const guchar *path, XMLwrapper *ai);
+static GtkWidget *make_about_desktop(const gchar *path);
 static GtkWidget *make_file_says(const guchar *path);
 static GtkWidget *make_permissions(const gchar *path, DirItem *item);
 static void add_file_output(FileStatus *fs,
@@ -278,6 +279,10 @@ static GtkWidget *make_vbox(const guchar *path, GObject *window)
 
 	if (about)
 		add_frame(vbox, make_about(path, ai));
+	else if (item->mime_type == application_x_desktop)
+	{
+		add_frame(vbox, make_about_desktop(path));
+	}
 	else if (item->base_type == TYPE_FILE)
 	{
 		label = gtk_label_new(NULL);
@@ -736,6 +741,39 @@ static GtkWidget *make_about(const guchar *path, XMLwrapper *ai)
 
 	g_hash_table_destroy(translate);
 
+	return view;
+}
+
+/* Create the TreeView widget with the desktop entry's details */
+static GtkWidget *make_about_desktop(const gchar *path)
+{
+	GtkListStore	*store;
+	GtkWidget	*view;
+	GError          *error=NULL;
+	gchar           *name=NULL, *comment=NULL, *exec=NULL;
+
+	make_list(&store, &view, NULL);
+
+	if(!get_values_from_desktop_file(path, &error,
+					 "Desktop Entry", "Name", &name,
+					 "Desktop Entry", "Comment", &comment,
+					 "Desktop Entry", "Exec", &exec,
+					 NULL))
+	{
+		/* Report it? */
+		delayed_error("%s", error->message);
+		if(error)
+			g_error_free(error);
+		return view;
+	}
+
+	if(name)
+		add_row_and_free(store, _("Name"), name);
+	if(comment)
+		add_row_and_free(store, _("Comment"), comment);
+	if(exec)
+		add_row_and_free(store, _("Execute"), exec);
+	
 	return view;
 }
 
