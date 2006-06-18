@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: ROX-Filer 2.4.1-20060525\n"
+"Project-Id-Version: ROX-Filer 2.4.1-20060617\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-05-25 17:01+0200\n"
-"PO-Revision-Date: 2006-05-25 16:59+0200\n"
+"POT-Creation-Date: 2006-06-17 22:57+0200\n"
+"PO-Revision-Date: 2006-06-17 23:01+0200\n"
 "Last-Translator: Vincent Lefevre <vincent@vinc17.org>\n"
 "Language-Team: ROX Mailing List <rox-devel@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -718,11 +718,11 @@ msgstr ""
 " affectera des objets sur le punaiseur ou le panneau - voulez-vous vraiment "
 "les supprimer ?"
 
-#: appmenu.c:196
+#: appmenu.c:197
 msgid "<missing label>"
 msgstr "<étiquette manquante>"
 
-#: appmenu.c:293
+#: appmenu.c:306
 #, c-format
 msgid ""
 "Symlink any programs you want into this directory. They will appear in the "
@@ -731,11 +731,11 @@ msgstr ""
 "Faites un lien symbolique des programmes que vous voulez dans ce répertoire. "
 "Ils apparaîtront dans le menu pour tous les objets de ce type (%s/%s)."
 
-#: appmenu.c:337 menu.c:230
+#: appmenu.c:350 menu.c:230
 msgid "Customise Menu..."
 msgstr "Personnaliser le menu..."
 
-#: appmenu.c:394 menu.c:247 toolbar.c:158
+#: appmenu.c:407 menu.c:247 toolbar.c:158
 msgid "Help"
 msgstr "Aide"
 
@@ -2120,8 +2120,8 @@ msgid "Refresh"
 msgstr "Rafraîchir"
 
 #: menu.c:202
-msgid "Save Display Settings..."
-msgstr "Sauver les options d'affichage..."
+msgid "Save Current Display Settings..."
+msgstr "Sauver les options d'affichage courantes..."
 
 #: menu.c:204
 msgid "Copy..."
@@ -2638,7 +2638,7 @@ msgstr ""
 msgid "(saving disabled by CHOICESPATH)"
 msgstr "(sauvegarde désactivée par CHOICESPATH)"
 
-#: options.c:1161 usericons.c:448
+#: options.c:1161 usericons.c:446
 #, c-format
 msgid "Error saving %s: %s"
 msgstr "Erreur lors de la sauvegarde de %s : %s"
@@ -2872,22 +2872,22 @@ msgstr "Il n'y a pas de vignette à supprimer"
 msgid "Purge thumbnails disk cache"
 msgstr "Vider le cache disque des vignettes"
 
-#: remote.c:626
+#: remote.c:660
 #, c-format
 msgid "Unknown style '%s'"
 msgstr "Style inconnu '%s'"
 
-#: remote.c:648
+#: remote.c:682
 #, c-format
 msgid "Unknown details type '%s'"
 msgstr "Type de détails inconnu '%s'"
 
-#: remote.c:676
+#: remote.c:710
 #, c-format
 msgid "Unknown sorting type '%s'"
 msgstr "Type de tri inconnu '%s'"
 
-#: remote.c:1122
+#: remote.c:1156
 #, c-format
 msgid "Attempt to invoke unknown SOAP method '%s'"
 msgstr "Tentative d'invoquer la méthode SOAP inconnue '%s'"
@@ -2970,7 +2970,7 @@ msgstr ""
 "Note : si c'est un programme que vous voulez lancer, vous devez positionner "
 "le bit d'exécution en choisissant « Permissions » dans le menu « Fichier »."
 
-#: run.c:666
+#: run.c:677
 #, c-format
 msgid ""
 "Executable '%s' is world-writeable! Refusing to run. Please change the "
@@ -2997,7 +2997,7 @@ msgstr ""
 "vous n'avez pas à vous inquiéter. Dans le cas contraire, vous devez "
 "vérifier, ou même juste supprimer, toutes les actions d'exécution existantes."
 
-#: run.c:679
+#: run.c:690
 msgid "go-w (Fix security problem)"
 msgstr "go-w (corriger un problème de sécurité)"
 
@@ -3312,12 +3312,12 @@ msgstr ""
 "quelconque, ou %s est un lien vers un répertoire invalide; essayez de le "
 "supprimer)"
 
-#: usericons.c:179
+#: usericons.c:177
 msgid "The pathname you gave does not exist. The icon has not been changed."
 msgstr ""
 "Le chemin que vous avez donné n'existe pas. L'icône n'a pas été changée."
 
-#: usericons.c:189 usericons.c:614
+#: usericons.c:187 usericons.c:612
 msgid ""
 "Unable to load image file -- maybe it's not in a format I understand, or "
 "maybe the permissions are wrong?\n"
@@ -3327,12 +3327,12 @@ msgstr ""
 "comprends pas, ou peut-être que les permissions sont incorrectes ?\n"
 "L'icône n'a pas été changée."
 
-#: usericons.c:236
+#: usericons.c:234
 #, c-format
 msgid "Really delete icon '%s'?"
 msgstr "Voulez-vous vraiment supprimer l'icône '%s' ?"
 
-#: usericons.c:240
+#: usericons.c:238
 #, c-format
 msgid ""
 "Can't delete '%s':\n"
@@ -3341,32 +3341,32 @@ msgstr ""
 "Impossible de supprimer '%s' :\n"
 "%s"
 
-#: usericons.c:268
+#: usericons.c:266
 msgid "Set icon"
 msgstr "Fixer l'icône"
 
-#: usericons.c:277
+#: usericons.c:275
 msgid ""
 "Use a copy of the image as the default for all files of these MIME types."
 msgstr ""
 "Utiliser une copie de l'image comme choix par défaut pour tous les fichiers "
 "de ces types MIME."
 
-#: usericons.c:279
+#: usericons.c:277
 #, c-format
 msgid "Set icon for all `%s/<anything>'"
 msgstr "Fixer l'icône pour tout `%s/<quelconque>'"
 
-#: usericons.c:284
+#: usericons.c:282
 msgid "Use a copy of the image for all files of this MIME type."
 msgstr "Utiliser une copie de l'image pour tous les fichiers de ce type MIME."
 
-#: usericons.c:286
+#: usericons.c:284
 #, c-format
 msgid "For all files of type `%s' (%s/%s)"
 msgstr "Pour tous les fichiers de type `%s' (%s/%s)"
 
-#: usericons.c:292
+#: usericons.c:290
 msgid ""
 "Add the file and image filenames to your personal list. The setting will be "
 "lost if the image or the file is moved."
@@ -3374,12 +3374,12 @@ msgstr ""
 "Ajoutez les noms du fichier et de l'image à votre liste personnelle. Ce "
 "choix sera perdu si l'image ou le fichier est déplacé."
 
-#: usericons.c:295
+#: usericons.c:293
 #, c-format
 msgid "Only for the file `%s'"
 msgstr "Seulement pour le fichier `%s'"
 
-#: usericons.c:303
+#: usericons.c:301
 msgid ""
 "Copy the image inside the directory, as a hidden file called '.DirIcon'. All "
 "users will then see the icon, and you can move the directory around safely. "
@@ -3390,19 +3390,19 @@ msgstr ""
 "sans risque. C'est généralement la meilleure option si vous avez le droit "
 "d'écrire dans le répertoire."
 
-#: usericons.c:309
+#: usericons.c:307
 msgid "Copy image into directory"
 msgstr "Copier l'image dans le répertoire"
 
-#: usericons.c:315
+#: usericons.c:313
 msgid "Drop an icon file here"
 msgstr "Faites glisser ici un fichier d'icône"
 
-#: usericons.c:585
+#: usericons.c:583
 msgid "Setting icon disabled by CHOICESPATH"
 msgstr "Le choix des icônes est désactivé par CHOICESPATH"
 
-#: usericons.c:629
+#: usericons.c:627
 #, c-format
 msgid ""
 "Error creating image '%s':\n"
