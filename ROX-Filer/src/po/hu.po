@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 2.4.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-06-18 09:40+0200\n"
-"PO-Revision-Date: 2006-06-18 11:46+0100\n"
+"POT-Creation-Date: 2006-06-19 12:19+0200\n"
+"PO-Revision-Date: 2006-06-19 12:30+0100\n"
 "Last-Translator: András Mohari <mayday@vizslamail.hu>\n"
 "Language-Team: Hungarian\n"
 "MIME-Version: 1.0\n"
@@ -32,6 +32,7 @@ msgid "Don't confirm every operation"
 msgstr "Nem kell jóváhagyni minden műveletet"
 
 #: abox.c:454
+#: infobox.c:771
 #: tips:63
 msgid "Name"
 msgstr "Név"
@@ -244,7 +245,7 @@ msgstr ""
 "Kész\n"
 
 #: action.c:558
-#: support.c:394
+#: support.c:395
 msgid "ERROR"
 msgstr "HIBA"
 
@@ -657,7 +658,7 @@ msgid "Change contents of subdirectories"
 msgstr "Az alkönyvtárak tartalmát is feldolgozza"
 
 #: action.c:2197
-#: infobox.c:622
+#: infobox.c:627
 msgid "Type:"
 msgstr "Típus:"
 
@@ -1660,49 +1661,49 @@ msgstr "Az ikon alatt megjelenő szöveg:"
 msgid "The keyboard shortcut is:"
 msgstr "A hozzárendelt billentyű:"
 
-#: infobox.c:110
+#: infobox.c:111
 #, c-format
 msgid "Are you sure you want to open %d windows?"
 msgstr "Tényleg megnyitsz %d ablakot?"
 
-#: infobox.c:111
+#: infobox.c:112
 msgid "Show Info"
 msgstr "Információ mutatása"
 
-#: infobox.c:133
+#: infobox.c:134
 #: menu.c:765
 msgid "(bad utf-8)"
 msgstr "(hibás utf-8)"
 
 # XXX: Lásd: "Show Help files"
-#: infobox.c:258
+#: infobox.c:259
 msgid "Show _Help Files"
 msgstr "_Help könyvtár megnyitása"
 
-#: infobox.c:271
+#: infobox.c:272
 msgid "<b>Permissions</b>"
 msgstr "<b>Jogosultságok</b>"
 
-#: infobox.c:285
+#: infobox.c:290
 msgid "<b>Contents indicate...</b>"
 msgstr "<b>Tartalma szerint...</b>"
 
-#: infobox.c:422
-#: infobox.c:563
-#: support.c:348
+#: infobox.c:427
+#: infobox.c:568
+#: support.c:349
 msgid "bytes"
 msgstr "byte"
 
-#: infobox.c:445
+#: infobox.c:450
 msgid "Failed to read size"
 msgstr "Nem sikerült lekérdezni a méretet"
 
-#: infobox.c:506
+#: infobox.c:511
 #, c-format
 msgid "'%s' is no longer a symlink"
 msgstr "\"%s\" már nem szimlink"
 
-#: infobox.c:513
+#: infobox.c:518
 #, c-format
 msgid ""
 "Failed to unlink '%s':\n"
@@ -1712,7 +1713,7 @@ msgstr ""
 "%s"
 
 # XXX
-#: infobox.c:518
+#: infobox.c:523
 #, c-format
 msgid ""
 "Failed to create symlink from '%s':\n"
@@ -1723,150 +1724,158 @@ msgstr ""
 "%s\n"
 "(a régi linket töröltem)"
 
-#: infobox.c:542
+#: infobox.c:547
 #: tips:283
 msgid "Error:"
 msgstr "Hiba:"
 
-#: infobox.c:549
+#: infobox.c:554
 msgid "Real directory:"
 msgstr "Valódi könyvtár:"
 
-#: infobox.c:552
+#: infobox.c:557
 msgid "Owner, Group:"
 msgstr "Tulajdonos, csoport:"
 
-#: infobox.c:559
-#: infobox.c:574
-#: infobox.c:583
+#: infobox.c:564
+#: infobox.c:579
+#: infobox.c:588
 msgid "Size:"
 msgstr "Méret:"
 
-#: infobox.c:584
+#: infobox.c:589
 msgid "Scanning"
 msgstr "Olvasás"
 
-#: infobox.c:609
+#: infobox.c:614
 msgid "Failed to scan"
 msgstr "Nem sikerült beolvasni"
 
 # XXX: Khm, egyáltalán van erre JÓ magyar fordítás?
 #      A "létrehozási idő" NEM jó!
-#: infobox.c:616
+#: infobox.c:621
 msgid "Change time:"
 msgstr "Változtatási idő:"
 
-#: infobox.c:618
+#: infobox.c:623
 msgid "Modify time:"
 msgstr "Módosítási idő:"
 
-#: infobox.c:620
+#: infobox.c:625
 msgid "Access time:"
 msgstr "Hozzáférési idő:"
 
-#: infobox.c:628
+#: infobox.c:633
 msgid "Extended attributes:"
 msgstr "Kiterjesztett attribútumok:"
 
-#: infobox.c:630
+#: infobox.c:635
 msgid "Present"
 msgstr "Jelen"
 
-#: infobox.c:631
+#: infobox.c:636
 msgid "None"
 msgstr "Nincs"
 
-#: infobox.c:632
+#: infobox.c:637
 msgid "Not supported"
 msgstr "Nem támogatott"
 
-#: infobox.c:644
+#: infobox.c:649
 msgid "Link target:"
 msgstr "Link célja:"
 
 # XXX: A "Hozzárendelt program:" túl hosszú. :)
-#: infobox.c:656
-#: infobox.c:659
+#: infobox.c:661
+#: infobox.c:664
 msgid "Run action:"
 msgstr "Megnyitás:"
 
 # XXX: Ez még bajt okozhat. Egyelőre egy helyen használják: ezt írja ki a tulajdonságok ablakban a futtatható fájlok "run action"-jeként.
-#: infobox.c:656
+#: infobox.c:661
 msgid "Execute file"
 msgstr "Futtasd a fájlt"
 
-#: infobox.c:751
+#: infobox.c:773
+msgid "Comment"
+msgstr "Megjegyzés"
+
+#: infobox.c:775
+msgid "Execute"
+msgstr "Futtatás"
+
+#: infobox.c:789
 msgid "<nothing yet>"
 msgstr "<még nincs kész>"
 
-#: infobox.c:821
+#: infobox.c:859
 #, c-format
 msgid "file(1) says... %s"
 msgstr "A file(1) szerint... %s"
 
-#: infobox.c:878
+#: infobox.c:916
 #, c-format
 msgid "Could not change permissions: %s"
 msgstr "Nem sikerült megváltoztatni a jogokat: %s"
 
-#: infobox.c:896
+#: infobox.c:934
 msgid "Owner"
 msgstr "Tulajdonos"
 
-#: infobox.c:898
+#: infobox.c:936
 msgid "Group"
 msgstr "Csoport"
 
-#: infobox.c:900
+#: infobox.c:938
 msgid "World"
 msgstr "Többiek"
 
-#: infobox.c:903
+#: infobox.c:941
 msgid "Read"
 msgstr "Olvasás"
 
-#: infobox.c:905
+#: infobox.c:943
 msgid "Write"
 msgstr "Írás"
 
-#: infobox.c:907
+#: infobox.c:945
 msgid "Exec"
 msgstr "Végrehajtás"
 
-#: infobox.c:924
+#: infobox.c:962
 msgid "SUID"
 msgstr "SUID"
 
-#: infobox.c:931
+#: infobox.c:969
 msgid "SGID"
 msgstr "SGID"
 
-#: infobox.c:938
+#: infobox.c:976
 msgid "Sticky"
 msgstr "Sticky"
 
-#: infobox.c:960
+#: infobox.c:998
 msgid "Symbolic link"
 msgstr "Szimbolikus link"
 
-#: infobox.c:963
+#: infobox.c:1001
 msgid "ROX application"
 msgstr "ROX-alkalmazás"
 
-#: infobox.c:971
+#: infobox.c:1009
 msgid "mounted"
 msgstr "csatolva"
 
-#: infobox.c:971
+#: infobox.c:1009
 msgid "unmounted"
 msgstr "lecsatolva"
 
-#: infobox.c:975
+#: infobox.c:1013
 #, c-format
 msgid "Mount point for %s (%s)"
 msgstr "%s csatolási pontja (%s)"
 
-#: infobox.c:978
+#: infobox.c:1016
 #, c-format
 msgid "Mount point (%s)"
 msgstr "Csatolási pont (%s)"
@@ -2907,22 +2916,24 @@ msgstr ""
 msgid "go-w (Fix security problem)"
 msgstr "go-w (Biztonsági hiba javítása)"
 
-#: support.c:271
+#: support.c:272
 msgid "B"
 msgstr "B"
 
-#: support.c:350
+#: support.c:351
 msgid "byte"
 msgstr "byte"
 
 # XXX stat()-olni...
-#: support.c:1566
+#: support.c:1567
+#: support.c:1621
 #, c-format
 msgid "Failed to open and stat file '%s': %s"
 msgstr "Nem sikerült megnyitni és stat()-olni a fájlt (%s): %s"
 
 # XXX mmap-olni...
-#: support.c:1577
+#: support.c:1578
+#: support.c:1632
 #, c-format
 msgid "Failed to mmap file '%s': %s"
 msgstr "Nem sikerült mmap-olni a fájlt (%s): %s"
