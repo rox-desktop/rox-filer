@@ -394,7 +394,7 @@ void examine(const guchar *path)
 		if (S_ISDIR(info.st_mode))
 			refresh_dirs(path);
 
-		/* If it's on the pinboard, update the icon... */
+		/* If it's on the pinboard or a panel, update the icon... */
 		icons_may_update(path);
 	}
 }
@@ -697,7 +697,7 @@ static gboolean type_open(const char *path, MIME_type *type)
 	if (S_ISDIR(info.st_mode))
 	{
 		argv[0] = g_strconcat(open, "/AppRun", NULL);
-		rox_spawn(home_dir, (const gchar **) argv) != 0;
+		rox_spawn(home_dir, (const gchar **) argv);
 	}
 	else if (type_get_type(open) == application_x_desktop)
 	{
@@ -707,7 +707,7 @@ static gboolean type_open(const char *path, MIME_type *type)
 	else
 	{
 		argv[0] = open;
-		rox_spawn(home_dir, (const gchar **) argv) != 0;
+		rox_spawn(home_dir, (const gchar **) argv);
 	}
 
 	if (argv[0] != open)
