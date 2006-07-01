@@ -342,7 +342,7 @@ MIME_type *mime_type_lookup(const char *type)
  */
 MaskedPixmap *type_to_icon(MIME_type *type)
 {
-	GdkPixbuf *full;
+	GtkIconInfo *full;
 	char	*type_name, *path;
 	time_t	now;
 
@@ -381,8 +381,7 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 
 	type_name = g_strconcat("mime-", type->media_type, ":",
 				type->subtype, NULL);
-	full = gtk_icon_theme_load_icon(icon_theme, type_name, HUGE_HEIGHT,
-						0, NULL);
+	full = gtk_icon_theme_lookup_icon(icon_theme, type_name, HUGE_HEIGHT, 0);
 	g_free(type_name);
 	if (!full)
 	{
@@ -392,18 +391,18 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 		else
 			type_name = g_strconcat("gnome-mime-", type->media_type,
 					"-", type->subtype, NULL);
-		full = gtk_icon_theme_load_icon(icon_theme,
+		full = gtk_icon_theme_lookup_icon(icon_theme,
 						type_name,
-						HUGE_HEIGHT, 0, NULL);
+						HUGE_HEIGHT, 0);
 		g_free(type_name);
 	}
 	if (!full)
 	{
 		/* Try for a media type */
 		type_name = g_strconcat("mime-", type->media_type, NULL);
-		full = gtk_icon_theme_load_icon(icon_theme,
+		full = gtk_icon_theme_lookup_icon(icon_theme,
 						type_name,
-						HUGE_HEIGHT, 0, NULL);
+						HUGE_HEIGHT, 0);
 		g_free(type_name);
 	}
 	if (!full)
@@ -411,15 +410,24 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 		/* Ugly hack... try for a GNOME default media icon */
 		type_name = g_strconcat("gnome-mime-", type->media_type, NULL);
 
-		full = gtk_icon_theme_load_icon(icon_theme,
+		full = gtk_icon_theme_lookup_icon(icon_theme,
 				type_name,
-				HUGE_HEIGHT, 0, NULL);
+				HUGE_HEIGHT, 0);
 		g_free(type_name);
 	}
 	if (full)
 	{
-		type->image = masked_pixmap_new(full);
-		g_object_unref(full);
+		const char *icon_path;
+		/* Get the actual icon through our cache, not through GTK, because
+		 * GTK doesn't cache icons.
+		 */
+		icon_path = gtk_icon_info_get_filename(full);
+		if (icon_path != NULL)
+			type->image = g_fscache_lookup(pixmap_cache, icon_path);
+		/* else shouldn't happen, because we didn't use
+		 * GTK_ICON_LOOKUP_USE_BUILTIN.
+		 */
+		gtk_icon_info_free(full);
 	}
 
 out:
