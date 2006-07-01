@@ -50,6 +50,7 @@
 #include "display.h"
 #include "xml.h"
 #include "dropbox.h"
+#include "icon.h"
 
 #define SET_MEDIA 2
 #define SET_TYPE 1
