@@ -162,6 +162,7 @@ static gboolean create_diricon(const guchar *filepath, const guchar *iconpath)
 		return FALSE;
 
 	dir_check_this(filepath);
+	icons_may_update(filepath);
 
 	return TRUE;
 }
@@ -206,18 +207,17 @@ static void dialog_response(GtkWidget *dialog, gint response, gpointer data)
 static void clear_icon(DropBox *drop_box, GObject *dialog)
 {
 	Radios *radios;
+	const guchar *pathname;
+
+	pathname = g_object_get_data(G_OBJECT(dialog), "pathname");
+	g_return_if_fail(pathname != NULL);
 	
 	radios = g_object_get_data(G_OBJECT(dialog), "radios");
 	g_return_if_fail(radios != NULL);
 
 	if (radios_get_value(radios) == SET_PATH)
 	{
-		const guchar *path;
-
-		path = g_object_get_data(G_OBJECT(dialog), "pathname");
-		g_return_if_fail(path != NULL);
-
-		delete_globicon(path);
+		delete_globicon(pathname);
 	}
 	else
 	{
@@ -237,6 +237,11 @@ static void clear_icon(DropBox *drop_box, GObject *dialog)
 			if (unlink(path))
 				delayed_error(_("Can't delete '%s':\n%s"),
 						path, g_strerror(errno));
+			else
+			{
+				dir_check_this(pathname);
+				icons_may_update(pathname);
+			}
 		}
 		g_free(tmp);
 	}
