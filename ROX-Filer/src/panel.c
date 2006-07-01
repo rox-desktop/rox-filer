@@ -2162,12 +2162,18 @@ static void panel_remove_items(void)
 	panel_save(panel);
 }
 
+/* Icon's size, shape or appearance has changed - update the display */
 static void panel_icon_redraw(Icon *icon)
 {
-	gtk_widget_set_state(((PanelIcon *) icon)->widget,
+	PanelIcon *pi = (PanelIcon *) icon;
+
+	gtk_widget_set_state(pi->widget,
 			icon->selected ? GTK_STATE_SELECTED
 				       : GTK_STATE_NORMAL);
-	gtk_widget_queue_draw(PANEL_ICON(icon)->widget);
+
+	/* Will regenerate the scaled icon from the new image */
+	gtk_widget_queue_resize(pi->widget);
+
 	panel_icon_set_tip((PanelIcon *) icon);
 }
 
