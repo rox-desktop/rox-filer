@@ -312,6 +312,7 @@ char *handler_for(MIME_type *type)
 {
 	char	*type_name;
 	char	*open;
+	char	*target;
 
 	type_name = g_strconcat(type->media_type, "_", type->subtype, NULL);
 	open = choices_find_xdg_path_load(type_name, "MIME-types", SITE);
@@ -321,7 +322,39 @@ char *handler_for(MIME_type *type)
 		open = choices_find_xdg_path_load(type->media_type,
 						  "MIME-types", SITE);
 
-	return open;
+	if (!open)
+		return NULL;
+
+	/* Some programs behave differently depending on the command
+	 * name (e.g., 'vim' vs 'gvim'), so symlinks need to be followed here.
+	 */
+	target = readlink_dup(open);
+	if (!target)
+	{
+		return open;
+	}
+
+	if (target[0] == '/')
+	{
+		/* Absolute path */
+		g_free(open);
+		return target;
+	}
+	else
+	{
+		/* Relative path (shouldn't normally be needed) */
+		gchar *dir;
+		char *abs_path;
+
+		dir = g_path_get_dirname(open);
+		g_free(open);
+
+		abs_path = g_strconcat(dir, "/", target, NULL);
+		g_free(target);
+		g_free(dir);
+
+		return abs_path;
+	}
 }
 
 MIME_type *mime_type_lookup(const char *type)
@@ -695,7 +728,6 @@ gchar *describe_current_command(MIME_type *type)
 	char *handler;
 	char *desc = NULL;
 	struct stat info;
-	char *target;
 
 	g_return_val_if_fail(type != NULL, NULL);
 
@@ -703,28 +735,6 @@ gchar *describe_current_command(MIME_type *type)
 
 	if (!handler)
 		return g_strdup(_("No run action defined"));
-
-	target = readlink_dup(handler);
-	if (target)
-	{
-		/* Cope with relative paths (shouldn't normally be needed) */
-
-		if (target[0] == '/')
-		{
-			g_free(handler);
-			handler = target;
-		}
-		else
-		{
-			gchar *dir;
-
-			dir = g_path_get_dirname(handler);
-			g_free(handler);
-			handler = g_strconcat(dir, "/", target, NULL);
-			g_free(target);
-			g_free(dir);
-		}
-	}
 
 	if (mc_stat(handler, &info) !=0 )
 	{
