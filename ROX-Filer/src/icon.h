@@ -41,7 +41,8 @@ struct _Icon {
 	DirItem		*item;
 	gchar		*shortcut;	/* Eg: Control + x */
 	MyKey		shortcut_key;	/* Parsed version of shortcut */
-        gchar           *args;          /* Arguments, or NULL if none */
+	gchar           *args;          /* Arguments, or NULL if none */
+	gboolean	locked;		/* TRUE if the icon can't be removed */
 
 	GtkWidget	*dialog;	/* Current rename box, if any */
 };

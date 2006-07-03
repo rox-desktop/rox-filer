@@ -133,7 +133,8 @@ static void panel_add_item(Panel *panel,
 			   const gchar *name,
 			   gboolean after,
 			   const gchar *shortcut,
-			   const gchar *args);
+			   const gchar *args,
+			   gboolean locked);
 static gboolean panel_drag_motion(GtkWidget	*widget,
 			    GdkDragContext	*context,
 			    gint		x,
@@ -443,12 +444,12 @@ Panel *panel_new(const gchar *name, PanelSide side)
 		/* Don't scare users with an empty panel... */
 		guchar *apps;
 		
-		panel_add_item(panel, "~", "Home", FALSE, NULL, NULL);
+		panel_add_item(panel, "~", "Home", FALSE, NULL, NULL, FALSE);
 
 		apps = pathdup(make_path(app_dir, ".."));
 		if (apps)
 		{
-			panel_add_item(panel, apps, "Apps", FALSE, NULL, NULL);
+			panel_add_item(panel, apps, "Apps", FALSE, NULL, NULL, FALSE);
 			g_free(apps);
 		}
 	}
@@ -482,13 +483,14 @@ Panel *panel_new(const gchar *name, PanelSide side)
 
 /* Externally visible function to add an item to a panel */
 gboolean panel_add(PanelSide side,
-		   const gchar *path, const gchar *label, gboolean after, const gchar *shortcut, const gchar *args)
+		   const gchar *path, const gchar *label, gboolean after, const gchar *shortcut, const gchar *args, 
+		   gboolean locked)
 {
 	g_return_val_if_fail(side >= 0 && side < PANEL_NUMBER_OF_SIDES, FALSE);
 	
 	g_return_val_if_fail(current_panel[side] != NULL, FALSE);
 
-	panel_add_item(current_panel[side], path, label, after, shortcut, args);
+	panel_add_item(current_panel[side], path, label, after, shortcut, args, locked);
 
 	return TRUE;
 }
@@ -584,7 +586,8 @@ static void panel_destroyed(GtkWidget *widget, Panel *panel)
 static void panel_load_side(Panel *panel, xmlNodePtr side, gboolean after)
 {
 	xmlNodePtr node;
-	char	   *label, *path, *shortcut, *args;
+	char	   *label, *path, *shortcut, *args, *tmp;
+	gboolean locked;
 
 	for (node = side->xmlChildrenNode; node; node = node->next)
 	{
@@ -601,8 +604,16 @@ static void panel_load_side(Panel *panel, xmlNodePtr side, gboolean after)
 			path = g_strdup("<missing path>");
 		shortcut = xmlGetProp(node, "shortcut");
 		args = xmlGetProp(node, "args");
+		tmp = xmlGetProp(node, "locked");
+		if (tmp)
+		{
+			locked = text_to_boolean(tmp, FALSE);
+			g_free(tmp);
+		}
+		else
+			locked = FALSE;
 
-		panel_add_item(panel, path, label, after, shortcut, args);
+		panel_add_item(panel, path, label, after, shortcut, args, locked);
 
 		g_free(path);
 		g_free(label);
@@ -642,7 +653,7 @@ static const char *pan_from_file(gchar *line)
 		leaf = NULL;
 	
 	panel_add_item(loading_panel, sep + 1, leaf, sep[0] == '>',
-		       NULL, NULL);
+		       NULL, NULL, FALSE);
 
 	g_free(leaf);
 
@@ -734,7 +745,8 @@ static void panel_add_item(Panel *panel,
 			   const gchar *name,
 			   gboolean after,
 			   const gchar *shortcut,
-			   const gchar *args)
+			   const gchar *args,
+			   gboolean locked)
 {
 	GtkWidget	*widget;
 	PanelIcon	*pi;
@@ -807,6 +819,7 @@ static void panel_add_item(Panel *panel,
 
 	icon_set_shortcut(icon, shortcut);
 	icon_set_arguments(icon, args);
+	icon->locked = locked;
 
 	if (!loading_panel)
 		panel_save(panel);
@@ -833,6 +846,7 @@ static gboolean remove_item_from_side(GtkWidget *container, const gchar *path,
 		if ((!path || strcmp(path, icon->src_path) == 0) &&
 		    (!label || strcmp(label, icon->item->leafname)==0))
 		{
+			icon->locked = FALSE;
 			icon_destroy(icon);
 			found = TRUE;
 			break;
@@ -1403,7 +1417,7 @@ static void add_uri_list(GtkWidget          *widget,
 		path = get_local_path((EscapedPath *) next->data);
 
 		if (path) {
-			panel_add_item(panel, path, NULL, after, NULL, NULL);
+			panel_add_item(panel, path, NULL, after, NULL, NULL, FALSE);
 			g_free(path);
 		}
 	}
@@ -1465,6 +1479,8 @@ static void make_widgets(xmlNodePtr side, GList *widgets)
 			xmlSetProp(tree, "shortcut", icon->shortcut);
 		if (icon->args)
 			xmlSetProp(tree, "args", icon->args);
+		if (icon->locked)
+			xmlSetProp(tree, "locked", "true");
 	}
 	
 	if (widgets)

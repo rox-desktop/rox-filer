@@ -225,6 +225,21 @@ gboolean icons_require(const gchar *path)
 	return check.found;
 }
 
+static gboolean any_selected_item_is_locked()
+{
+	GList *next;
+
+	for (next = icon_selection; next; next = next->next)
+	{
+		Icon *icon = (Icon *)next->data;
+
+		if (icon->locked)
+			return TRUE;
+	}
+
+	return FALSE;
+}
+
 /* Menu was clicked over this icon. Set things up correctly (shade items,
  * add app menu stuff, etc).
  * You should show icon_menu after calling this...
@@ -233,6 +248,7 @@ gboolean icons_require(const gchar *path)
 void icon_prepare_menu(Icon *icon, GtkWidget *options_item)
 {
 	GtkWidget *image;
+	gboolean shaded;
 
 	appmenu_remove();
 
@@ -254,11 +270,16 @@ void icon_prepare_menu(Icon *icon, GtkWidget *options_item)
 
 	gtk_menu_shell_append(GTK_MENU_SHELL(icon_menu), options_item);
 	gtk_widget_show_all(options_item);
-
-	/* Shade Remove Item(s) unless there is a selection */
-	menu_set_items_shaded(icon_menu,
-		(icon_selection || menu_icon) ? FALSE : TRUE,
-		4, 1);
+	
+	/* Shade Remove Item(s) if any item is locked or nothing is selected */
+	if (icon_selection)
+		shaded = any_selected_item_is_locked();
+	else if (menu_icon)
+		shaded = menu_icon->locked;
+	else
+		shaded = TRUE;
+	
+	menu_set_items_shaded(icon_menu, shaded, 4, 1);
 
 	menu_show_shift_action(file_shift_item, icon ? icon->item : NULL,
 			FALSE);
@@ -339,7 +360,8 @@ void icon_destroy(Icon *icon)
 
 	icon_set_selected_int(icon, FALSE);
 
-	g_signal_emit_by_name(icon, "destroy");
+	if (!icon->locked)
+		g_signal_emit_by_name(icon, "destroy");
 }
 
 /* Return a text/uri-list of all the icons in the selection */
@@ -517,21 +539,24 @@ static void icon_unhash_path(Icon *icon)
 
 static void rename_activate(GtkWidget *dialog)
 {
-	GtkWidget *entry, *src, *shortcut, *arg;
+	GtkWidget *entry, *src, *shortcut, *arg, *lock_state;
 	Icon *icon;
 	const guchar *new_name, *new_src, *new_shortcut, *new_args;
+	gboolean new_lock_state;
 	
 	entry = g_object_get_data(G_OBJECT(dialog), "new_name");
 	icon = g_object_get_data(G_OBJECT(dialog), "callback_icon");
 	src = g_object_get_data(G_OBJECT(dialog), "new_path");
 	shortcut = g_object_get_data(G_OBJECT(dialog), "new_shortcut");
 	arg = g_object_get_data(G_OBJECT(dialog), "new_arg");
+	lock_state = g_object_get_data(G_OBJECT(dialog), "new_lock_state");
 
 	g_return_if_fail(entry != NULL &&
 			 src != NULL &&
 			 icon != NULL &&
 			 shortcut != NULL &&
-			 arg != NULL);
+			 arg != NULL &&
+			 lock_state != NULL);
 
 	new_name = gtk_entry_get_text(GTK_ENTRY(entry));
 	new_src = gtk_entry_get_text(GTK_ENTRY(src));
@@ -539,7 +564,8 @@ static void rename_activate(GtkWidget *dialog)
 	if (strcmp(new_shortcut, CLICK_TO_SET) == 0)
 		new_shortcut = NULL;
 	new_args = gtk_entry_get_text(GTK_ENTRY(arg));
-	
+	new_lock_state = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lock_state));
+
 	if (*new_src == '\0')
 		report_error(
 			_("The location must contain at least one character!"));
@@ -548,6 +574,7 @@ static void rename_activate(GtkWidget *dialog)
 		icon_set_path(icon, new_src, new_name);
 		icon_set_shortcut(icon, new_shortcut);
 		icon_set_arguments(icon, new_args);
+		icon->locked = new_lock_state;
 		g_signal_emit_by_name(icon, "update");
 		gtk_widget_destroy(dialog);
 	}
@@ -603,12 +630,26 @@ static void remove_items(gpointer data, guint action, GtkWidget *widget)
 	IconClass	*iclass;
 
 	if (menu_icon)
+	{
+		if (menu_icon->locked)
+		{
+			delayed_error(_("You must unlock '%s' before removing it"),
+					menu_icon->item->leafname);
+			return;
+		}
 		icon_set_selected(menu_icon, TRUE);
+	}
 	
 	if (!icon_selection)
 	{
 		delayed_error(
 			_("You must first select some items to remove"));
+		return;
+	}
+
+	if (any_selected_item_is_locked())
+	{
+		delayed_error(_("An item must be unlocked before it can be removed."));
 		return;
 	}
 
@@ -781,7 +822,7 @@ static void clear_shortcut(GtkButton *clear, GtkLabel *label)
 static void show_rename_box(Icon *icon)
 {
 	GtkDialog	*dialog;
-	GtkWidget	*label, *entry, *button, *button2, *hbox, *spacer;
+	GtkWidget	*label, *entry, *button, *button2, *hbox, *spacer, *lock_state;
 	GtkBox		*vbox;
 
 	if (icon->dialog)
@@ -860,6 +901,11 @@ static void show_rename_box(Icon *icon)
 	g_signal_connect(button2, "clicked",
 			G_CALLBACK(clear_shortcut),
 			GTK_BIN(button)->child);
+			
+	lock_state = gtk_check_button_new_with_label(_("Lock"));
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lock_state), icon->locked);
+	gtk_box_pack_start(vbox, lock_state, TRUE, TRUE, 0);
+	g_object_set_data(G_OBJECT(dialog), "new_lock_state", lock_state);
 
 	g_object_set_data(G_OBJECT(dialog), "callback_icon", icon);
 
@@ -949,6 +995,7 @@ static void icon_init(GTypeInstance *object, gpointer gclass)
 	icon->shortcut_key.keycode = 0;
 	icon->shortcut_key.modifier = 0;
 	icon->args = NULL;
+	icon->locked = FALSE;
 }
 
 /* As icon_set_selected(), but doesn't automatically unselect incompatible

@@ -42,7 +42,8 @@ void panel_icon_may_update(Icon *icon);
 void panel_save(Panel *panel);
 
 gboolean panel_add(PanelSide side,
-		   const gchar *path, const gchar *label, gboolean after, const gchar *shortcut, const gchar *args);
+		   const gchar *path, const gchar *label, gboolean after, const gchar *shortcut, const gchar *args, 
+		   gboolean locked);
 gboolean panel_remove_item(PanelSide side, const gchar *path,
 			   const gchar *label);
 void panel_mark_used(GdkRegion *used);

@@ -453,7 +453,7 @@ void pinboard_moved_widget(GtkWidget *widget, const gchar *name,
  */
 void pinboard_pin_with_args(const gchar *path, const gchar *name,
 				   int x, int y, const gchar *shortcut,
-				   const gchar *args)
+				   const gchar *args, gboolean locked)
 {
 	GtkWidget	*align, *vbox;
 	GdkWindow	*events;
@@ -540,6 +540,7 @@ void pinboard_pin_with_args(const gchar *path, const gchar *name,
 
 	icon_set_shortcut(icon, shortcut);
 	icon_set_arguments(icon, args);
+	icon->locked = locked;
 
 	if (!loading_pinboard)
 		pinboard_save();
@@ -548,7 +549,7 @@ void pinboard_pin_with_args(const gchar *path, const gchar *name,
 void pinboard_pin(const gchar *path, const gchar *name, int x, int y,
 		  const gchar *shortcut)
 {
-	pinboard_pin_with_args(path, name, x, y, shortcut, NULL);
+	pinboard_pin_with_args(path, name, x, y, shortcut, NULL, FALSE);
 }
 
 /*
@@ -572,7 +573,8 @@ gboolean pinboard_remove(const gchar *path, const gchar *name)
 
 		if(name && strcmp(name, icon->item->leafname)!=0)
 			continue;
-
+	
+		icon->locked = FALSE;
 		icon_destroy(icon);
 	
 		pinboard_save();
@@ -1418,6 +1420,7 @@ static void pinboard_load_from_xml(xmlDocPtr doc)
 	xmlNodePtr node, root;
 	char	   *tmp, *label, *path, *shortcut, *args;
 	int	   x, y;
+	gboolean locked;
 
 	root = xmlDocGetRootElement(doc);
 
@@ -1453,8 +1456,17 @@ static void pinboard_load_from_xml(xmlDocPtr doc)
 			path = g_strdup("<missing path>");
 		shortcut = xmlGetProp(node, "shortcut");
 		args = xmlGetProp(node, "args");
+		
+		tmp = xmlGetProp(node, "locked");
+		if (tmp)
+		{
+			locked = text_to_boolean(tmp, FALSE);
+			g_free(tmp);
+		}
+		else
+			locked = FALSE;
 
-		pinboard_pin_with_args(path, label, x, y, shortcut, args);
+		pinboard_pin_with_args(path, label, x, y, shortcut, args, locked);
 
 		g_free(path);
 		g_free(label);
@@ -1567,6 +1579,8 @@ static void pinboard_save(void)
 			xmlSetProp(tree, "shortcut", icon->shortcut);
 		if (icon->args)
 			xmlSetProp(tree, "args", icon->args);
+		if (icon->locked)
+			xmlSetProp(tree, "locked", "true");
 	}
 
 	save_new = g_strconcat(save, ".new", NULL);
