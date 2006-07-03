@@ -201,9 +201,23 @@ static GtkWidget *create_menu_item(xmlNode *node)
 	icon_name = xmlGetProp(node, "icon");
 	if (icon_name)
 	{
-		GtkWidget *icon;
-		icon = gtk_image_new_from_icon_name(icon_name,
-						    GTK_ICON_SIZE_MENU);
+		GtkWidget *icon = NULL;
+		GtkStockItem stock_item;
+		if (gtk_stock_lookup(icon_name, &stock_item))
+			icon = gtk_image_new_from_stock(icon_name, GTK_ICON_SIZE_MENU);
+		else
+		{
+			GdkPixbuf* pixbuf;
+			int size;
+			gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, NULL, &size);
+			pixbuf = gtk_icon_theme_load_icon(icon_theme, icon_name, 
+							size, 0, NULL);
+			if (pixbuf)
+			{
+				icon = gtk_image_new_from_pixbuf(pixbuf);
+				g_object_unref(pixbuf);
+			}
+		}
 		g_free(icon_name);
 		if (icon)
 			gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(item),
