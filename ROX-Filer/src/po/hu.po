@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 2.4.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-06-19 12:19+0200\n"
-"PO-Revision-Date: 2006-06-19 12:30+0100\n"
+"POT-Creation-Date: 2006-07-04 09:15+0200\n"
+"PO-Revision-Date: 2006-07-04 09:33+0100\n"
 "Last-Translator: András Mohari <mayday@vizslamail.hu>\n"
 "Language-Team: Hungarian\n"
 "MIME-Version: 1.0\n"
@@ -733,17 +733,17 @@ msgstr ") a törlése hatással van az asztal vagy panel elemeire. Tényleg tör
 msgid "<missing label>"
 msgstr "<hiányzó címke>"
 
-#: appmenu.c:306
+#: appmenu.c:320
 #, c-format
 msgid "Symlink any programs you want into this directory. They will appear in the menu for all items of this type (%s/%s)."
 msgstr "Készíts linkeket ebben a könyvtárban a kívánt programokra. Ezek fognak megjelenni a menüben az ilyen típusú fájloknál (%s/%s)."
 
-#: appmenu.c:350
+#: appmenu.c:364
 #: menu.c:230
 msgid "Customise Menu..."
 msgstr "Menü testreszabása..."
 
-#: appmenu.c:407
+#: appmenu.c:421
 #: menu.c:247
 #: toolbar.c:158
 msgid "Help"
@@ -1071,7 +1071,7 @@ msgid "Sorry, I can't use '%s' because it's not a local file."
 msgstr "Sajnos \"%s\" nem használható, mert nem helyi fájl."
 
 #: dropbox.c:278
-#: pinboard.c:853
+#: pinboard.c:855
 #, c-format
 msgid ""
 "Can't access '%s':\n"
@@ -1568,7 +1568,7 @@ msgid "Home Directory"
 msgstr "Saját könyvtár"
 
 #: icon.c:138
-#: icon.c:1338
+#: icon.c:1389
 #: menu.c:203
 #: type.c:216
 msgid "File"
@@ -1596,7 +1596,7 @@ msgid "Set Icon..."
 msgstr "Ikon hozzárendelése..."
 
 #: icon.c:143
-#: icon.c:804
+#: icon.c:846
 msgid "Edit Item"
 msgstr "Elem szerkesztése"
 
@@ -1609,57 +1609,75 @@ msgstr "Hely megmutatása"
 msgid "Remove Item(s)"
 msgstr "Elemek törlése"
 
-#: icon.c:276
+#: icon.c:297
 #: menu.c:760
 #, c-format
 msgid "%s '%s'"
 msgstr "%s: \"%s\""
 
-#: icon.c:289
+#: icon.c:310
 msgid "Nothing"
 msgstr "Semmi"
 
-#: icon.c:545
+#: icon.c:571
 msgid "The location must contain at least one character!"
 msgstr "Az elérési út nem maradhat üresen!"
 
-#: icon.c:611
+#: icon.c:636
+#, c-format
+msgid "You must unlock '%s' before removing it"
+msgstr "\"%s\" eltávolításához előbb meg kell szüntetni a zárolását"
+
+#: icon.c:646
 msgid "You must first select some items to remove"
 msgstr "Előbb jelöld ki a törlendő elemeket"
 
-#: icon.c:625
+# XXX: Akkor írja ki, amikor egy nem zárolt ikont akarunk eltávolítani, de vannak kijelölve zároltak is... A kérdés csak az: Ezt egy általános instrukcióként kell értelmezni, vagy inkább arra utal, hogy van egy (vagy több) kijelölt zárolt elem, amelyek miatt az eltávolítás nem működik?
+#: icon.c:652
+msgid "An item must be unlocked before it can be removed."
+msgstr "Csak akkor törölhetők ez elemek, ha nincsenek zárolva."
+
+#: icon.c:666
 msgid "You must open the menu over an item"
 msgstr "A menüt elem felett kell megnyitni"
 
-#: icon.c:650
+#: icon.c:691
 #: menu.c:1256
 msgid "You can only set the run action for a regular file"
 msgstr "Program csak közönséges fájlhoz rendelhető"
 
-#: icon.c:736
+#: icon.c:777
 msgid "Press the desired shortcut (eg, Control+F1)"
 msgstr "Üsd le a kívánt billentyűt (pl. Control+F1)"
 
 # XXX:
-#: icon.c:758
+#: icon.c:799
 msgid "Failed to get keyboard grab!"
 msgstr "Nem sikerült kisajátítani a billentyűzetet!"
 
-#: icon.c:807
+#: icon.c:849
 msgid "Clicking the icon opens:"
 msgstr "Az ikonhoz rendelt útvonal:"
 
-#: icon.c:817
+#: icon.c:859
 msgid "Arguments to pass (for executables):"
 msgstr "Argumentumok (végrehajtható fájlokhoz):"
 
-#: icon.c:831
+#: icon.c:873
 msgid "The text displayed under the icon is:"
 msgstr "Az ikon alatt megjelenő szöveg:"
 
-#: icon.c:844
+#: icon.c:886
 msgid "The keyboard shortcut is:"
 msgstr "A hozzárendelt billentyű:"
+
+#: icon.c:906
+msgid "Locked"
+msgstr "Zárolt"
+
+#: icon.c:911
+msgid "Locking an item prevents it from being accidentally removed"
+msgstr "A zárolt elemeket nem lehet véletlenül törölni"
 
 #: infobox.c:111
 #, c-format
@@ -2601,7 +2619,7 @@ msgid "(saving disabled by CHOICESPATH)"
 msgstr "(a mentést tiltja a CHOICESPATH)"
 
 #: options.c:1161
-#: usericons.c:446
+#: usericons.c:452
 #, c-format
 msgid "Error saving %s: %s"
 msgstr "Hiba %s mentésekor: %s"
@@ -2610,28 +2628,28 @@ msgstr "Hiba %s mentésekor: %s"
 msgid "Missing '='"
 msgstr "Hiányzó \"=\""
 
-#: panel.c:437
+#: panel.c:438
 msgid "Your old panel file has been converted to the new XML format."
 msgstr "A régi panel fájl az új XML formátumba lett alakítva."
 
-#: panel.c:544
+#: panel.c:546
 msgid "You have tried to close a panel via the window manager - I usually find that this is accidental... really close?"
 msgstr "Az ablakkezelőn keresztül próbáltad bezárni a panelt. Ez általában nem szándékosan történik... Tényleg bezárod?"
 
-#: panel.c:637
+#: panel.c:648
 msgid "Missing < or > in panel config file"
 msgstr "Hiányzik a < vagy > a panel konfigurációs fájlban"
 
-#: panel.c:1517
+#: panel.c:1533
 #, c-format
 msgid "Error saving panel %s: %s"
 msgstr "Hiba a panel (%s) mentésekor: %s"
 
-#: panel.c:1833
+#: panel.c:1849
 msgid "Applet quit without ever creating a widget!"
 msgstr "Az applet kilépett mielőtt megjelent volna!"
 
-#: panel.c:1932
+#: panel.c:1948
 #, c-format
 msgid ""
 "Error running applet:\n"
@@ -2640,57 +2658,57 @@ msgstr ""
 "Hiba az applet futtatásakor:\n"
 "%s"
 
-#: panel.c:2336
+#: panel.c:2358
 msgid "Panel Options..."
 msgstr "Panel beállításai..."
 
-#: panel.c:2428
+#: panel.c:2450
 #, c-format
 msgid "Xinerama monitor %d unavailable"
 msgstr "Nem érhető el a Xinerama monitor (%d)"
 
-#: panel.c:2503
+#: panel.c:2525
 msgid "Panel Options"
 msgstr "Panel beállításai"
 
-#: panel.c:2518
+#: panel.c:2540
 #, c-format
 msgid "Panel: %s"
 msgstr "Panel: %s"
 
-#: panel.c:2526
+#: panel.c:2548
 msgid "Select the panel's position:"
 msgstr "Válaszd ki a panel helyét:"
 
-#: panel.c:2532
+#: panel.c:2554
 msgid "Top-edge panel"
 msgstr "Felső panel"
 
-#: panel.c:2533
+#: panel.c:2555
 msgid "Top edge"
 msgstr "Felül"
 
-#: panel.c:2534
+#: panel.c:2556
 msgid "Bottom edge panel"
 msgstr "Alsó panel"
 
-#: panel.c:2535
+#: panel.c:2557
 msgid "Bottom edge"
 msgstr "Alul"
 
-#: panel.c:2536
+#: panel.c:2558
 msgid "Left edge panel"
 msgstr "Bal panel"
 
-#: panel.c:2537
+#: panel.c:2559
 msgid "Left edge"
 msgstr "Bal oldalon"
 
-#: panel.c:2538
+#: panel.c:2560
 msgid "Right-edge panel"
 msgstr "Jobb panel"
 
-#: panel.c:2539
+#: panel.c:2561
 msgid "Right edge"
 msgstr "Jobb oldalon"
 
@@ -2698,11 +2716,11 @@ msgstr "Jobb oldalon"
 msgid "Your old pinboard file has been converted to the new XML format."
 msgstr "A régi pinboard fájl az új XML formátumba lett alakítva."
 
-#: pinboard.c:635
+#: pinboard.c:637
 msgid "The backdrop handler must be an application directory. Drag an application directory into the Set Backdrop dialog box, or (for programmers) pass it to the SOAP SetBackdropApp method."
 msgstr "A háttérkezelőnek alkalmazási könyvtárnak kell lennie. Dobj egy alkalmazási könyvtárat a \"Háttér beállítása\" párbeszédablakba. (Programozóknak: Add át a SetBackdropApp SOAP-metódusnak paraméterként.)"
 
-#: pinboard.c:654
+#: pinboard.c:656
 msgid ""
 "You can only set the backdrop to an image or to a program which knows how to manage ROX-Filer's backdrop.\n"
 "\n"
@@ -2712,76 +2730,76 @@ msgstr ""
 "\n"
 "Programozóknak: Az alkalmazás AppInfo.xml fájljában szerepelnie kell a CanSetBackdrop elemnek, ahogy az a ROX-Filer kézikönyvében le van írva."
 
-#: pinboard.c:674
+#: pinboard.c:676
 msgid "Set backdrop"
 msgstr "Háttér beállítása"
 
-#: pinboard.c:685
+#: pinboard.c:687
 msgid "Choose a style and drag an image in:"
 msgstr "Válaszd ki a megjelenítés módját, és dobj ide egy képet:"
 
-#: pinboard.c:698
+#: pinboard.c:700
 msgid "Centre the image without scaling it"
 msgstr "Középre igazítja a képet átméretezés nélkül"
 
-#: pinboard.c:699
+#: pinboard.c:701
 msgid "Centre"
 msgstr "Középre"
 
-#: pinboard.c:700
+#: pinboard.c:702
 msgid "Scale the image to fit the backdrop area, without distorting it"
 msgstr "Az asztalhoz méretezi a képet torzítás nélkül"
 
-#: pinboard.c:702
+#: pinboard.c:704
 msgid "Scale"
 msgstr "Átméretezve"
 
-#: pinboard.c:703
+#: pinboard.c:705
 msgid "Stretch the image to fill the backdrop area"
 msgstr "A kép teljesen kitölti a hátteret"
 
-#: pinboard.c:704
+#: pinboard.c:706
 msgid "Stretch"
 msgstr "Nyújtva"
 
-#: pinboard.c:705
+#: pinboard.c:707
 msgid "Tile the image over the backdrop area"
 msgstr "Tapétaként jeleníti meg a képet"
 
-#: pinboard.c:706
+#: pinboard.c:708
 msgid "Tile"
 msgstr "Tapétaként"
 
-#: pinboard.c:711
+#: pinboard.c:713
 msgid "Drop an image here"
 msgstr "Dobj ide egy képet"
 
-#: pinboard.c:772
+#: pinboard.c:774
 msgid "No pinboard was in use... the 'Default' pinboard has been selected. Use 'rox -p=Default' to turn it on in future."
 msgstr "Nem volt használatban pinboard... kijelöltem a \"Default\" nevű pinboardot. Ezt a későbbiekben a \"rox -p=Default\" paranccsal használhatod."
 
-#: pinboard.c:866
+#: pinboard.c:868
 msgid "Only files (and certain applications) can be used to set the background image."
 msgstr "Csak fájlok (és bizonyos alkalmazások) adhatók meg háttérkép beállításához."
 
-#: pinboard.c:1480
+#: pinboard.c:1492
 msgid "Missing '>' in icon label"
 msgstr "Hiányzik a \">\" az ikon címkéjében"
 
-#: pinboard.c:1489
+#: pinboard.c:1501
 msgid "Missing ',' after icon label"
 msgstr "Hiányzik a \",\" az ikon címkéje után"
 
-#: pinboard.c:1574
+#: pinboard.c:1588
 #, c-format
 msgid "Error saving pinboard %s: %s"
 msgstr "Hiba a pinboard (%s) mentésekor: %s"
 
-#: pinboard.c:2118
+#: pinboard.c:2132
 msgid "Backdrop..."
 msgstr "Háttér..."
 
-#: pinboard.c:2211
+#: pinboard.c:2225
 #, c-format
 msgid ""
 "Error loading backdrop image:\n"
@@ -2825,7 +2843,7 @@ msgstr "Ismeretlen részletezési mód: \"%s\""
 msgid "Unknown sorting type '%s'"
 msgstr "Ismeretlen rendezési mód: \"%s\""
 
-#: remote.c:1156
+#: remote.c:1160
 #, c-format
 msgid "Attempt to invoke unknown SOAP method '%s'"
 msgstr "Kísérlet ismeretlen SOAP-metódus hívására: \"%s\""
@@ -3114,7 +3132,7 @@ msgstr "Door"
 msgid "Unknown"
 msgstr "Ismeretlen"
 
-#: type.c:455
+#: type.c:496
 msgid ""
 "Enter a shell command which will load \"$@\" into a suitable program. Eg:\n"
 "\n"
@@ -3124,64 +3142,64 @@ msgstr ""
 "\n"
 "gimp \"$@\""
 
-#: type.c:636
+#: type.c:677
 msgid "This is not a program! Give me an application instead!"
 msgstr "Ez nem program. Adj meg egy futtatható programot!"
 
-#: type.c:697
+#: type.c:737
 msgid "No run action defined"
 msgstr "Nincs hozzárendelve program"
 
-#: type.c:723
+#: type.c:741
 #, c-format
 msgid "Error in handler %s: %s"
 msgstr "Hiba a kezelőben (%s): %s"
 
-#: type.c:738
+#: type.c:756
 #, c-format
 msgid "Invalid application %s (bad AppRun)"
 msgstr "Érvénytelen alkalmazás: %s (hibás az AppRun)"
 
-#: type.c:749
+#: type.c:767
 #, c-format
 msgid "Non-executable %s"
 msgstr "Nem végrehajtható: %s"
 
-#: type.c:782
+#: type.c:800
 msgid "Set run action"
 msgstr "Program hozzárendelése"
 
-#: type.c:788
+#: type.c:806
 msgid "If a handler for the specific type isn't set up, use this as the default."
 msgstr "Ha a teljes típushoz nincs hozzárendelve semmi, akkor ezt használja."
 
-#: type.c:790
+#: type.c:808
 #, c-format
 msgid "Set default for all `%s/<anything>'"
 msgstr "Minden ilyen típushoz: %s/<akármi>"
 
-#: type.c:794
+#: type.c:812
 msgid "Use this application for all files with this MIME type."
 msgstr "A megadott programot használja ehhez a MIME-típushoz."
 
-#: type.c:796
+#: type.c:814
 #, c-format
 msgid "Only for the type `%s' (%s/%s)"
 msgstr "Csak ehhez a típushoz: \"%s\" (%s/%s)"
 
-#: type.c:802
+#: type.c:820
 msgid "Drop a suitable application here"
 msgstr "Dobj ide egy megfelelő programot"
 
-#: type.c:817
+#: type.c:835
 msgid "OR"
 msgstr "VAGY"
 
-#: type.c:824
+#: type.c:842
 msgid "Enter a shell command:"
 msgstr "Adj meg egy shell parancsot:"
 
-#: type.c:853
+#: type.c:871
 msgid "_Use Command"
 msgstr "_Parancs használata"
 
@@ -3190,25 +3208,25 @@ msgstr "_Parancs használata"
 # egy script, egy program, vagy egy szimbolikus link programra/scriptre.
 # Így aztán a "run action...is...big" fordítása elég körülményes (legalábbis
 # nekem).
-#: type.c:883
+#: type.c:901
 msgid "A run action already exists and is quite a big program - are you sure you want to delete it?"
 msgstr "Már van hozzárendelve program, és elég nagy méretű. Tényleg törölni akarod?"
 
-#: type.c:894
+#: type.c:912
 #, c-format
 msgid "Can't remove %s: %s"
 msgstr "%s nem törölhető: %s"
 
-#: type.c:931
+#: type.c:949
 msgid "Choices saving is disabled by CHOICESPATH variable"
 msgstr "A beállítások mentését tiltja a CHOICESPATH változó"
 
-#: type.c:1206
+#: type.c:1224
 #, c-format
 msgid "Icon theme '%s' does not contain MIME icons. Using ROX default theme instead."
 msgstr "Nincsenek MIME-ikonok az ikontémában (%s). A ROX alapértelmezett témáját használom helyette."
 
-#: type.c:1221
+#: type.c:1239
 #, c-format
 msgid ""
 "Failed to create symlink '%s':\n"
@@ -3221,12 +3239,12 @@ msgstr ""
 "\n"
 "(talán a ROX téma már létezik azon a helyen, de a \"mime-application:postscript\" ikont valamiért nem sikerült betölteni, vagy pedig \"%s\" egy rossz könyvtárra mutató link; próbáld törölni)"
 
-#: usericons.c:177
+#: usericons.c:179
 msgid "The pathname you gave does not exist. The icon has not been changed."
 msgstr "A megadott elérési út nem létezik. Az ikon változatlan marad."
 
-#: usericons.c:187
-#: usericons.c:612
+#: usericons.c:189
+#: usericons.c:618
 msgid ""
 "Unable to load image file -- maybe it's not in a format I understand, or maybe the permissions are wrong?\n"
 "The icon has not been changed."
@@ -3234,12 +3252,12 @@ msgstr ""
 "Nem sikerült betölteni a képfájlt -- talán ismeretlen a formátuma, vagy rosszul vannak beállítva a jogosultságai.\n"
 "Az ikon változatlan marad."
 
-#: usericons.c:234
+#: usericons.c:235
 #, c-format
 msgid "Really delete icon '%s'?"
 msgstr "Tényleg törlöd az ikont (%s)?"
 
-#: usericons.c:238
+#: usericons.c:239
 #, c-format
 msgid ""
 "Can't delete '%s':\n"
@@ -3248,55 +3266,55 @@ msgstr ""
 "\"%s\" nem törölhető:\n"
 "%s"
 
-#: usericons.c:266
+#: usericons.c:272
 msgid "Set icon"
 msgstr "Ikon hozzárendelése"
 
-#: usericons.c:275
+#: usericons.c:281
 msgid "Use a copy of the image as the default for all files of these MIME types."
 msgstr "A kép másolatát használja az összes fájlhoz, melynek ez a MIME-típusa."
 
-#: usericons.c:277
+#: usericons.c:283
 #, c-format
 msgid "Set icon for all `%s/<anything>'"
 msgstr "Minden ilyen típushoz: %s/<akármi>"
 
-#: usericons.c:282
+#: usericons.c:288
 msgid "Use a copy of the image for all files of this MIME type."
 msgstr "A kép másolatát használja az összes ilyen MIME-típusú fájlnál."
 
-#: usericons.c:284
+#: usericons.c:290
 #, c-format
 msgid "For all files of type `%s' (%s/%s)"
 msgstr "Csak ehhez a típushoz: \"%s\" (%s/%s)"
 
 # XXX
-#: usericons.c:290
+#: usericons.c:296
 msgid "Add the file and image filenames to your personal list. The setting will be lost if the image or the file is moved."
 msgstr "A saját listádhoz adja a fájl és a képfájl nevét. A beállítás hatástalanná válik, ha a képet vagy a fájlt áthelyezed."
 
-#: usericons.c:293
+#: usericons.c:299
 #, c-format
 msgid "Only for the file `%s'"
 msgstr "Csak ehhez a fájlhoz: %s"
 
-#: usericons.c:301
+#: usericons.c:307
 msgid "Copy the image inside the directory, as a hidden file called '.DirIcon'. All users will then see the icon, and you can move the directory around safely. This is usually the best option if you can write to the directory."
 msgstr "A könyvtárba másolja a képet \".DirIcon\" nevű rejtett fájlként. Minden felhasználónál ugyanez a kép jelenik meg, a könyvtár pedig bárhová áthelyezhető. Általában ez legjobb választás, ha van írási jogod a könyvtárra."
 
-#: usericons.c:307
+#: usericons.c:313
 msgid "Copy image into directory"
 msgstr "Kép könyvtárba másolása"
 
-#: usericons.c:313
+#: usericons.c:319
 msgid "Drop an icon file here"
 msgstr "Dobj ide egy ikonfájlt"
 
-#: usericons.c:583
+#: usericons.c:589
 msgid "Setting icon disabled by CHOICESPATH"
 msgstr "Az ikon beállítását tiltja a CHOICESPATH változó"
 
-#: usericons.c:627
+#: usericons.c:633
 #, c-format
 msgid ""
 "Error creating image '%s':\n"
