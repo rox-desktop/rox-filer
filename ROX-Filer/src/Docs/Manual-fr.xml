@@ -7,7 +7,7 @@
 <book lang="fr">
  <bookinfo>
   <title>
-   ROX-Filer 2.4 - Manuel de l'utilisateur
+   ROX-Filer 2.5 - Manuel de l'utilisateur
    <ulink url="http://rox.sourceforge.net"/>
   </title>
 
@@ -3013,6 +3013,9 @@ comme seul argument. Vous pouvez intégrer des menus 'AppMenu' à d'autres menus
 créer des sous-menus, à condition qu'ils disposent d'un élément '$lt;Label$gt;'.
 </para></listitem>
 
+Les éléments <userinput>Item</userinput> peuvent aussi bénéficier d'un attribut 
+<userinput>icon</userinput>, qui spécifie le nom de l'icône choisie dans le thème actif.
+
 </itemizedlist>
 
   </para>
@@ -3036,8 +3039,8 @@ pourvu que des fichiers de traduction corrects soient fournis :
 
 <orderedlist>
 <listitem><para>Ouvrez la boîte d'options via le menu,</para></listitem>
-<listitem><para>Sélectionnez une langue,</para></listitem>
-<listitem><para>Cliquez sur <guibutton>Sauver</guibutton> et redémarrez le <foreignphrase lang="en">filer</foreignphrase>
+<listitem><para>Sélectionnez une langue dans la liste proposée,</para></listitem>
+<listitem><para>Cliquez sur <guibutton>OK</guibutton> et redémarrez le <foreignphrase lang="en">filer</foreignphrase>
 pour que les changements soient pris en compte.</para></listitem>
 </orderedlist>
 
@@ -3049,21 +3052,21 @@ pour que les changements soient pris en compte.</para></listitem>
   <para>
 
 <orderedlist>
-<listitem><para>Allez dans le dossier <filename>src</filename> et créez le fichier
-<filename>messages.pot</filename> :
+<listitem><para>Allez dans le dossier <filename>src/po</filename> et créez le fichier
+<filename>src/messages.pot</filename> :
 
 <screen>
-$ cd ROX-Filer/src
-$ make messages.pot
+$ cd ROX-Filer/src/po
+$ ./update-po
 </screen>
 
 </para></listitem>
 
-<listitem><para>Copiez le fichier dans le sous-dossier <filename>po</filename>
-(du dossier <filename>src</filename>) en le nommant <filename>&lt;name&gt;.po</filename>.
+<listitem><para>Copiez le fichier dans le sous-dossier <filename>src/po</filename>
+ en le nommant <filename>&lt;name&gt;.po</filename>.
 Ex : si votre langue est 'ml' ('ma langue') :
 
-<screen>$ cp messages.pot po/ml.po</screen>
+<screen>$ cp ../messages.pot ml.po</screen>
 </para></listitem>
 
 <listitem><para>Ouvrez la copie dans un éditeur de texte.</para></listitem>
@@ -3074,8 +3077,6 @@ Ex : si votre langue est 'ml' ('ma langue') :
 <listitem><para>Exécutez le script <filename>make-mo</filename> pour créer le
 fichier binaire que <application>ROX-Filer</application> pourra utiliser.
 Vous aurez besoin du paquetage GNU gettext pour effectuer cette opération.
-Si vous ne l'avez pas, envoyez-moi (ndt : pas à moi, à l'auteur du manuel !)
-simplement le fichier <filename>.po</filename> et je le convertirai pour vous.
 
 <screen>
 $ cd ROX-Filer/src/po
@@ -3090,8 +3091,8 @@ votre langue soit listée, redémarrez le <foreignphrase lang="en">filer</foreig
 boîte d'options (voir la section <xref linkend="LANG"/>).
 </para></listitem>
 
-<listitem><para>Envoyez-moi le fichier <filename>.po</filename> pour que je
-puisse l'inclure dans les prochaines versions du <foreignphrase lang="en">filer</foreignphrase>.
+<listitem><para>Envoyez le fichier <filename>.po</filename> dans le 'gestionnaire
+de patches ROX', pour qu'il puisse être inclus dans les prochaines versions du <foreignphrase lang="en">filer</foreignphrase>.
 </para></listitem>
 
 </orderedlist>
@@ -3123,7 +3124,7 @@ a créées ; vérifiez que la traduction est correcte et supprimez la ligne <co
 
 <listitem><para>Exécutez <command>make-mo</command> comme la fois d'avant.</para></listitem>
 
-<listitem><para>Soumettez-moi le fichier mis à jour.</para></listitem>
+<listitem><para>Soumettez-nous le fichier mis à jour.</para></listitem>
 
 </orderedlist>
 
@@ -3655,8 +3656,8 @@ Les méthodes suivantes sont reconnues :</para>
  <listitem>
   <para>
    <function>OpenDir</function>(<parameter>Filename</parameter>,
-   [<parameter>Style</parameter>, <parameter>Details</parameter>, <parameter>Sort</parameter>, <parameter>Class</parameter>, <parameter>ID</parameter>],
-<parameter>Hidden</parameter>, <parameter>Filter</parameter>)
+   [<parameter>Style</parameter>, <parameter>Details</parameter>, <parameter>Sort</parameter>, <parameter>Class</parameter>, <parameter>ID</parameter>,
+<parameter>Hidden</parameter>, <parameter>Filter</parameter>])
    Ouvre une fenêtre et y affiche le dossier <parameter>Filename</parameter>.
    <parameter>Style</parameter> peut prendre la valeur <userinput>Large</userinput>, 
    <userinput>Small</userinput>, <userinput>Huge</userinput> ou <userinput>Automatic</userinput>. 
@@ -3685,7 +3686,7 @@ pour n'afficher que les fichiers se terminant par .c.
 
  <listitem>
   <para>
-   <function>Panel</function>(<parameter>Name</parameter>, <parameter>Side</parameter>)
+   <function>Panel</function>([<parameter>Side</parameter>, <parameter>Name</parameter>])
    Ouvre le panneau nommé <parameter>Name</parameter> sur le côté de l'écran précisé en
    <parameter>Side</parameter> (<userinput>Top</userinput>|<userinput>Bottom</userinput>|
    <userinput>Left</userinput>|<userinput>Right</userinput> &mdash; NDT : Haut|Bas|Gauche|Droite).
@@ -3712,10 +3713,12 @@ pour n'afficher que les fichiers se terminant par .c.
 
  <listitem>
   <para>
-   <function>PanelRemove</function>(<parameter>Side</parameter>,<parameter>Path</parameter>, 
-                                    [<parameter>Label</parameter>])
-   Retire <parameter>Path</parameter> du panneau sur le côté <parameter>Side</parameter>. 
-   Si <parameter>Label</parameter> est précisé, il doit correspondre au label de l'objet. 
+   <function>PanelRemove</function>(<parameter>Side</parameter>,
+                                                                         <parameter>Path</parameter>, 
+                                                                         [<parameter>Label</parameter>])
+   Retire un objet du panneau sur le côté <parameter>Side</parameter>. 
+   Si  ni <parameter>Path</parameter>, ni <parameter>Label</parameter> ne sont
+   précisés, l'appel échouera : au moins un de ces deux paramètres doit être renseigné.  
    Si plusieurs objets correspondent, un seul est retiré.
   </para>
  </listitem>
