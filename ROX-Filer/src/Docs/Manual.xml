@@ -621,7 +621,7 @@
        </entry></row><row><entry>
        Eye</entry><entry>
        Toggle the display of hidden files (those with names starting with a dot)</entry><entry>
-       Same
+       Toggle display of thumbnails for image files.
        </entry></row><row><entry>
        List with selections</entry><entry>
        Select All.</entry><entry>
@@ -1311,8 +1311,9 @@
        <row><entry>
          <guimenuitem>Edit Item</guimenuitem></entry><entry>
          Change the name displayed under the icon, or the pathname the item
-         points to. You can also set a keyboard shortcut for the icon here.
-	 For programs, you can specify extra arguments to be passed in.
+         points to. You can also set a keyboard shortcut for the icon here,
+	 and lock it against accidental deletion. For programs, you can
+	 specify extra arguments to be passed in.
        </entry></row>
 
        <row><entry>
@@ -3356,6 +3357,16 @@ then this must match the label of the item.  If more than one item matches, only
    <listitem><para><function>FileType</function>(<parameter>Filename</parameter>)
      Returns the MIME-type of <parameter>Filename</parameter> (by writing the
      SOAP response to standard output).
+   </para></listitem>
+
+   <listitem><para><function>SetIcon</function>(<parameter>Path</parameter>,
+   <parameter>Icon</parameter>)
+     Set the icon to use for the given path. This is equivalent to using the
+     <guimenuitem>Set Icon...</guimenuitem> menu item.
+   </para></listitem>
+
+   <listitem><para><function>UnsetIcon</function>(<parameter>Path</parameter>)
+     Clear the icon to use for the given path.
    </para></listitem>
   </itemizedlist>
 
