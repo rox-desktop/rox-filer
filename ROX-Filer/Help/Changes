@@ -2,53 +2,151 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
-*** I'm planning to generate the changelog from the subversion commit
-*** messages. Please just add your message there and we'll stop updating
-*** this file...
+* Note: you don't need to update file this when committing a change.
+* Just add a log message with the commit (with your name in brackets at
+* the end) and I'll update this file only when making a new release.
 
-25-May-2006
-~~~~~~~~~~~
-Updated French translation (Vincent Lefèvre).
 
-27-Feb-2006
-~~~~~~~~~~~
-Updated Hungarian translation (Andras Mohari).
+Release 2.5 (2006-07-07)
 
-25-Feb-2006
-~~~~~~~~~~~
-When running ROX-Filer for the first time ever, don't tell users that the
-Choices directory has been migrated unless they already had one. Also, don't
-bother creating symlinks to the new locations in this case. Other applications
-have had a while to catch up to the new system, and the message is rather
-confusing to new users (Thomas Leonard).
-Add a 'Manage Thumbnails' link to the Options box (Thomas Leonard).
-If 0launch isn't available, tell the user the URL of the program we were
-trying to run so they can get it themselves. Tell users about right-click
-behaviour in a tooltip (Thomas Leonard).
+New features:
 
-23-Feb-2006
-~~~~~~~~~~~
-Added Vietnamese translation (Xomhau Newnick).
+- Allow pinboard and panel icons to be locked (Dennis Tomas, suggested
+  by Abrolag).
 
-10-Feb-2006
-~~~~~~~~~~~
-The monospace font for the list view is now configurable via 
-a ViewDetails::mono-font gtkrc entry (Stephen Watson).
+- Display extra information in properties box for desktop files (Stephen
+  Watson).
 
-29-Jan-2006
-~~~~~~~~~~~
-When iconfiying a window, try to find space on the pinboard of the current
-screen first (Tony Houghton).
+- Allow setting icons in the AppInfo.xml file (Dennis Tomas). Example:
 
-25-Jan-2006
-~~~~~~~~~~~
-Make sure all the help message is translatable (Stephen Watson, reported
-by Andras Mohari).
+  <AppMenu>
+   <Item option="--options" icon="gtk-preferences">...</Item>
+  </AppMenu>
 
-10-Jan-2006
-~~~~~~~~~~~
-Use a monospace font for the size and permissions columsn in the list view
-(Andras Mohari).
+- Added SetIcon and UnsetIcon SOAP calls (Jonatan Liljedahl). With this
+  you can have your volume manager (like ivman) set icons for the
+  mounted media that represents what type of media it is (cdr, cdrw, usb
+  stick, etc).
+
+- Right-clicking on the Show/hide button now turns thumbnails on and off
+  (Peter Federighi).
+
+- Added options to change the "mount" and "umount" commands (Thomas
+  Leonard).  This may be useful for using programs such as "pmount" and
+  "pumount" (which allow mounting removable media without an fstab
+  entry, or encrypted filesystems).
+
+- Added a 'Manage Thumbnails' link to the Options box (Thomas Leonard).
+  If 0launch isn't available, tell the user the URL of the program we
+  were trying to run so they can get it themselves. Tell users about
+  right-click behaviour in a tooltip (Thomas Leonard).
+
+
+Changes:
+
+- Removed separator from icon properties dialog box (Thomas Leonard).
+
+- Updated Word MIME type for new MIME database (Keith Warno).
+
+- When the handler for a MIME type is a symlink to a program, run the
+  program using the target of the symlink rather than the link itself so
+  that programs like gvim see the right name and behave correctly
+  (Thomas Leonard, reported by Keith Warno).
+
+- Use full URI, not local path, for DocBook stylesheet (Pär Forsling).
+
+- When setting or clearing a globicon, redraw pinboard and panel icons
+  too (Dennis Tomas).
+
+- When loading MIME icons from the current theme only get the pathname
+  from GTK, but actually load it through our own cache (Thomas Leonard).
+  GTK was loading a new copy of the image each time!
+
+- Changed name of save settings menu option to be more explicit (Stephen
+  Watson).
+
+- In many .desktop files there is no "%F" or similar parameter to the
+  "Exec" entry, although the application can open files. Work around
+  this problem by adding the arguments to the end of the command in this
+  case (Dennis Tomas).
+
+- Added Zero Install source interface (Thomas Leonard). Run this with
+  0launch to compile against the GTK and GLib 2.4 headers (which will be
+  downloaded automatically). This produces a binary that runs with these
+  older versions, as well as with all later releases. Note that this has
+  been somewhat superceded by the GTK-2.4 compatibility environment:
+
+  http://0install.net/2006/interfaces/GTK-2.4.xml
+
+- New type for XML files; "application/" rather than "text/" to match
+  freedesktop.org updates (Thomas Leonard).
+
+- Moved test for a hidden file into its own function. Allows us to
+  define additional tests as to whether a file is hidden, rather than
+  just the first character of the file name (Stephen Watson).
+
+- Updated source file headers by removing the $Id$ line, updating the
+  year and clarifying the copyrights (Thomas Leonard).
+
+- The monospace font for the list view is now configurable via a
+  ViewDetails::mono-font gtkrc entry (Stephen Watson).
+
+- When iconfiying a window, try to find space on the pinboard of the
+  current screen first (Tony Houghton).
+
+- Updated the help text for rox --help (Andras Mohari).
+
+- Use a monospace font for the size and permissions columsn in the list
+  view (Andras Mohari).
+
+
+Bug fixes:
+
+- When a panel icon's image changed, the display didn't update (Thomas
+  Leonard, reported by Dennis Tomas).
+
+- Any line in a .desktop file would be ignored if there was a blank line
+  directly before it (Dennis Tomas).
+
+- Escape " characters when generating translations for the Options.xml
+  file (Andras Mohari).
+
+- When reading the output from 'du' for the Properties box, set the
+  channel's encoding to NULL to avoid errors with non-UTF-8 filenames
+  (Andras Mohari).
+
+- When running ROX-Filer for the first time ever, don't tell users that
+  the Choices directory has been migrated unless they already had one.
+  Also, don't bother creating symlinks to the new locations in this
+  case. Other applications have had a while to catch up to the new
+  system, and the message is rather confusing to new users (Thomas
+  Leonard).
+
+
+Translations:
+
+- Updated Chinese Translations (Babyfai Cheung).
+
+- Updated French manual translation (Arnaud Calvo).
+
+- Updated French translation (Vincent Lefèvre).
+
+- Updated Hungarian translation and converted to UTF-8 (Andras Mohari).
+
+- Updated Italian translation (Yuri Bongiorno).
+
+- Updated Russian translation (Nikita E. Shalaev).
+
+- Added Ukrainian translation (Yourko).
+
+- Added Vietnamese translation (Xomhau Newnick).
+
+- Updated instructions for creating a translation (reported by Yourko).
+
+- Make sure all the help message is translatable (Stephen Watson,
+  reported by Andras Mohari).
+
+
 
 30-Dec-2005 (Release 2.4.1)
 ~~~~~~~~~~~
