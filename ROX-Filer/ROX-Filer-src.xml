@@ -11,27 +11,10 @@
   <icon type='image/png' href='http://rox.sourceforge.net/Icons/ROX-Filer.png'/>
 
   <group main='src/build'>
-    <requires interface="http://0install.net/2006/interfaces/GTK-dev">
-      <version not-before='2.4' before='2.6'/>
-      <environment insert="lib/pkgconfig" name="PKG_CONFIG_PATH"/>
-      <environment insert="" name="GTKHEADERS"/>
-    </requires>
-    <requires interface="http://0install.net/2006/interfaces/GLib-dev">
-      <version not-before='2.4' before='2.6'/>
-      <environment insert="lib/pkgconfig" name="PKG_CONFIG_PATH"/>
-      <environment insert="" name="GLIBHEADERS"/>
-    </requires>
-    <requires interface="http://0install.net/2006/interfaces/ATK-dev">
-      <version before='1.9'/>
-      <environment insert="lib/pkgconfig" name="PKG_CONFIG_PATH"/>
-      <environment insert="" name="ATKHEADERS"/>
-    </requires>
-    <requires interface="http://0install.net/2006/interfaces/Pango-dev">
-      <version before='1.5'/>
-      <environment insert="lib/pkgconfig" name="PKG_CONFIG_PATH"/>
-      <environment insert="" name="PANGOHEADERS"/>
+    <requires interface="http://0install.net/2006/interfaces/GTK-2.4.xml">
+      <environment insert="" name="GTK24_HOME"/>
     </requires>
 
-    <implementation id="." version="2.5" released='2006-07-07'/>
+    <implementation id="." version="2.5.0" released='Snapshot'/>
   </group>
 </interface>
