@@ -1674,7 +1674,7 @@ gchar *build_command_with_path(const char *cmd, const char *path)
 
 	for(subs=cmd; *subs; subs++)
 	{
-		if(*subs=='\\')
+		if(subs[0]=='\\' && subs[1]=='$')
 		{
 			subs++;
 			continue;
