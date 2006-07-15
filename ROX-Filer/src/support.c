@@ -1658,3 +1658,40 @@ err:
 
 	return (*error==NULL);
 }
+
+/**
+ * Build a command to execute with a supplied path.  If the command pattern
+ * given contains @c $1 it is substituted with the path, otherwise the path
+ * is appended to the pattern after a space character
+ * @param[in] cmd command pattern, with optional @c $1
+ * @param[in] path path to substitute or append
+ * @return generated command line, pass to g_free() when done.
+ */
+gchar *build_command_with_path(const char *cmd, const char *path)
+{
+	const char *subs;
+	gchar *result;
+
+	for(subs=cmd; *subs; subs++)
+	{
+		if(*subs=='\\')
+		{
+			subs++;
+			continue;
+		}
+		if(strncmp(subs, "$1", 2)==0)
+			break;
+	}
+	if(*subs) {
+		int size=strlen(cmd)+strlen(path)+1;
+		result = g_new(char, size);
+		strncpy(result, cmd, subs-cmd);
+		result[subs-cmd] = 0;
+		strcat(result, path);
+		strcat(result, subs+2);
+	} else {
+		result = g_strconcat(cmd, " ", path, NULL);
+	}
+
+	return result;
+}

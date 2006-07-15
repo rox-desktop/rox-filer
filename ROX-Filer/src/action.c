@@ -124,6 +124,7 @@ static Option o_action_newer;
 
 static Option o_action_mount_command;
 static Option o_action_umount_command;
+static Option o_action_eject_command;
 
 /* Whenever the text in these boxes is changed we store a copy of the new
  * string to be used as the default next time.
@@ -969,7 +970,7 @@ static void do_delete(const char *src_path, const char *unused)
 
 static void do_eject(const char *path)
 {
-	const char *argv[3] = {NULL, NULL, NULL};
+	const char *argv[]={"sh", "-c", NULL, NULL};
 	char *err;
 	
 	check_flags();
@@ -1000,10 +1001,10 @@ static void do_eject(const char *path)
 		g_return_if_fail(c == 'X');
 	}
 
-	argv[0] = "eject";
-	argv[1] = path;
-	argv[2] = NULL;
-	err = fork_exec_wait(argv);
+	argv[2] = build_command_with_path(o_action_eject_command.value,
+					  path);
+	err = fork_exec_wait((const char**)argv);
+	g_free((gchar *) argv[2]);
 	if (err)
 	{
 		printf_send(_("!%s\neject failed\n"), err);
@@ -1607,14 +1608,14 @@ static void do_link_absolute(const char *path, const char *dest)
 /* Mount/umount this item (depending on 'mount') */
 static void do_mount(const guchar *path, gboolean mount)
 {
-	const char *argv[3] = {NULL, NULL, NULL};
+	const char *argv[] = {"sh", "-c", NULL, NULL};
 	char *err;
 
 	check_flags();
 
-	argv[0] = mount ? o_action_mount_command.value
-			: o_action_umount_command.value;
-	argv[1] = path;
+	argv[2] = build_command_with_path(mount ? o_action_mount_command.value
+					  : o_action_umount_command.value,
+					  path);
 
 	if (quiet)
 		printf_send(mount ? _("'Mounting %s\n")
@@ -1639,6 +1640,7 @@ static void do_mount(const guchar *path, gboolean mount)
 	}
 
 	err = fork_exec_wait(argv);
+	g_free((gchar *) argv[2]);
 	if (err)
 	{
 		printf_send(mount ?
@@ -2349,6 +2351,8 @@ void action_init(void)
 			  "action_mount_command", "mount");
 	option_add_string(&o_action_umount_command,
 			  "action_umount_command", "umount");
+	option_add_string(&o_action_eject_command,
+			  "action_eject_command", "eject");
 }
 
 #define MAX_ASK 4
