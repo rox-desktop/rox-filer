@@ -185,7 +185,12 @@ static MIME_type *get_mime_type(const gchar *type_name, gboolean can_create)
 		return mtype;
 
 	slash = strchr(type_name, '/');
-	g_return_val_if_fail(slash != NULL, NULL);     /* XXX: Report nicely */
+	if (slash == NULL)
+	{
+		g_warning("MIME type '%s' does not contain a '/' character!",
+			  type_name);
+		return NULL;
+	}
 
 	mtype = g_new(MIME_type, 1);
 	mtype->media_type = g_strndup(type_name, slash - type_name);
