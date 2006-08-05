@@ -1758,12 +1758,20 @@ void collection_move_cursor(Collection *collection, int drow, int dcol)
 			row = last;
 		else {
 			row += drow;
-			if (!collection->vertical_order) 
-		{
+			if (collection->vertical_order) 
+			{
+				if (row >= total_rows)
+				{
+					row = 0;
+					col += 1;
+				}
+			}
+			else 
+			{
 				row = MAX(row, 0); 
 				row = MIN(row, total_rows - 1);
+			}
 		}
-	}
 	}
 
 	item = collection_rowcol_to_item(collection, row, col);
@@ -1771,7 +1779,7 @@ void collection_move_cursor(Collection *collection, int drow, int dcol)
 	item = MAX(item, 0);
 	item = MIN(item, collection->number_of_items-1);
 
-		collection_set_cursor_item(collection, item, TRUE);
+	collection_set_cursor_item(collection, item, TRUE);
 }
 
 /* Start a lasso box drag */
