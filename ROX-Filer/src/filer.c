@@ -2922,7 +2922,9 @@ gboolean filer_match_filter(FilerWindow *filer_window, DirItem *item)
 	switch(filer_window->filter) {
 	case FILER_SHOW_GLOB:
 		return fnmatch(filer_window->filter_string,
-			       item->leafname, 0)==0;
+			       item->leafname, 0)==0 ||
+		  (item->base_type==TYPE_DIRECTORY &&
+		   !filer_window->filter_directories);
 		
 	case FILER_SHOW_ALL:
 	default:
@@ -2935,6 +2937,12 @@ gboolean filer_match_filter(FilerWindow *filer_window, DirItem *item)
 void filer_set_hidden(FilerWindow *filer_window, gboolean hidden)
 {
 	filer_window->show_hidden=hidden;
+}
+
+/* Provided to hide the implementation */
+void filer_set_filter_directories(FilerWindow *filer_window, gboolean filter_directories)
+{
+	filer_window->filter_directories=filter_directories;
 }
 
 /* Set the filter type. Returns TRUE if the type has changed

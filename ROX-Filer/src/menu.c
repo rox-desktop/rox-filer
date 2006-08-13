@@ -127,6 +127,7 @@ static void set_with(gpointer data, guint action, GtkWidget *widget);
 static void set_sort(gpointer data, guint action, GtkWidget *widget);
 static void reverse_sort(gpointer data, guint action, GtkWidget *widget);
 
+static void filter_directories(gpointer data, guint action, GtkWidget *widget);
 static void hidden(gpointer data, guint action, GtkWidget *widget);
 static void show_thumbs(gpointer data, guint action, GtkWidget *widget);
 static void refresh(gpointer data, guint action, GtkWidget *widget);
@@ -197,6 +198,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">",				NULL, NULL, 0, "<Separator>"},
 {">" N_("Show Hidden"),   	"<Ctrl>H", hidden, 0, "<ToggleItem>"},
 {">" N_("Filter Files..."),   	NULL, mini_buffer, MINI_FILTER, NULL},
+{">" N_("Filter Directories With Files"),	NULL, filter_directories, 0, "<ToggleItem>"},
 {">" N_("Show Thumbnails"),	NULL, show_thumbs, 0, "<ToggleItem>"},
 {">" N_("Refresh"),		NULL, refresh, 0, "<StockItem>", GTK_STOCK_REFRESH},
 {">" N_("Save Current Display Settings..."),	 NULL, save_settings, 0, NULL},
@@ -961,6 +963,17 @@ static void hidden(gpointer data, guint action, GtkWidget *widget)
 
 	display_set_hidden(window_with_focus,
 			   !window_with_focus->show_hidden);
+}
+
+static void filter_directories(gpointer data, guint action, GtkWidget *widget)
+{
+	if (updating_menu)
+		return;
+	
+	g_return_if_fail(window_with_focus != NULL);
+
+	display_set_filter_directories(window_with_focus,
+			   !window_with_focus->filter_directories);
 }
 
 static void show_thumbs(gpointer data, guint action, GtkWidget *widget)

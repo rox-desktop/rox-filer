@@ -485,6 +485,20 @@ void display_set_hidden(FilerWindow *filer_window, gboolean hidden)
 	display_update_hidden(filer_window);
 }
 
+/* Set the 'Filter Directories' flag for this window */
+void display_set_filter_directories(FilerWindow *filer_window, gboolean filter_directories)
+{
+	if (filer_window->filter_directories == filter_directories)
+		return;
+
+	/*
+	filer_window->show_hidden = hidden;
+	*/
+	filer_set_filter_directories(filer_window, filter_directories);
+
+	display_update_hidden(filer_window);
+}
+
 void display_set_filter(FilerWindow *filer_window, FilterType type,
 			const gchar *filter_string)
 {

@@ -59,6 +59,7 @@ struct _FilerWindow
 	ViewType	view_type;
 	gboolean	temp_item_selected;
 	gboolean	show_hidden;
+	gboolean	filter_directories;
 	FilerFlags	flags;
 	SortType	sort_type;
 	GtkSortType	sort_order;
@@ -162,6 +163,7 @@ void filer_refresh(FilerWindow *filer_window);
 gboolean filer_match_filter(FilerWindow *filer_window, DirItem *item);
 gboolean filer_set_filter(FilerWindow *filer_window,
 			  FilterType type, const gchar *filter_string);
+void filer_set_filter_directories(FilerWindow *fwin, gboolean filter_directories);
 void filer_set_hidden(FilerWindow *fwin, gboolean hidden);
 void filer_next_selected(FilerWindow *filer_window, int dir);
 void filer_save_settings(FilerWindow *fwin);
