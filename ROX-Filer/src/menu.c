@@ -164,6 +164,7 @@ static GtkWidget	*filer_file_menu;	/* The File '' menu */
 static GtkWidget	*file_shift_item;	/* Shift Open label */
 static GtkWidget	*filer_auto_size_menu;	/* The Automatic item */
 static GtkWidget	*filer_hidden_menu;	/* The Show Hidden item */
+static GtkWidget	*filer_filter_dirs_menu;/* The Filter Dirs item */
 static GtkWidget	*filer_reverse_menu;	/* The Reversed item */
 static GtkWidget	*filer_thumb_menu;	/* The Show Thumbs item */
 static GtkWidget	*filer_new_window;	/* The New Window item */
@@ -289,6 +290,7 @@ gboolean ensure_filer_menu(void)
 	GET_MENU_ITEM(filer_menu, "filer");
 	GET_SMENU_ITEM(filer_file_menu, "filer", "File");
 	GET_SSMENU_ITEM(filer_hidden_menu, "filer", "Display", "Show Hidden");
+	GET_SSMENU_ITEM(filer_filter_dirs_menu, "filer", "Display", "Filter Directories With Files");
 	GET_SSMENU_ITEM(filer_reverse_menu, "filer", "Display", "Reversed");
 	GET_SSMENU_ITEM(filer_auto_size_menu, "filer", "Display", "Automatic");
 	GET_SSMENU_ITEM(filer_thumb_menu, "filer", "Display",
@@ -738,6 +740,9 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, ViewIter *iter)
 		gtk_check_menu_item_set_active(
 				GTK_CHECK_MENU_ITEM(filer_hidden_menu),
 				filer_window->show_hidden);
+		gtk_check_menu_item_set_active(
+				GTK_CHECK_MENU_ITEM(filer_filter_dirs_menu),
+				filer_window->filter_directories);
 		gtk_check_menu_item_set_active(
 				GTK_CHECK_MENU_ITEM(filer_reverse_menu),
 				filer_window->sort_order != GTK_SORT_ASCENDING);

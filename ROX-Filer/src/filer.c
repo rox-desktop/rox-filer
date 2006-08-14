@@ -104,8 +104,9 @@ typedef struct {
 	DetailsType	details_type;
 	DisplayStyle	display_style;
 
-	FilterType filter_type;
-	char *filter;
+	FilterType      filter_type;
+	char           *filter;
+	gboolean        filter_directories;
 } Settings;
 
 enum settings_flags{
@@ -1437,6 +1438,7 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win,
 	filer_window->filter = FILER_SHOW_ALL;
 	filer_window->filter_string = NULL;
 	filer_window->regexp = NULL;
+	filer_window->filter_directories = FALSE;
 	
 	if (src_win && o_display_inherit_options.int_value)
 	{
@@ -1448,6 +1450,7 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win,
 		filer_window->show_thumbs = src_win->show_thumbs;
 		filer_window->view_type = src_win->view_type;
 
+		filer_window->filter_directories = src_win->filter_directories;
 		filer_set_filter(filer_window, src_win->filter,
 				 src_win->filter_string);
 	}
@@ -1491,9 +1494,13 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win,
 			filer_window->show_thumbs = dir_settings->show_thumbs;
 		
 		if (dir_settings->flags & SET_FILTER)
+		{
 			filer_set_filter(filer_window,
 					   dir_settings->filter_type,
 					   dir_settings->filter);
+			filer_set_filter_directories(filer_window,
+					     dir_settings->filter_directories);
+		}
 	}
 
 	/* Add all the user-interface elements & realise */
@@ -3077,6 +3084,9 @@ static void load_from_node(Settings *set, xmlDocPtr doc, xmlNodePtr node)
 	} else if(strcmp(node->name, "Filter") == 0) {
 		set->filter=g_strdup(str);
 		set->flags|=SET_FILTER;		
+	} else if(strcmp(node->name, "FilterDirectories") == 0) {
+		set->filter_directories=atoi(str);
+		set->flags|=SET_FILTER;		
 	}
 	
 	if(str)
@@ -3194,7 +3204,9 @@ static void add_nodes(gpointer key, gpointer value, gpointer data)
 		xmlNewChild(sub, NULL, "FilterType", tmp);
 		g_free(tmp);
 		if(set->filter && set->filter[0])
-			xmlNewChild(sub, NULL, "Filter", set->filter);
+			xmlNewChild(sub, NULL, "Filter", set->filter);	
+		tmp=g_strdup_printf("%d", set->filter_directories);
+		xmlNewChild(sub, NULL, "FilterDirectories", tmp);
 	}
 }
 
@@ -3264,9 +3276,13 @@ static void check_settings(FilerWindow *filer_window)
 					   set->show_thumbs);
 		
 		if(set->flags & SET_FILTER)
+		{
 			display_set_filter(filer_window,
 					   set->filter_type,
 					   set->filter);
+			display_set_filter_directories(filer_window,
+					   set->filter_directories);
+		}
 	}
 
 }
@@ -3352,6 +3368,7 @@ void filer_save_settings(FilerWindow *fwin)
 	set->filter_type=fwin->filter;
 	if(fwin->filter_string)
 		set->filter=g_strdup(fwin->filter_string);
+	set->filter_directories=fwin->filter_directories;
 
 	/* Store other parameters
 	*/
