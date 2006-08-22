@@ -171,6 +171,8 @@ static Option o_filer_view_type;
 Option o_filer_auto_resize, o_unique_filer_windows;
 Option o_filer_size_limit;
 
+#define ROX_RESPONSE_EJECT 99 /**< User clicked on Eject button */
+
 void filer_init(void)
 {
 	const gchar *ohost;
@@ -504,13 +506,24 @@ static char *get_ancestor_user_mount_point(const char *start)
 
 static void umount_dialog_response(GtkWidget *dialog, int response, char *mount)
 {
-	if (response == GTK_RESPONSE_OK)
+	GList *list;
+	
+	switch (response)
 	{
-		GList *list; 
-
+	case GTK_RESPONSE_OK:
 		list = g_list_prepend(NULL, mount);
 		action_mount(list, FALSE, FALSE, TRUE);
 		g_list_free(list);
+		break;
+
+	case ROX_RESPONSE_EJECT:
+		list = g_list_prepend(NULL, mount);
+		action_eject(list);
+		g_list_free(list);
+		break;
+
+	default:
+		break;
 	}
 
 	g_free(mount);
@@ -574,6 +587,13 @@ static void may_offer_unmount(FilerWindow *filer_window, char *mount)
 	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
 	gtk_dialog_add_action_widget(GTK_DIALOG(dialog), button,
 					GTK_RESPONSE_OK);
+	gtk_widget_show(button);
+
+	/* We need a better icon, but I can't draw */
+	button = button_new_mixed(GTK_STOCK_UNDO, _("Eject"));
+	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
+	gtk_dialog_add_action_widget(GTK_DIALOG(dialog), button,
+					ROX_RESPONSE_EJECT);
 	gtk_widget_show(button);
 
 	g_signal_connect(G_OBJECT(dialog), "response",
