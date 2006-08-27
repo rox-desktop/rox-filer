@@ -745,7 +745,6 @@ static void handle_drops(FilerWindow *filer_window,
 
 static void tally_items(gpointer key, gpointer value, gpointer data)
 {
-	gchar  *leafname = (gchar *) key;
 	DirItem *item = (DirItem *) value;
 	int     *tally = (int *) data;
 
