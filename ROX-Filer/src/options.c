@@ -298,11 +298,13 @@ GtkWidget *options_show(void)
 	if (!option_tooltips)
 		option_tooltips = gtk_tooltips_new();
 
+	/* For debugging
 	if (g_hash_table_size(loading) != 0)
 	{
 		g_print(PROJECT ": Some options loaded but not used:\n");
 		g_hash_table_foreach(loading, (GHFunc) puts, NULL);
 	}
+	*/
 
 	if (window)
 	{
