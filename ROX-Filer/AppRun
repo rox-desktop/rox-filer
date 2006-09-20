@@ -7,6 +7,10 @@ APP_DIR=`cd "$APP_DIR";pwd`; export APP_DIR
 
 DEBUGGER=""
 
+if [ "x$MAKE" = x ]; then
+  MAKE=make export MAKE
+fi
+
 case $1 in
 	--debug) shift ;
 		if [ "$#" = 0 ] ; then
@@ -35,7 +39,7 @@ case $1 in
 		rm -f "$BUILDDIR/config.cache"
 		rm -f "$APP_DIR/src/config.h"	# (for upgrading)
 		cd "$BUILDDIR" && "$APP_DIR/src/configure" "$@" \
-			&& make clean && make && echo Done >&2 && exit 0
+			&& $MAKE clean && $MAKE && echo Done >&2 && exit 0
 		echo Compile failed >&2
 		echo Press Return... >&2
 		read WAIT
