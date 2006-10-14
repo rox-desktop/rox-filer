@@ -796,6 +796,7 @@ void display_update_view(FilerWindow *filer_window,
 	{
 		view->layout = gtk_widget_create_pango_layout(
 				filer_window->window, item->leafname);
+		pango_layout_set_auto_dir(view->layout, FALSE);
 	}
 	else
 	{
