@@ -129,12 +129,13 @@ GtkTooltips *tooltips = NULL;
        "  -S, --rox-session	use default panel and pinboard options, and -n\n"\
        "  -t, --top=PANEL	open PANEL as a top-edge panel\n"	\
        "  -u, --user		show user name in each window \n"	\
+       "  -U, --url=URL		open file or direction in file: URL form\n"   \
        "  -v, --version		display the version information and exit\n"   \
        "  -x, --examine=FILE	FILE has changed - re-examine it\n"	\
        "\nReport bugs to %s.\n"		\
        "Home page (including updated versions): http://rox.sourceforge.net/\n")
 
-#define SHORT_OPS "c:d:t:b:l:r:B:op:s:hvnux:m:D:RS"
+#define SHORT_OPS "c:d:t:b:l:r:B:op:s:hvnux:m:D:RSU:"
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
@@ -158,6 +159,7 @@ static struct option long_opts[] =
 	{"close", 1, NULL, 'D'},
 	{"mime-type", 1, NULL, 'm'},
 	{"client-id", 1, NULL, 'c'},
+	{"url", 1, NULL, 'u'},
 	{NULL, 0, NULL, 0},
 };
 #endif
@@ -498,6 +500,25 @@ int main(int argc, char **argv)
 				new_copy = TRUE;
 				add_default_panel_and_pinboard(body);
 				break;
+
+		        case 'U':
+		        {
+				EscapedPath *uri=(EscapedPath *) VALUE;
+				gchar *tmp2;
+				
+				tmp2=get_local_path(uri);
+				if(tmp2) {
+					tmp=pathdup(tmp2);
+					g_free(tmp2);
+					soap_add(body, "Run", "Filename",
+						 tmp, NULL, NULL);
+					g_free(tmp);
+				} else {
+					g_warning(_("Cannot handle URL %s"),
+						  uri);
+				}
+				break;
+			}
 
 			default:
 				printf(_(USAGE));
