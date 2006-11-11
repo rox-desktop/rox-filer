@@ -192,6 +192,7 @@ static void soap_add(xmlNodePtr body,
 			   xmlChar *function,
 			   const xmlChar *arg1_name, const xmlChar *arg1_value,
 			   const xmlChar *arg2_name, const xmlChar *arg2_value);
+static void soap_reply(xmlDocPtr reply, gboolean rpc_mode);
 static void child_died(int signum);
 static void child_died_callback(void);
 static void wake_up_cb(gpointer data, gint source, GdkInputCondition condition);
@@ -254,6 +255,7 @@ int main(int argc, char **argv)
 	guchar		*tmp, *dir;
 	gchar *client_id = NULL;
 	gboolean	show_user = FALSE;
+	gboolean	rpc_mode = FALSE;
 	xmlDocPtr	rpc, soap_rpc = NULL, reply;
 	xmlNodePtr	body;
 	int		fd, ofd0=-1;
@@ -493,6 +495,8 @@ int main(int argc, char **argv)
 					dup2(fd, 0);
 					close(fd);
 				}
+				/* Want to print return uninterpreted */
+				rpc_mode=TRUE;
 				
 				break;
 
@@ -502,23 +506,9 @@ int main(int argc, char **argv)
 				break;
 
 		        case 'U':
-		        {
-				EscapedPath *uri=(EscapedPath *) VALUE;
-				gchar *tmp2;
-				
-				tmp2=get_local_path(uri);
-				if(tmp2) {
-					tmp=pathdup(tmp2);
-					g_free(tmp2);
-					soap_add(body, "Run", "Filename",
-						 tmp, NULL, NULL);
-					g_free(tmp);
-				} else {
-					g_warning(_("Cannot handle URL %s"),
-						  uri);
-				}
+				soap_add(body, "RunURI",
+						"URI", VALUE, NULL, NULL);
 				break;
-			}
 
 			default:
 				printf(_(USAGE));
@@ -647,12 +637,7 @@ int main(int argc, char **argv)
 	/* Finally, execute the request */
 	reply = run_soap(rpc);
 	xmlFreeDoc(rpc);
-	if (reply)
-	{
-		/* Write the result, if any, to stdout */
-		save_xml_file(reply, "-");
-		xmlFreeDoc(reply);
-	}
+	soap_reply(reply, rpc_mode);
 
 	/* Try to find out why we crash with GTK 2.4 */
 	XSetErrorHandler(rox_x_error);
@@ -744,6 +729,34 @@ static void soap_add(xmlNodePtr body,
 		if (arg2_name)
 			xmlNewTextChild(node, rox, arg2_name, arg2_value);
 	}
+}
+
+static void soap_reply(xmlDocPtr reply, gboolean rpc_mode)
+{
+	gboolean print=TRUE;
+
+	if(!reply)
+		return;
+
+	if(!rpc_mode) {
+		gchar **errs=extract_soap_errors(reply);
+
+		if(errs) {
+			int i;
+			
+			print=FALSE;
+
+			for(i=0; errs[i]; i++)
+				fprintf(stderr, "%s\n", errs[i]);
+
+			g_strfreev(errs);
+		}
+	}
+
+	/* Write the result, if any, to stdout */
+	if(print)
+		save_xml_file(reply, "-");
+	xmlFreeDoc(reply);
 }
 
 /* This is called as a signal handler; simply ensures that

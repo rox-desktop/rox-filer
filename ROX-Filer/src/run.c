@@ -323,6 +323,52 @@ gboolean run_by_path(const guchar *full_path)
 	return retval;
 }
 
+/* Convert uri to path and call run_by_path() */
+gboolean run_by_uri(const gchar *uri, gchar **errmsg)
+{
+	gboolean retval;
+	gchar *tmp, *tmp2;
+	gchar *scheme;
+
+	scheme=get_uri_scheme((EscapedPath *) uri);
+	if(!scheme)
+	{
+		*errmsg=g_strdup_printf(_("'%s' is not a valid URI"),
+						uri);
+		return FALSE;
+	}
+
+	if(strcmp(scheme, "file")==0) {
+		tmp=get_local_path((EscapedPath *) uri);
+		if(tmp) {
+			tmp2=pathdup(tmp);
+			retval=run_by_path(tmp2);
+			if(!retval)
+				*errmsg=g_strdup_printf(_("%s not accessable"),
+							tmp);
+		
+			g_free(tmp2);
+			g_free(tmp);
+
+		} else {
+			retval=FALSE;
+			*errmsg=g_strdup_printf(_("Non-local URL %s"), uri);
+		}
+		
+	} else {
+		/* XXX: Here is where we should get the xsetting
+		   ROX/URI/scheme and execute that command, but for the
+		   moment just complain. */
+		retval=FALSE;
+		*errmsg=g_strdup_printf(_("%s: no handler for %s"),
+					uri, scheme);
+	}
+	
+	g_free(scheme);
+
+	return retval;
+}
+
 /* Open dir/Help, or show a message if missing */
 void show_help_files(const char *dir)
 {

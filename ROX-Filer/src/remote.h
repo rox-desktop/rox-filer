@@ -9,4 +9,6 @@
 gboolean remote_init(xmlDocPtr rpc, gboolean new_copy);
 xmlDocPtr run_soap(xmlDocPtr soap);
 
+gchar **extract_soap_errors(xmlDocPtr reply);
+
 #endif /* _REMOTE_H */

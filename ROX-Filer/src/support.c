@@ -521,6 +521,28 @@ char *get_local_path(const EscapedPath *escaped_uri)
 	}
 }
 
+/* Return the scheme part of a URI, or NULL if not a valid URI (see
+ * RFC 2396).  g_free() the returned value.
+ */
+#define SCHEME_CHARS "+-."  /* In addition to alpha-numerics */
+gchar *get_uri_scheme(const EscapedPath *uri)
+{
+	const gchar *start=(const gchar *) uri;
+	const gchar *p=start;
+	
+	if(!g_ascii_isalpha(p[0]))
+		return NULL;
+
+	while(g_ascii_isalnum(p[0]) ||
+	      strchr(SCHEME_CHARS, p[0]))
+		p++;
+
+	if(p[0]!=':')
+		return NULL;
+
+	return g_strndup(start, p-start);
+}
+
 /* Set the close-on-exec flag for this FD.
  * TRUE means that an exec()'d process will not get the FD.
  */

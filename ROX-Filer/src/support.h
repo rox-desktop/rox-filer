@@ -58,6 +58,7 @@ int stat_with_timeout(const char *path, struct stat *info);
 EscapedPath *escape_uri_path(const char *path);
 EscapedPath *encode_path_as_uri(const guchar *path);
 gchar *unescape_uri(const EscapedPath *uri);
+gchar *get_uri_scheme(const EscapedPath *uri);
 gboolean available_in_path(const char *file);
 char *get_value_from_desktop_file(const char *path,
 				  const char *section,

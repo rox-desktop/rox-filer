@@ -87,6 +87,7 @@ static xmlNodePtr rpc_Show(GList *args);
 static xmlNodePtr rpc_Pinboard(GList *args);
 static xmlNodePtr rpc_Panel(GList *args);
 static xmlNodePtr rpc_Run(GList *args);
+static xmlNodePtr rpc_RunURI(GList *args);
 static xmlNodePtr rpc_Copy(GList *args);
 static xmlNodePtr rpc_Move(GList *args);
 static xmlNodePtr rpc_Link(GList *args);
@@ -132,6 +133,7 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 	soap_register("CloseDir", rpc_CloseDir, "Filename", NULL);
 	soap_register("Examine", rpc_Examine, "Filename", NULL);
 	soap_register("Show", rpc_Show, "Directory,Leafname", NULL);
+	soap_register("RunURI", rpc_RunURI, "URI", NULL);
 
 	soap_register("Pinboard", rpc_Pinboard, NULL, "Name");
 	soap_register("Panel", rpc_Panel, NULL, "Side,Name");
@@ -310,6 +312,66 @@ out:
 	return rep_doc;
 }
 
+
+/* Parse a SOAP reply and extract any fault strings, returning them as
+ * a NULL terminated list of strings (g_strfreev).
+ */
+gchar **extract_soap_errors(xmlDocPtr reply)
+{
+	gchar **errs;
+	GSList *errlist=NULL, *tmp;
+	int i, n;
+	
+	xmlNodePtr root, node;
+
+	if(!reply)
+		return NULL;
+
+	root=xmlDocGetRootElement(reply);
+	if(strcmp(root->name, "Envelope")==0) {
+		node=get_subnode(root, SOAP_ENV_NS, "Body");
+		if(node) {
+			xmlNodePtr sub, fault;
+			for(sub=node->xmlChildrenNode; sub;
+			    sub=sub->next) {
+				if(sub->type != XML_ELEMENT_NODE)
+					continue;
+				if(strcmp(sub->name, "env:Fault")!=0)
+					continue;
+				
+				/*if (sub->ns == NULL)
+				  continue;
+
+				  if(strcmp(sub->ns->href,
+				  SOAP_ENV_NS)!=0)
+				  continue;*/
+
+				fault=get_subnode(sub, NULL,
+						  "faultstring");
+				if(fault) {
+					xmlChar *txt;
+					txt=xmlNodeGetContent(fault);
+					if(txt) {
+						errlist=g_slist_append(errlist,
+								       g_strdup(txt));
+								       
+						xmlFree(txt);
+					}
+				}
+			}
+		}
+	}
+
+	n=g_slist_length(errlist);
+	errs=g_malloc(sizeof(gchar *)*(n+1));
+	for(i=0, tmp=errlist; i<n; i++, tmp=g_slist_next(tmp))
+		errs[i]=tmp->data;
+	errs[n]=NULL;
+
+	g_slist_free(errlist);
+
+	return errs;
+}
 
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
@@ -735,6 +797,29 @@ static xmlNodePtr rpc_Run(GList *args)
 	g_free(path);
 
 	return NULL;
+}
+
+static xmlNodePtr rpc_RunURI(GList *args)
+{
+	char	   *uri, *errmsg=NULL;
+	xmlNodePtr  reply=NULL;
+
+	uri = string_value(ARG(0));
+	run_by_uri(uri, &errmsg);
+	g_free(uri);
+	
+	if(errmsg)
+	{
+		reply = xmlNewNode(NULL, "env:Fault");
+		xmlNewNs(reply, SOAP_RPC_NS, "rpc");
+		xmlNewNs(reply, SOAP_ENV_NS, "env");
+		xmlNewTextChild(reply, NULL, "faultcode",
+						"Failed");
+		xmlNewTextChild(reply, NULL, "faultstring", errmsg);
+		g_free(errmsg);
+	}
+
+	return reply;
 }
 
 static xmlNodePtr rpc_CloseDir(GList *args)
