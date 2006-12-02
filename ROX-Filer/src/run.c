@@ -38,6 +38,7 @@
 #include "diritem.h"
 #include "action.h"
 #include "icon.h"
+#include "choices.h"
 
 /* Static prototypes */
 static void write_data(gpointer data, gint fd, GdkInputCondition cond);
@@ -329,6 +330,7 @@ gboolean run_by_uri(const gchar *uri, gchar **errmsg)
 	gboolean retval;
 	gchar *tmp, *tmp2;
 	gchar *scheme;
+	gchar *cmd;
 
 	scheme=get_uri_scheme((EscapedPath *) uri);
 	if(!scheme)
@@ -354,11 +356,20 @@ gboolean run_by_uri(const gchar *uri, gchar **errmsg)
 			retval=FALSE;
 			*errmsg=g_strdup_printf(_("Non-local URL %s"), uri);
 		}
+
+	} else if((cmd=choices_find_xdg_path_load(scheme, "URI", SITE))) {
+		DirItem *item;
+
+		item=diritem_new(scheme);
+		diritem_restat(cmd, item, NULL);
+
+		run_with_args(cmd, item, uri);
+		retval=TRUE; /* we hope... */
+
+		diritem_free(item);
+		g_free(cmd);
 		
 	} else {
-		/* XXX: Here is where we should get the xsetting
-		   ROX/URI/scheme and execute that command, but for the
-		   moment just complain. */
 		retval=FALSE;
 		*errmsg=g_strdup_printf(_("%s: no handler for %s"),
 					uri, scheme);
