@@ -620,7 +620,7 @@
        </entry></row><row><entry>
        Occhio</entry><entry>
        Mostra o nasconde i file nascosti (il cui nome inizia con un punto)</entry><entry>
-       La stessa cosa
+       Mostra o nasconde le miniature delle immagini
        </entry></row><row><entry>
        Elenco con selezioni</entry><entry>
        Seleziona tutto.</entry><entry>
@@ -1302,8 +1302,9 @@
        <row><entry>
          <guimenuitem>Modifica oggetto</guimenuitem></entry><entry>
          Cambia il nome visualizzato sotto l'icona o il percorso all'oggetto a
-         cui punta. Qui è anche possibile impostare una scorciatoia da tastiera per l'icona
-         e ai programmi si possono specificare gli argomenti aggiuntivi da passare.
+         cui punta. Si può impostare una scorciatoia da tastiera per l'icona o
+         bloccarla per impedirne la cancellazione accidentale.
+	 Inoltre, è possibile specificare gli argomenti aggiuntivi da passare ai programmi.
        </entry></row>
 
        <row><entry>
@@ -2604,7 +2605,8 @@
        Quando se ne sceglie uno, <filename>AppRun</filename> viene eseguito con
        <userinput>option</userinput> come unico argomento. È possibile nidificare 
        AppMenu dentro altri AppMenu per creare sottomenù, purché abbiano i 
-       &lt;Label&gt;.
+       &lt;Label&gt;. L'elemento <userinput>Item</userinput>può avere anche l'attributo
+       <userinput>icon</userinput>, il nome di un'icona dell'attuale tema di icone per la voce di menù.
      </para></listitem>
 
     </itemizedlist>
@@ -2630,7 +2632,7 @@
 
     <orderedlist>
      <listitem><para>Dal menù, scegliere «Opzioni»</para></listitem>
-     <listitem><para>Selezionare una lingua</para></listitem>
+     <listitem><para>Selezionare una lingua dall'elenco</para></listitem>
      <listitem><para>Fare clic su <guibutton>Ok</guibutton> e riavviare il filer affinché
        le nuove impostazioni abbiano effetto.</para></listitem>
     </orderedlist>
@@ -2643,21 +2645,20 @@
    <para>
 
     <orderedlist>
-     <listitem><para>Andare nella directory <filename>src</filename> e creare il file
-       <filename>messages.pot</filename>:
+     <listitem><para>Andare nella directory <filename>src/po</filename> e creare il file
+       <filename>src/messages.pot</filename>:
 
        <screen>
-        $ cd ROX-Filer/src
-        $ make messages.pot</screen>
+        $ cd ROX-Filer/src/po
+        $ ./update-po</screen>
 
      </para></listitem>
 
-     <listitem><para>Copiare il file nella sottodirectory <filename>po</filename>
-       che si trova dentro <filename>src</filename> con il nome
-       <filename>&lt;nome&gt;.po</filename>. Esempio, per l'italiano si usa
+     <listitem><para>Copiare il file nella directory <filename>src/po</filename>
+       come <filename>&lt;nome&gt;.po</filename>. Esempio, per l'italiano si usa
        «it» (sigla internazionale dell'Italia):
 
-       <screen>$ cp messages.pot po/it.po</screen>
+       <screen>$ cp ../messages.pot it.po</screen>
      </para></listitem>
 
      <listitem><para>Aprire il file in un editor di testi.</para></listitem>
@@ -2667,8 +2668,7 @@
 
      <listitem><para>Eseguire lo script <filename>make-mo</filename> per creare un file
        binario che serve a <application>ROX-Filer</application>.
-       Per fare questo è necessario avere il pacchetto GNU gettext. In mancanza, spedire il file
-       <filename>.po</filename> all'autore di <application>ROX-Filer</application> che ve lo convertirà.
+       Per fare questo è necessario avere il pacchetto GNU gettext. 
 
        <screen>
         $ cd ROX-Filer/src/po
@@ -2681,7 +2681,7 @@
        (vedere la sezione <xref linkend="LANG"/>).
      </para></listitem>
 
-     <listitem><para>Spedire il file <filename>.po</filename> all'autore di <application>ROX-Filer</application>,
+     <listitem><para>Allegare il file <filename>.po</filename> al patch tracker di ROX
      così sarà incluso nella prossima versione.
      </para></listitem>
 
@@ -3195,8 +3195,8 @@ EOF</screen>
 
    <listitem><para><function>OpenDir</function>(<parameter>NomeFile</parameter>,
      [<parameter>Style</parameter>, <parameter>Details</parameter>, <parameter>Sort</parameter>,
-     <parameter>Class</parameter>, <parameter>ID</parameter>],
-     <parameter>Hidden</parameter>, <parameter>Filter</parameter>)
+     <parameter>Class</parameter>, <parameter>ID</parameter>,
+     <parameter>Hidden</parameter>, <parameter>Filter</parameter>])
      Apre una finestra mostrando la directory <parameter>NomeFile</parameter>.
      <parameter>Style</parameter> può essere <userinput>Large</userinput>, <userinput>Small</userinput>, <userinput>Huge</userinput>
      o <userinput>Automatic</userinput>.
@@ -3217,8 +3217,8 @@ EOF</screen>
      <userinput>*.c</userinput> vengono mostrati solo i file che terminano per «.c».
    </para></listitem>
 
-   <listitem><para><function>Panel</function>(<parameter>Side</parameter>,
-     [<parameter>Name</parameter>])
+   <listitem><para><function>Panel</function>([<parameter>Side</parameter>,
+     <parameter>Name</parameter>])
      Apre il pannello di nome <parameter>Name</parameter> sul lato 
      <parameter>Side</parameter> (<userinput>Top</userinput>|<userinput>Bottom</userinput>|<userinput>Left</userinput>|<userinput>Right</userinput>) dello schermo.
      <parameter>Name</parameter> può essere un nome in 
@@ -3240,7 +3240,11 @@ EOF</screen>
 
    <listitem><para><function>PanelRemove</function>(<parameter>Side</parameter>,
      <parameter>Path</parameter>, [<parameter>Label</parameter>])
-     Rimuove <parameter>Path</parameter> dal pannello sul lato <parameter>Side</parameter> dello schermo. Se viene specificato <parameter>Label</parameter>, allora questo deve corrispondere all'etichetta dell'oggetto. Se corrisponde a più di un oggetto, ne viene rimosso solo uno.
+     Rimuove un oggetto dal pannello sul lato <parameter>Side</parameter> dello schermo. 
+     Se non viene specificato <parameter>Path</parameter> o <parameter>Label</parameter>,
+     allora corrisponde ogni percorso o etichetta. 
+     Almeno uno deve essere specificato. 
+     Se più di un oggetto corrisponde, solo uno viene rimosso.
    </para></listitem>
    
    <listitem><para><function>Pinboard</function>([<parameter>Name</parameter>])
@@ -3305,6 +3309,16 @@ EOF</screen>
    <listitem><para><function>FileType</function>(<parameter>NomeFile</parameter>)
      Restituisce il tipo di MIME di <parameter>NomeFile</parameter> (scrive sullo
      standard output la risposta SOAP).
+   </para></listitem>
+
+   <listitem><para><function>SetIcon</function>(<parameter>Path</parameter>,
+   <parameter>Icon</parameter>)
+     Imposta l'icona da usare per un determinato percorso. È equivalente a usare la voce di menù
+     <guimenuitem>Imposta icona...</guimenuitem>.
+   </para></listitem>
+
+   <listitem><para><function>UnsetIcon</function>(<parameter>Path</parameter>)
+     Cancella l'icona da usare per un determinato percorso.
    </para></listitem>
   </itemizedlist>
 
