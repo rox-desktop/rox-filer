@@ -1619,7 +1619,7 @@ err:
 
 /* Load .desktop file 'path' and set the value of the named keys in the
  * NULL terminated list.
- * Sets error if the desktop file cannot be parsed and returns NULL.
+ * Sets error if the desktop file cannot be parsed and returns false.
  * Sets NULL (but does not set error) if the key is not present.
  * String set must be g_free()d.
  */
