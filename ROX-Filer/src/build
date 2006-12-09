@@ -5,8 +5,20 @@
 
 if [ "x$GTK24_HOME" == "x" ]; then
   echo 'Run me like this:'
-  echo '0launch ../ROX-Filer-src.xml'
+  echo '0compile setup ../../ROX-Filer-src.xml build-dir'
+  echo 'cd build-dir'
+  echo '0compile build'
   exit 1
 fi
-cd `dirname "$0"`
-exec "$GTK24_HOME/gtk-2.4" make "$@"
+
+if [ ! -f Makefile ]; then
+  "$GTK24_HOME/gtk-2.4" "$SRCDIR/ROX-Filer/src/configure" "$@" || exit 1
+fi
+
+[ -d "$DISTDIR/ROX-Filer" ] || mkdir "$DISTDIR/ROX-Filer" || exit 1
+
+"$GTK24_HOME/gtk-2.4" make "PLATFORM_DIR=$DISTDIR/ROX-Filer"|| exit 1
+
+(cd "$SRCDIR" && cp -ru Choices install.sh README README-es ROX-Filer.xml rox.xml "$DISTDIR") || exit 1
+(cd "$SRCDIR/ROX-Filer" && cp -ru Help images Messages ROX AppInfo.xml AppRun Options.xml style.css subclasses "$DISTDIR/ROX-Filer") || exit 1
+find "$DISTDIR" -name '.svn' -type d |xargs rm -r
