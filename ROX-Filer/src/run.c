@@ -620,6 +620,7 @@ static gboolean run_desktop(const char *full_path,
 {
 	GError *error = NULL;
 	char *exec = NULL;
+	char *terminal = NULL;
 	gint argc = 0;
 	gchar **argv = NULL;
 	GPtrArray *expanded = NULL;
@@ -627,8 +628,11 @@ static gboolean run_desktop(const char *full_path,
 	int i;
 	gboolean success = FALSE;
 
-	exec = get_value_from_desktop_file(full_path, "Desktop Entry", "Exec",
-					&error);
+	get_values_from_desktop_file(full_path,
+					&error,
+					"Desktop Entry", "Exec", &exec,
+					"Desktop Entry", "Terminal", &terminal,
+					NULL);
 	if (error)
 	{
 		delayed_error("Failed to parse .desktop file '%s':\n%s",
@@ -651,6 +655,12 @@ static gboolean run_desktop(const char *full_path,
 	}
 
 	expanded = g_ptr_array_new();
+
+	if (terminal && g_strcasecmp(terminal, "true") == 0) {
+		g_ptr_array_add(expanded, "xterm");
+		g_ptr_array_add(expanded, "-e");
+	}
+
 	for (i = 0; i < argc; i++)
 	{
 		const char *src = argv[i];
@@ -695,6 +705,8 @@ err:
 		g_error_free(error);
 	if (exec != NULL)
 		g_free(exec);
+	if (terminal != NULL)
+		g_free(terminal);
 	if (argv != NULL)
 		g_strfreev(argv);
 	if (expanded != NULL)
