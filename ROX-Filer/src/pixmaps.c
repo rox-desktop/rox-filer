@@ -293,6 +293,13 @@ void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 		struct stat info1, info2;
 		char *dir;
 
+		// Skip zero-byte files. They're either empty, or special (may cause
+		// us to hang, e.g. /proc/kmsg).
+		if (mc_stat(path, &info1) == 0 && info1.st_size == 0) {
+			callback(data, NULL);
+			return;
+		}
+
 		dir = g_path_get_dirname(path);
 
 		/* If the image itself is in ~/.thumbnails, load it now
