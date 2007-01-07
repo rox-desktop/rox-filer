@@ -689,7 +689,7 @@ static void pinboard_set_backdrop_box(void)
 	gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
 	gtk_box_pack_start(vbox, label, TRUE, TRUE, 4);
 
-	/* The Centred, Scaled, Tiled radios... */
+	/* The Centred, Scaled, Fit, Tiled radios... */
 	hbox = gtk_hbox_new(TRUE, 2);
 	gtk_box_pack_start(vbox, hbox, TRUE, TRUE, 4);
 
@@ -702,6 +702,9 @@ static void pinboard_set_backdrop_box(void)
 	radios_add(radios, _("Scale the image to fit the backdrop area, "
 			     "without distorting it"),
 			BACKDROP_SCALE, _("Scale"));
+	radios_add(radios, _("Scale the image to fit the backdrop area, "
+			     "regardless of image dimensions - overscale"),
+			BACKDROP_FIT, _("Fit"));
 	radios_add(radios, _("Stretch the image to fill the backdrop area"),
 			BACKDROP_STRETCH, _("Stretch"));
 	radios_add(radios, _("Tile the image over the backdrop area"),
@@ -1404,6 +1407,7 @@ static void backdrop_from_xml(xmlNode *node)
 		current_pinboard->backdrop_style =
 		  g_strcasecmp(style, "Tiled") == 0 ? BACKDROP_TILE :
 		  g_strcasecmp(style, "Scaled") == 0 ? BACKDROP_SCALE :
+		  g_strcasecmp(style, "Fit") == 0 ? BACKDROP_FIT :
 		  g_strcasecmp(style, "Stretched") == 0 ? BACKDROP_STRETCH :
 		  g_strcasecmp(style, "Centred") == 0 ? BACKDROP_CENTRE :
 		  g_strcasecmp(style, "Program") == 0 ? BACKDROP_PROGRAM :
@@ -1553,6 +1557,7 @@ static void pinboard_save(void)
 			style == BACKDROP_TILE   ? "Tiled" :
 			style == BACKDROP_CENTRE ? "Centred" :
 			style == BACKDROP_SCALE  ? "Scaled" :
+			style == BACKDROP_FIT    ? "Fit" :
 			style == BACKDROP_STRETCH  ? "Stretched" :
 						   "Program");
 	}
@@ -2240,7 +2245,7 @@ static GdkPixmap *load_backdrop(const gchar *path, BackdropStyle style)
 
 		g_object_unref(old);
 	}
-	else if (style == BACKDROP_CENTRE || style == BACKDROP_SCALE)
+	else if (style == BACKDROP_CENTRE || style == BACKDROP_SCALE || style == BACKDROP_FIT)
 	{
 		GdkPixbuf *old = pixbuf;
 		int	  x, y, width, height;
@@ -2255,6 +2260,13 @@ static GdkPixmap *load_backdrop(const gchar *path, BackdropStyle style)
 			scale_x = screen_width / ((float) width);
 			scale_y = screen_height / ((float) height);
 			scale = MIN(scale_x, scale_y);
+		}
+		else if (style == BACKDROP_FIT)
+		{
+			float	  scale_x, scale_y;
+			scale_x = screen_width / ((float) width);
+			scale_y = screen_height / ((float) height);
+			scale = MAX(scale_x, scale_y);
 		}
 		else
 			scale = 1;
@@ -2328,6 +2340,11 @@ static void command_from_backdrop_app(Pinboard *pinboard, const gchar *command)
 	{
 		style = BACKDROP_SCALE;
 		command += 6;
+	}
+	else if (strncmp(command, "fit ", 4) == 0)
+	{
+		style = BACKDROP_FIT;
+		command += 4;
 	}
 	else if (strncmp(command, "stretch ", 8) == 0)
 	{
@@ -2739,6 +2756,7 @@ static void update_radios(GtkWidget *dialog)
 		case BACKDROP_STRETCH:
 		case BACKDROP_SCALE:
 		case BACKDROP_CENTRE:
+		case BACKDROP_FIT:
 			radios_set_value(radios,
 					 current_pinboard->backdrop_style);
 			gtk_widget_set_sensitive(hbox, TRUE);

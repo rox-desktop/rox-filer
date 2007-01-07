@@ -18,7 +18,7 @@ extern GdkColor pin_text_fg_col, pin_text_bg_col;
 typedef enum {
 	BACKDROP_NONE,
 	BACKDROP_PROGRAM,
-	BACKDROP_CENTRE, BACKDROP_SCALE, BACKDROP_STRETCH, BACKDROP_TILE
+	BACKDROP_CENTRE, BACKDROP_SCALE, BACKDROP_STRETCH, BACKDROP_TILE, BACKDROP_FIT
 } BackdropStyle;
 
 void pinboard_init(void);
