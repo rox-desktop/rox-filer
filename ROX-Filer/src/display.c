@@ -55,6 +55,7 @@
 #include "diritem.h"
 #include "fscache.h"
 #include "view_iface.h"
+#include "xtypes.h"
 
 #define HUGE_WRAP (1.5 * o_large_width.int_value)
 
@@ -168,7 +169,7 @@ void draw_huge_icon(GdkWindow *window, GdkRectangle *area,
 	{
 		draw_emblem_on_icon(window, im_symlink, &image_x, area->y + 2);
 	}
-	if (item->flags & ITEM_FLAG_HAS_XATTR)
+	if ((item->flags & ITEM_FLAG_HAS_XATTR) && !o_xattr_ignore.int_value)
 	{
 		draw_emblem_on_icon(window, im_xattr, &image_x, area->y + 2);
 	}
@@ -225,7 +226,7 @@ void draw_large_icon(GdkWindow *window,
 	{
 		draw_emblem_on_icon(window, im_symlink, &image_x, area->y + 2);
 	}
-	if (item->flags & ITEM_FLAG_HAS_XATTR)
+	if ((item->flags & ITEM_FLAG_HAS_XATTR) && !o_xattr_ignore.int_value)
 	{
 		draw_emblem_on_icon(window, im_xattr, &image_x, area->y + 2);
 	}
@@ -276,7 +277,7 @@ void draw_small_icon(GdkWindow *window, GdkRectangle *area,
 	{
 		draw_emblem_on_icon(window, im_symlink, &image_x, area->y + 8);
 	}
-	if (item->flags & ITEM_FLAG_HAS_XATTR)
+	if ((item->flags & ITEM_FLAG_HAS_XATTR) && !o_xattr_ignore.int_value)
 	{
 		draw_emblem_on_icon(window, im_xattr, &image_x, area->y + 8);
 	}

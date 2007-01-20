@@ -236,24 +236,34 @@ const char *basetype_name(DirItem *item)
 	return _("Unknown");
 }
 
+struct mime_list {
+	GList *list;
+	gboolean only_regular;
+};
+
 static void append_names(gpointer key, gpointer value, gpointer udata)
 {
-	GList **list = (GList **) udata;
+	struct mime_list *mlist = (struct mime_list*) udata;
 
-	*list = g_list_prepend(*list, key);
+	if(!mlist->only_regular || strncmp((char *)key, "inode/", 6)!=0)
+		mlist->list = g_list_prepend(mlist->list, key);
 }
 
 /* Return list of all mime type names. Caller must free the list
  * but NOT the strings it contains (which are never freed).
+ If only_regular is true then inode types are excluded.
  */
-GList *mime_type_name_list(void)
+GList *mime_type_name_list(gboolean only_regular)
 {
-	GList *list = NULL;
+	struct mime_list list;
 
+	list.list=NULL;
+	list.only_regular=only_regular;
+		
 	g_hash_table_foreach(type_hash, append_names, &list);
-	list = g_list_sort(list, (GCompareFunc) strcmp);
+	list.list = g_list_sort(list.list, (GCompareFunc) strcmp);
 
-	return list;
+	return list.list;
 }
 
 /*			MIME-type guessing 			*/

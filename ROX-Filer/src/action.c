@@ -1205,8 +1205,12 @@ static void do_settype(const char *path, const char *unused)
 		int res;
 		printf_send("<%s", path);
 		printf_send(">");
-		res=printf_reply(from_parent, FALSE,
-				 _("?Change type of '%s'?"), path);
+		if (S_ISDIR(info.st_mode))
+			res=printf_reply(from_parent, FALSE,
+					 _("?Change contents of '%s'?"), path);
+		else
+			res=printf_reply(from_parent, FALSE,
+					 _("?Change type of '%s'?"), path);
 		printf_send("<");
 		if (!res)
 			return;
@@ -1266,6 +1270,16 @@ static void do_settype(const char *path, const char *unused)
 			for_dir_contents(do_settype, safe_path, unused);
 			g_free(safe_path);
 		}
+		else if(!o_brief)
+		{
+			printf_send(_("'Not changing type of directory '%s'\n"),
+				    path);
+		}
+	}
+	else if(!o_brief)
+	{
+		printf_send(_("'Non-regular file '%s' not changed\n"),
+			    path);
 	}
 }
 
@@ -2195,7 +2209,7 @@ void action_settype(GList *paths, gboolean force_recurse, const char *oldtype)
 	gui_side->default_string = &last_settype_string;
 
 	/* Note: get the list again each time -- it can change */
-	presets = mime_type_name_list();
+	presets = mime_type_name_list(TRUE);
 	abox_add_combo(ABOX(abox), _("Type:"), presets, new_entry_string,
 				new_help_button(show_settype_help, NULL));
 	g_list_free(presets);
