@@ -74,6 +74,7 @@ Option o_display_show_full_type;
 Option o_display_inherit_options;
 static Option o_filer_change_size_num;
 Option o_vertical_order_small, o_vertical_order_large;
+Option o_xattr_show;
 
 /* Static prototypes */
 static void display_details_set(FilerWindow *filer_window, DetailsType details);
@@ -104,6 +105,7 @@ void display_init()
 	option_add_int(&o_filer_change_size_num, "filer_change_size_num", 30); 
 	option_add_int(&o_vertical_order_small, "vertical_order_small", FALSE);
 	option_add_int(&o_vertical_order_large, "vertical_order_large", FALSE);
+	option_add_int(&o_xattr_show, "xattr_show", TRUE);
 
 	option_add_notify(options_changed);
 }
@@ -169,7 +171,7 @@ void draw_huge_icon(GdkWindow *window, GdkRectangle *area,
 	{
 		draw_emblem_on_icon(window, im_symlink, &image_x, area->y + 2);
 	}
-	if ((item->flags & ITEM_FLAG_HAS_XATTR) && !o_xattr_ignore.int_value)
+	if ((item->flags & ITEM_FLAG_HAS_XATTR) && o_xattr_show.int_value)
 	{
 		draw_emblem_on_icon(window, im_xattr, &image_x, area->y + 2);
 	}
@@ -226,7 +228,7 @@ void draw_large_icon(GdkWindow *window,
 	{
 		draw_emblem_on_icon(window, im_symlink, &image_x, area->y + 2);
 	}
-	if ((item->flags & ITEM_FLAG_HAS_XATTR) && !o_xattr_ignore.int_value)
+	if ((item->flags & ITEM_FLAG_HAS_XATTR) && o_xattr_show.int_value)
 	{
 		draw_emblem_on_icon(window, im_xattr, &image_x, area->y + 2);
 	}
@@ -277,7 +279,7 @@ void draw_small_icon(GdkWindow *window, GdkRectangle *area,
 	{
 		draw_emblem_on_icon(window, im_symlink, &image_x, area->y + 8);
 	}
-	if ((item->flags & ITEM_FLAG_HAS_XATTR) && !o_xattr_ignore.int_value)
+	if ((item->flags & ITEM_FLAG_HAS_XATTR) && o_xattr_show.int_value)
 	{
 		draw_emblem_on_icon(window, im_xattr, &image_x, area->y + 8);
 	}
