@@ -10,11 +10,7 @@ PKG_CONFIG = @PKG_CONFIG@
 LIBS = @LIBS@ @LFS_LDFLAGS@ -lICE -lSM
 #PROF = -fprofile-arcs -pg
 
-ifeq (${GTKHEADERS},)
-  PKG_CONFIG_FLAGS=
-else
-  PKG_CONFIG_FLAGS=--define-variable=gtkprefix="${GTKHEADERS}" --define-variable=glibprefix="${GLIBHEADERS}" --define-variable=pangoprefix="${PANGOHEADERS}" --define-variable=atkprefix="${ATKHEADERS}"
-endif
+PKG_CONFIG_FLAGS=
 
 CFLAGS = -I. -I${srcdir} ${PROF} @CFLAGS@ @LFS_CFLAGS@ \
 	 `${PKG_CONFIG} ${PKG_CONFIG_FLAGS} --cflags gtk+-2.0 libxml-2.0`
