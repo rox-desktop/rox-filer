@@ -3085,10 +3085,12 @@ $ rehash</screen>
        <listitem><para>show user name in each window.
       </para></listitem></varlistentry>
 
-      <varlistentry><term><option>-U</option></term><term><option>--url=URL</option></term>
-       <listitem><para>run URL as a file or directory, if it is a
-file: url and refers to a file on the local machine.  rox -U
-file:///tmp is equivalent to rox /tmp.
+      <varlistentry><term><option>-U</option></term><term><option>--url=URI</option></term>
+       <listitem><para>run URI as a file or directory. If URI is a
+file: url and refers to a file on the local machine then it is
+converted to a local file name:  rox -U
+file:///tmp is equivalent to rox /tmp.  If the URI is some other
+scheme the shared URI handler configuration is consulted to run it.
       </para></listitem></varlistentry>
 
       <varlistentry><term><option>-v</option></term><term><option>--version</option></term>
