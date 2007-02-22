@@ -129,7 +129,7 @@ GtkTooltips *tooltips = NULL;
        "  -S, --rox-session	use default panel and pinboard options, and -n\n"\
        "  -t, --top=PANEL	open PANEL as a top-edge panel\n"	\
        "  -u, --user		show user name in each window \n"	\
-       "  -U, --url=URL		open file or direction in file: URL form\n"   \
+       "  -U, --url=URL		open file or directory in URI form\n"   \
        "  -v, --version		display the version information and exit\n"   \
        "  -x, --examine=FILE	FILE has changed - re-examine it\n"	\
        "\nReport bugs to %s.\n"		\
