@@ -7,6 +7,95 @@
 * the end) and I'll update this file only when making a new release.
 
 
+Release 2.6 (2007-02-25)
+
+CHANGES
+
+- If a .desktop file says "Terminal=true" then run the program in a terminal
+  (Thomas Leonard, reported by Frank McCormick). Note: this is currently
+  hard-coded to use xterm.
+
+- Option to display xattr indicator now independant of xattr support option
+
+- The symlink and xattr emblems are now loaded from stock items and therefore
+  themeable. Made clear that setting type on directories sets the contents, not
+  the directory.  inode/* types excluded from the list of types available for
+  setting (Stephen Watson).
+
+- Added "Fit" backdrop image scaling mode (Peter Hyman). Like "Scale", this
+  scales the image without distorting it, but it will make it larger than the
+  screen if necessary to avoid a border.
+
+- New MIME type for Jar archives.
+
+- Lookup URI handlers by scheme in choices (Stephen Watson)
+
+- Added -U option for parsing filenames in URL form (Stephen Watson).
+
+- Added a new SOAP method, RunURI, and made the -U option use that. In addition
+  error returns from SOAP methods implicitly invoked (not via -R) are printed
+  as simple messages rather than the XML data (Stephen Watson).
+
+- Add eject button to the unmount/don't unmount dialog (Stephen Watson).
+
+- Mount and unmount commands can have additional parameters, eject command can
+  also be changed in the same way (Jim Ramsay, Stephen Watson).
+
+- Menu option to control whether directories are filtered by name along with
+  other files (Janek Kozicki and Andras Mohari).
+
+
+BUG FIXES
+
+- Don't try to thumbnail zero-byte files. They're either empty, or special and
+  may cause us to hang (Thomas Leonard; reported by Barry Kauler).
+
+- Always use the default RTL setting to render filenames, even if they start
+  with a character that suggests the opposite. Fixes a positioning problem
+  (Thomas Leonard; reported by Alexander McLeay).
+
+- Use $MAKE to run make, for *BSD users
+
+- Don't display a warning about deprecated options; it just confuses people
+  (Thomas Leonard; reported by Peter).
+
+- When moving the cursor down on the last row of a collection in vertical mode,
+  move to the start of the next column (Thomas Leonard).
+
+- When reporting an invalid MIME type, include the type's name in the error
+  message (Thomas Leonard).
+
+- Fix bug when checking for escape characters in command string (Stephen Watson).
+
+
+COMPILATION
+
+- Removed code to set location of pkg-config files. No longer needed, since the
+  discovery of ${pcfiledir} (suggested by Stephen Watson).
+
+- Made ROX-Filer-src.xml use the gtk-2.4 build environment, rather than
+  depending on all the headers directly. The build environment sets up a
+  temporary directory with some symlinks, which means you can compile without
+  having any version of the GTK headers installed at all. Before, an existing
+  -dev installation was required (but only to get the major version number of
+  the library!).
+
+
+TRANSLATIONS
+
+- Updated French translation (Vincent Lefèvre).
+
+- Updated Hungarian translation (amohari).
+
+- Updated Italian translation (deslar).
+
+- Updated Russian translation (Nikita E. Shalaev).
+
+- Updated Ukrainian translation (Yury Bulka).
+
+- Updated Vietnamese translation (Anhtuan).
+
+
 Release 2.5 (2006-07-07)
 
 New features:

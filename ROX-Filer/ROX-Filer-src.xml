@@ -2,7 +2,8 @@
 <?xml-stylesheet type='text/xsl'
      href='http://0install.net/2006/stylesheets/interface.xsl'?>
 
-<interface xmlns="http://zero-install.sourceforge.net/2004/injector/interface">
+<interface xmlns="http://zero-install.sourceforge.net/2004/injector/interface"
+  xmlns:compile="http://zero-install.sourceforge.net/2006/namespaces/0compile">
   <name>ROX-Filer-src</name>
   <summary>source code for ROX-Filer</summary>
   <description>
@@ -10,11 +11,13 @@
   </description>
   <icon type='image/png' href='http://rox.sourceforge.net/Icons/ROX-Filer.png'/>
 
-  <group main='src/build'>
+  <group main='src/build' arch='*-src'
+  	 compile:build-main='ROX-Filer/AppRun'
+	 compile:command='"$SRCDIR/ROX-Filer/src/build"'>
     <requires interface="http://0install.net/2006/interfaces/GTK-2.4.xml">
       <environment insert="" name="GTK24_HOME"/>
     </requires>
 
-    <implementation id="." version="2.5.0" released='Snapshot'/>
+    <implementation id=".." version="2.6" released='Snapshot'/>
   </group>
 </interface>
