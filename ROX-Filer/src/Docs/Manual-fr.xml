@@ -7,8 +7,8 @@
 <book lang="fr">
  <bookinfo>
   <title>
-   ROX-Filer 2.5 - Manuel de l'utilisateur
-   <ulink url="http://rox.sourceforge.net"/>
+   ROX-Filer 2.6 - Manuel de l'utilisateur
+   <ulink url="http://rox.sourceforge.net/Manual/Manual/Manual-fr.html"/>
   </title>
 
   <authorgroup>
@@ -766,7 +766,7 @@ Autre bouton
  <row>
   <entry>Œil</entry>
   <entry>Bascule entre l'affichage et le masquage des fichiers cachés (ceux dont le nom commence par un point)</entry>
-  <entry>Same</entry>
+  <entry>Idem</entry>
  </row>
  <row>
   <entry>Liste avec sélections</entry>
@@ -935,6 +935,15 @@ Opérations diverses agissant sur la fenêtre.
     Contraint ROX à n'afficher que les fichiers dont les noms correspondent 
     à un certain motif.
     La barre de titre affichera <guilabel>(Glob (motif))</guilabel> si un filtre est utilisé.
+  </entry>
+ </row>
+
+ <row>
+  <entry>
+    <guimenuitem>Filtrer les répertoires avec les fichiers</guimenuitem>
+  </entry>
+  <entry>
+    Applique aux répertoires également, le filtre défini dans <guimenuitem>Filtrer des fichiers...</guimenuitem>.
   </entry>
  </row>
 
@@ -1595,7 +1604,8 @@ Ouvre le même menu que le menu 'Fichier' du <foreignphrase lang="en">filer</for
 <row><entry>
 <guimenuitem>Éditer l'objet</guimenuitem></entry><entry>
 Modifier le nom qui est affiché sous l'icône, ou le chemin de l'objet vers lequel
-pointe l'icône. Vous pouvez aussi assigner un raccourci-clavier à cet objet.
+pointe l'icône. Vous pouvez aussi assigner un raccourci-clavier à cet objet, 
+et le vérouiller pour éviter de l'enlever accidentellement.
 Pour les programmes, vous pouvez préciser des arguments à passer.
 </entry></row>
 
@@ -3487,6 +3497,18 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filena
    <listitem><para>affiche le nom de l'utilisateur dans chaque fenêtre.
   </para></listitem></varlistentry>
 
+  <varlistentry>
+    <term><option>-U</option></term>
+    <term><option>--url=URI</option></term>
+	<listitem>
+	  <para>
+	    Exécute URI en tant que fichier ou répertoire. 
+	    Si URI est une URL de type "file:" et correspond à un fichier sur la machine locale, 
+	    elle sera convertie en un nom de fichier local : "rox -U file:///tmp" sera 
+	    converti en "rox /tmp". Si l'URI correspond à un autre type d'URL, la configuration
+	    du gestionnaire d'URI est alors consultée.
+      </para></listitem></varlistentry>
+
   <varlistentry><term><option>-v</option></term><term><option>--version</option></term>
    <listitem><para>Affiche les informations sur la version et s'arrête.
   </para></listitem></varlistentry>
@@ -3795,6 +3817,14 @@ pour n'afficher que les fichiers se terminant par .c.
 
  <listitem>
   <para>
+   <function>RunURI</function>(<parameter>URI</parameter>)
+   Exécute <parameter>URI</parameter> comme s'il avait été cliqué dans le filer.
+   <parameter>URI</parameter> est interprétée comme une URI, sous la forme file://localhost/chemin.
+  </para>
+ </listitem>
+
+ <listitem>
+  <para>
    <function>Show</function>(<parameter>Directory</parameter>, <parameter>Leafname</parameter>)
    Ouvre le dossier <parameter>Directory</parameter> et met en évidence le fichier dont le nom
    est <parameter>Leafname</parameter>.
@@ -3806,6 +3836,21 @@ pour n'afficher que les fichiers se terminant par .c.
    <function>FileType</function>(<parameter>Filename</parameter>)
    Affiche le type MIME du fichier <parameter>Filename</parameter> (en écrivant la
    réponse SOAP sur la sortie standard).
+  </para>
+ </listitem>
+
+ <listitem>
+  <para>
+   <function>SetIcon</function>(<parameter>Path</parameter>, <parameter>Icon</parameter>)
+   Définit l'icône à utiliser pour le chemin donné. C'est l'équivalent de la commande 
+   <guimenuitem>Fixer l'icône...</guimenuitem> du menu Fichier.
+  </para>
+ </listitem>
+
+ <listitem>
+  <para>
+   <function>UnsetIcon</function>(<parameter>Path</parameter>)
+   Supprime l'association entre l'icône à utiliser et le chemin donné.
   </para>
  </listitem>
 </itemizedlist>
