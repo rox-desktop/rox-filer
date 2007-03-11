@@ -23,5 +23,5 @@ fi
 (cd "$SRCDIR/ROX-Filer" && cp -ru .DirIcon Help images Messages ROX AppInfo.xml AppRun Options.xml style.css subclasses "$DISTDIR/ROX-Filer") || exit 1
 find "$DISTDIR" -name '.svn' -type d |xargs rm -rf
 
-# Remove debugging symbols
-rm "$DISTDIR/ROX-Filer/ROX-Filer.dbg"
+# Remove debugging symbols, if any
+rm -f "$DISTDIR/ROX-Filer/ROX-Filer.dbg"
