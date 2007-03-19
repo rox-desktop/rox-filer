@@ -611,8 +611,7 @@ static GdkPixbuf *get_thumbnail_for(const char *pathname)
 
 	/* Note that these don't need freeing... */
 	ssize = gdk_pixbuf_get_option(thumb, "tEXt::Thumb::Size");
-	if (!ssize)
-		goto err;
+	/* This is optional, so don't flag an error if it is missing */
 
 	smtime = gdk_pixbuf_get_option(thumb, "tEXt::Thumb::MTime");
 	if (!smtime)
@@ -626,7 +625,7 @@ static GdkPixbuf *get_thumbnail_for(const char *pathname)
 	if (info.st_mtime != ttime && now>ttime+PIXMAP_THUMB_TOO_OLD_TIME)
 		goto err;
 
-	if (info.st_size < atol(ssize))
+	if (ssize && info.st_size < atol(ssize))
 		goto err;
 
 	goto out;
