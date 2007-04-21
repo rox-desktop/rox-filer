@@ -3,7 +3,7 @@
 # This script is called by ROX-Filer-src.xml. It builds the filer
 # against the GTK 2.4 headers, using the gtk-2.4 compatibility environment.
 
-if [ "x$GTK24_HOME" == "x" ]; then
+if [ "x$GTK24_HOME" = "x" ]; then
   echo 'Run me like this:'
   echo '0compile setup ../../ROX-Filer-src.xml build-dir'
   echo 'cd build-dir'
