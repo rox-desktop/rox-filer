@@ -118,10 +118,11 @@ static MaskedPixmap *get_bad_image(void);
 static GdkPixbuf *scale_pixbuf_up(GdkPixbuf *src, int max_w, int max_h);
 static GdkPixbuf *get_thumbnail_for(const char *path);
 static void thumbnail_child_done(ChildThumbnail *info);
-static void child_create_thumbnail(const gchar *path);
+static void child_create_thumbnail(const gchar *path, MIME_type *type);
 static GList *thumbs_purge_cache(Option *option, xmlNode *node, guchar *label);
 static gchar *thumbnail_path(const gchar *path);
 static gchar *thumbnail_program(MIME_type *type);
+static GdkPixbuf *extract_tiff_thumbnail(const gchar *path);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -394,7 +395,7 @@ void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 			_exit(1);
 		}
 
-		child_create_thumbnail(path);
+		child_create_thumbnail(path, type);
 		_exit(0);
 	}
 
@@ -544,11 +545,15 @@ static gchar *thumbnail_program(MIME_type *type)
 /* Called in a subprocess. Load path and create the thumbnail
  * file. Parent will notice when we die.
  */
-static void child_create_thumbnail(const gchar *path)
+static void child_create_thumbnail(const gchar *path, MIME_type *type)
 {
-	GdkPixbuf *image;
+	GdkPixbuf *image=NULL;
 
-	image = rox_pixbuf_new_from_file_at_scale(path,
+        if(strcmp(type->subtype, "jpeg")==0)
+            image=extract_tiff_thumbnail(path);
+
+	if(!image)
+            image = rox_pixbuf_new_from_file_at_scale(path,
 			PIXMAP_THUMB_SIZE, PIXMAP_THUMB_SIZE, TRUE, NULL);
 
 	if (image)
@@ -1007,3 +1012,157 @@ static GList *thumbs_purge_cache(Option *option, xmlNode *node, guchar *label)
 
 	return g_list_append(NULL, align);
 }
+
+/* Exif reading */
+#define JPEG_FORMAT        0x201
+#define JPEG_FORMAT_LENGTH 0x202
+
+/*
+ * Extract n-byte integer in Motorola (big-endian) format
+ */
+static inline long long s2n_motorola(const unsigned char *p, int len)
+{
+    long long a=0;
+    int i;
+
+    for(i=0; i<len; i++)
+        a=(a<<8) | (int)(p[i]);
+
+    return a;
+}
+
+/*
+ * Extract n-byte integer in Intel (little-endian) format
+ */
+static inline long long s2n_intel(const unsigned char *p, int len)
+{
+    long long a=0;
+    int i;
+  
+    for(i=0; i<len; i++)
+        a=a | (((int) p[i]) << (i*8));
+
+    return a;
+}
+
+/*
+ * Extract n-byte integer from data
+ */
+static int s2n(const unsigned char *dat, int off, int len, char format)
+{
+    const unsigned char *p=dat+off;
+
+    switch(format) {
+    case 'I':
+        return s2n_intel(p, len);
+
+    case 'M':
+        return s2n_motorola(p, len);
+    }
+
+    return 0;
+}
+
+/*
+ * Load header of JPEG/Exif file and attempt to extract the embedded
+ * thumbnail.  Return NULL on failure.
+ */
+static GdkPixbuf *extract_tiff_thumbnail(const gchar *path)
+{
+    FILE *in;
+    char header[256];
+    int i, n;
+    int length;
+    unsigned char *data;
+    char format;
+    int ifd, entries;
+    int thumb=0, tlength=0;
+    GdkPixbuf *buf=NULL;
+
+    in=fopen(path, "rb");
+    if(!in) {
+        return NULL;
+    }
+
+    /* Check for Exif format */
+    n=fread(header, 1, 12, in);
+    if(n!=12 || strncmp(header, "\377\330\377\341", 4)!=0 ||
+       strncmp(header+6, "Exif", 4)!=0) {
+        fclose(in);
+        return NULL;
+    }
+
+    /* Read header */
+    length=header[4]*256+header[5];
+    data=g_new(unsigned char, length);
+    n=fread(data, 1, length, in);
+    fclose(in);   /* File no longer needed */
+    if(n!=length) {
+        g_free(data);
+        return NULL;
+    }
+
+    /* Big or little endian (as 'M' or 'I') */
+    format=data[0];
+
+    /* Skip over main section */
+    ifd=s2n(data, 4, 4, format);
+    entries=s2n(data, ifd, 2, format);
+
+    /* Second section contains data on thumbnail */
+    ifd=s2n(data, ifd+2+12*entries, 4, format);
+    entries=s2n(data, ifd, 2, format);
+
+    /* Loop over the entries */
+    for(i=0; i<entries; i++) {
+        int entry=ifd+2+12*i;
+        int tag=s2n(data, entry, 2, format);
+        int type=s2n(data, entry+2, 2, format);
+        int count, offset;
+
+        count=s2n(data, entry+4, 4, format);
+        offset=entry+8;
+
+        if(type==4) {
+            int val=(int) s2n(data, offset, 4, format);
+
+            /* Only interested in two entries, the location of the thumbnail
+               and its size */
+            switch(tag) {
+            case JPEG_FORMAT: thumb=val; break;
+            case JPEG_FORMAT_LENGTH: tlength=val; break;
+            }
+        }
+    }
+
+    if(thumb && tlength) {
+        GError *err=NULL;
+        GdkPixbufLoader *loader;
+
+        /* Don't read outside the header (some files have incorrect data) */
+        if(thumb+tlength>length)
+            tlength=length-thumb;
+
+        loader=gdk_pixbuf_loader_new();
+        gdk_pixbuf_loader_write(loader, data+thumb, tlength, &err);
+        if(err) {
+            g_error_free(err);
+            return NULL;
+        }
+
+        gdk_pixbuf_loader_close(loader, &err);
+        if(err) {
+            g_error_free(err);
+            return NULL;
+        }
+
+        buf=gdk_pixbuf_loader_get_pixbuf(loader);
+        g_object_ref(buf);      /* Ref the image before we unref the loader */
+        g_object_unref(loader);
+    }
+
+    g_free(data);
+
+    return buf;
+}
+
