@@ -37,6 +37,7 @@
 #define ROX_FILER_URI "http://rox.sourceforge.net/2005/interfaces/ROX-Filer"
 
 static gboolean use_0launch;
+gboolean session_auto_respawn = FALSE;	/* If we were started as 'rox -S' */
 
 static void save_state(SmClient *client)
 {
@@ -151,7 +152,8 @@ void session_init(const gchar *client_id)
 	sc_set_list_of_array_prop(client, SmCloneCommand,
 			(const gchar **) clone_cmd,
 			clone_cmd[2] == NULL ? 2 : 3);
-	sc_set_card_prop(client, SmRestartStyleHint, SmRestartIfRunning);
+	sc_set_card_prop(client, SmRestartStyleHint,
+			session_auto_respawn ? SmRestartImmediately : SmRestartIfRunning);
 	
 	client->save_yourself_fn = &save_yourself;
 	client->shutdown_cancelled_fn = NULL;

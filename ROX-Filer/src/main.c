@@ -503,6 +503,7 @@ int main(int argc, char **argv)
 		        case 'S':
 				new_copy = TRUE;
 				add_default_panel_and_pinboard(body);
+				session_auto_respawn = TRUE;
 				break;
 
 		        case 'U':
