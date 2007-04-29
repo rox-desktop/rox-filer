@@ -3,7 +3,10 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 version='1.0'>
 
-  <xsl:import href="http://docbook.sourceforge.net/release/xsl/current/xhtml/docbook.xsl"/>
+  <!-- Hint: apt-get install docbook-xsl -->
+  <xsl:import href="/usr/share/xml/docbook/stylesheet/nwalsh/xhtml/docbook.xsl"/>
+  <!-- Too slow: <xsl:import href="http://docbook.sourceforge.net/release/xsl/current/xhtml/docbook.xsl"/> -->
+
 <!--
   <xsl:param name="generate.component.toc">0</xsl:param>
 -->

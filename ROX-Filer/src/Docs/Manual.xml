@@ -3078,7 +3078,9 @@ $ rehash</screen>
       </para></listitem></varlistentry>
 
       <varlistentry><term><option>-S</option></term><term><option>--rox-session</option></term>
-       <listitem><para>run under ROX-Session, open the default panel and pinboard (implies --new).
+       <listitem><para>run by session manager, open the default panel and pinboard (implies --new).
+If an XSM session manager is running and this option is used then ROX-Filer will ask to be automatically
+restarted if it crashes.
       </para></listitem></varlistentry>
 
       <varlistentry><term><option>-t</option></term><term><option>--top=PANEL</option></term>
