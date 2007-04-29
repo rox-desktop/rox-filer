@@ -73,19 +73,26 @@ static void save_state(SmClient *client)
 		g_ptr_array_add(restart_cmd, filer_window->sym_path);
 	}
 	
-	for(i = 0; i < PANEL_NUMBER_OF_SIDES; i++)
+	if (session_auto_respawn)
 	{
-		panel = current_panel[i];
-		if(!panel)
-			continue;
-		g_ptr_array_add(restart_cmd, types[panel->side]);
-		g_ptr_array_add(restart_cmd, panel->name);
+		for(i = 0; i < PANEL_NUMBER_OF_SIDES; i++)
+		{
+			panel = current_panel[i];
+			if(!panel)
+				continue;
+			g_ptr_array_add(restart_cmd, types[panel->side]);
+			g_ptr_array_add(restart_cmd, panel->name);
+		}
+		
+		if (pinboard)
+		{
+			g_ptr_array_add(restart_cmd, "-p");
+			g_ptr_array_add(restart_cmd, (gchar *) pinboard_get_name());
+		}
 	}
-	
-	if (pinboard)
+	else
 	{
-		g_ptr_array_add(restart_cmd, "-p");
-		g_ptr_array_add(restart_cmd, (gchar *) pinboard_get_name());
+		g_ptr_array_add(restart_cmd, "-S");
 	}
 	
 	sc_set_list_of_array_prop(client, SmRestartCommand, 
