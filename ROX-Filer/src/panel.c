@@ -54,7 +54,7 @@
 #include "pinboard.h"		/* For pinboard_get_window() */
 
 /* The width of the separator at the inner edge of the panel */
-#define EDGE_WIDTH 2
+#define EDGE_WIDTH 1
 
 /* The gap between panel icons */
 #define PANEL_ICON_SPACING 8
