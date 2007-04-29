@@ -34,6 +34,10 @@
 #include "sc.h"
 #include "session.h"
 
+#define ROX_FILER_URI "http://rox.sourceforge.net/2005/interfaces/ROX-Filer"
+
+static gboolean use_0launch;
+
 static void save_state(SmClient *client)
 {
 	FilerWindow *filer_window;
@@ -42,11 +46,19 @@ static void save_state(SmClient *client)
 	GList *list;
 	GPtrArray *restart_cmd = g_ptr_array_new();
 	SmPropValue *program;
-	gchar *types[] = { "-t", "-b", "-l", "-r" };
+	gchar *types[] = { "-t", "-B", "-l", "-r" };
 	gint i, nvals;
 	
-	sc_get_prop_value(client, SmProgram, &program, &nvals);
-	g_ptr_array_add(restart_cmd, program->value);
+	if (use_0launch)
+	{
+		g_ptr_array_add(restart_cmd, "0launch");
+		g_ptr_array_add(restart_cmd, ROX_FILER_URI);
+	}
+	else
+	{
+		sc_get_prop_value(client, SmProgram, &program, &nvals);
+		g_ptr_array_add(restart_cmd, program->value);
+	}
 	
 	g_ptr_array_add(restart_cmd, "-c");
 	g_ptr_array_add(restart_cmd, client->id);
@@ -99,15 +111,32 @@ void session_init(const gchar *client_id)
 	SmClient *client;
 	struct passwd *pw;
 	gchar *bin_path;
-	gchar *clone_cmd[2];
+	gchar *clone_cmd[3];
+	gchar *zerolaunch;
 
 	if (!sc_session_up())
 		return;
 
 	pw = getpwuid(euid);
-	bin_path = g_strconcat(app_dir, "/AppRun", NULL);
-	clone_cmd[0] = bin_path,
-	clone_cmd[1] = "-n";
+
+	zerolaunch = g_find_program_in_path("0launch");
+	use_0launch = (zerolaunch != NULL);
+	g_free(zerolaunch);
+
+	if (use_0launch)
+	{
+		bin_path = "0launch";
+		clone_cmd[0] = bin_path;
+		clone_cmd[1] = ROX_FILER_URI,
+		clone_cmd[2] = "-n";
+	}
+	else
+	{
+		bin_path = g_strconcat(app_dir, "/AppRun", NULL);
+		clone_cmd[0] = bin_path;
+		clone_cmd[1] = "-n";
+		clone_cmd[2] = NULL;
+	}
 
 	client = sc_new(client_id);
 	
@@ -120,7 +149,8 @@ void session_init(const gchar *client_id)
 	sc_set_array_prop(client, SmProgram, bin_path);
 	sc_set_array_prop(client, SmUserID, pw->pw_name);
 	sc_set_list_of_array_prop(client, SmCloneCommand,
-			(const gchar **) clone_cmd, 2);
+			(const gchar **) clone_cmd,
+			clone_cmd[2] == NULL ? 2 : 3);
 	sc_set_card_prop(client, SmRestartStyleHint, SmRestartIfRunning);
 	
 	client->save_yourself_fn = &save_yourself;
