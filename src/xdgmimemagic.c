@@ -676,7 +676,8 @@ _xdg_mime_magic_lookup_data (XdgMimeMagic *mime_magic,
 	      mime_type = match->mime_type;
 	      priority = match->priority;
 	    }
-	  else if (had_match && match->priority == priority)
+	  else if (had_match && match->priority == priority &&
+		   !xdg_mime_mime_type_subclass (mime_type, match->mime_type))
 	    /* multiple unrelated patterns with the same priority matched,
 	     * so we can't tell what type this is. */
 	    mime_type = NULL;
