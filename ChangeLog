@@ -1,5 +1,10 @@
 2007-06-01  Christian Neumair  <cneumair@gnome.org>
 
+	* src/xdgmimeglob.c: (_xdg_glob_hash_node_lookup_file_name): Don't
+	return NULL MIME types, #5241.
+
+2007-06-01  Christian Neumair  <cneumair@gnome.org>
+
 	* src/xdgmime.c: (xdg_mime_shutdown): Fix cache variable name from last
 	commit.
 
