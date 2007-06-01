@@ -671,13 +671,13 @@ _xdg_mime_magic_lookup_data (XdgMimeMagic *mime_magic,
       if (_xdg_mime_magic_match_compare_to_data (match, data, len))
 	{
 	  if (!had_match || match->priority > priority ||
-	      (mime_type != NULL && xdg_mime_mime_type_subclass (match->mime_type, mime_type)))
+	      (mime_type != NULL && _xdg_mime_mime_type_subclass (match->mime_type, mime_type)))
 	    {
 	      mime_type = match->mime_type;
 	      priority = match->priority;
 	    }
 	  else if (had_match && match->priority == priority &&
-		   !xdg_mime_mime_type_subclass (mime_type, match->mime_type))
+		   !_xdg_mime_mime_type_subclass (mime_type, match->mime_type))
 	    /* multiple unrelated patterns with the same priority matched,
 	     * so we can't tell what type this is. */
 	    mime_type = NULL;
@@ -689,7 +689,7 @@ _xdg_mime_magic_lookup_data (XdgMimeMagic *mime_magic,
 	  for (n = 0; n < n_mime_types; n++)
 	    {
 	      if (mime_types[n] && 
-		  xdg_mime_mime_type_equal (mime_types[n], match->mime_type))
+		  _xdg_mime_mime_type_equal (mime_types[n], match->mime_type))
 		mime_types[n] = NULL;
 	    }
 	}

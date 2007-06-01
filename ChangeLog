@@ -1,5 +1,17 @@
 2007-06-01  Christian Neumair  <cneumair@gnome.org>
 
+	* src/xdgmime.c: (xdg_mime_shutdown): Fix cache variable name from last
+	commit.
+
+	* src/xdgmime.c: (xdg_mime_unalias_mime_type), (xdg_mime_mime_type_equal):
+	* src/xdgmime.h:
+	* src/xdgmimemagic.c: (_xdg_mime_magic_lookup_data):
+	Define and use private versions of functions that may lead to an
+	xdg_mime_init() call and thus to an invalid cache, and a crash - #6824.
+	Thanks to Joe Shaw <joeshaw@novell.com>.
+
+2007-06-01  Christian Neumair  <cneumair@gnome.org>
+
 	* src/xdgmime.c: (xdg_mime_shutdown): Free caches, #7496.
 	Thanks to Yevgen Muntyan <muntyan@tamu.edu>.
 
