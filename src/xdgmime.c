@@ -76,6 +76,7 @@ struct XdgDirTimeList
   char *directory_name;
   int checked;
   XdgDirTimeList *next;
+  XdgMimeCache *cache;
 };
 
 struct XdgCallbackList
@@ -139,6 +140,7 @@ xdg_mime_init_from_directory (const char *directory)
 	  list->directory_name = file_name;
 	  list->mtime = st.st_mtime;
 	  list->next = dir_time_list;
+	  list->cache = cache;
 	  dir_time_list = list;
 
 	  _caches = realloc (_caches, sizeof (XdgMimeCache *) * (n_caches + 2));
@@ -274,6 +276,18 @@ xdg_run_command_on_dirs (XdgDirectoryFunc  func,
     }
 }
 
+static XdgMimeCache *
+xdg_lookup_cache_for_file (const char *file_path)
+{
+  XdgDirTimeList *list;
+
+  for (list = dir_time_list; list; list = list->next)
+      if (! strcmp (list->directory_name, file_path))
+	 return list->cache;
+
+  return NULL;
+}
+
 /* Checks file_path to make sure it has the same mtime as last time it was
  * checked.  If it has a different mtime, or if the file doesn't exist, it
  * returns FALSE.
@@ -313,10 +327,28 @@ static int
 xdg_check_dir (const char *directory,
 	       int        *invalid_dir_list)
 {
-  int invalid;
+  int invalid, has_cache;
   char *file_name;
 
   assert (directory != NULL);
+
+  /* Check the mime.cache file */
+  file_name = malloc (strlen (directory) + strlen ("/mime/mime.cache") + 1);
+  strcpy (file_name, directory); strcat (file_name, "/mime/mime.cache");
+  invalid = xdg_check_file (file_name);
+  has_cache = xdg_lookup_cache_for_file (file_name) != NULL;
+  free (file_name);
+
+  if (has_cache)
+    {
+      if (invalid)
+	{
+	  *invalid_dir_list = TRUE;
+	  return TRUE;
+	}
+
+      return FALSE;
+    }
 
   /* Check the globs file */
   file_name = malloc (strlen (directory) + strlen ("/mime/globs") + 1);
@@ -332,17 +364,6 @@ xdg_check_dir (const char *directory,
   /* Check the magic file */
   file_name = malloc (strlen (directory) + strlen ("/mime/magic") + 1);
   strcpy (file_name, directory); strcat (file_name, "/mime/magic");
-  invalid = xdg_check_file (file_name);
-  free (file_name);
-  if (invalid)
-    {
-      *invalid_dir_list = TRUE;
-      return TRUE;
-    }
-
-  /* Check the mime.cache file */
-  file_name = malloc (strlen (directory) + strlen ("/mime/mime.cache") + 1);
-  strcpy (file_name, directory); strcat (file_name, "/mime/mime.cache");
   invalid = xdg_check_file (file_name);
   free (file_name);
   if (invalid)
