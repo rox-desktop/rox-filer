@@ -463,8 +463,9 @@ cache_glob_node_lookup_suffix (XdgMimeCache *cache,
 	    {
 	      mimetype_offset = GET_UINT32 (cache->buffer, offset + 16 * mid + 4);
 	      n = 0;
-	      mime_types[n++] = cache->buffer + mimetype_offset;
-	      
+              if (cache->buffer[mimetype_offset])
+                mime_types[n++] = cache->buffer + mimetype_offset;
+
 	      n_children = GET_UINT32 (cache->buffer, offset + 16 * mid + 8);
 	      child_offset = GET_UINT32 (cache->buffer, offset + 16 * mid + 12);
 	      i = 0;
