@@ -472,10 +472,8 @@ xdg_mime_get_mime_type_for_file (const char  *file_name,
                                  struct stat *statbuf)
 {
   const char *mime_type;
-  /* currently, only a few globs occur twice, and none
-   * more often, so 5 seems plenty.
-   */
-  const char *mime_types[5];
+  /* Used to detect whether multiple MIME types match file_name */
+  const char *mime_types[2];
   FILE *file;
   unsigned char *data;
   int max_extent;
@@ -495,7 +493,7 @@ xdg_mime_get_mime_type_for_file (const char  *file_name,
     return _xdg_mime_cache_get_mime_type_for_file (file_name, statbuf);
 
   base_name = _xdg_get_base_name (file_name);
-  n = _xdg_glob_hash_lookup_file_name (global_hash, base_name, mime_types, 5);
+  n = _xdg_glob_hash_lookup_file_name (global_hash, base_name, mime_types, 2);
 
   if (n == 1)
     return mime_types[0];
@@ -804,6 +802,8 @@ xdg_mime_dump (void)
   _xdg_mime_alias_list_dump (alias_list);
   printf ("\n*** PARENTS ***\n\n");
   _xdg_mime_parent_list_dump (parent_list);
+  printf ("\n*** CACHE ***\n\n");
+  _xdg_glob_hash_dump (global_hash);
 }
 
 

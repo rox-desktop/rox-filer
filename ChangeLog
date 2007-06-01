@@ -1,5 +1,14 @@
 2007-06-01  Christian Neumair  <cneumair@gnome.org>
 
+	* src/xdgmime.c: (xdg_mime_get_mime_type_for_file): Only request two
+	MIME types from cache.
+
+	* src/xdgmime.c: (xdg_mime_dump): Dump cache.
+
+	* src/xdgmimecache.c: Warn if building without MMAP support.
+
+2007-06-01  Christian Neumair  <cneumair@gnome.org>
+
 	* src/xdgmime.c: (xdg_lookup_cache_for_file), (xdg_check_dir):
 	Fix constant re-creation of memory MIME cache, #7495.
 
