@@ -1,3 +1,8 @@
+2007-06-01  Christian Neumair  <cneumair@gnome.org>
+
+	* src/xdgmimemagic.c: Don't declare errno, fixes build on Dragonfly
+	BSD, GNOME #336382.
+
 2006-07-13  Christian Neumair  <chris@gnome-de.org>
 
 	* src/xdgmimemagic.c: (_xdg_mime_magic_parse_magic_line):
