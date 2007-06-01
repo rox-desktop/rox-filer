@@ -1,5 +1,10 @@
 2007-06-01  Christian Neumair  <cneumair@gnome.org>
 
+	* src/xdgmimecache.c: (_xdg_mime_cache_list_mime_parents): Fix
+	several problems with this function, #9560. Thanks to Yevgen Muntyan.
+
+2007-06-01  Christian Neumair  <cneumair@gnome.org>
+
 	* src/xdgmimemagic.c: Don't declare errno, fixes build on Dragonfly
 	BSD, GNOME #336382.
 
