@@ -1,5 +1,10 @@
 2007-06-01  Christian Neumair  <cneumair@gnome.org>
 
+	* src/xdgmime.c: (xdg_mime_shutdown): Free caches, #7496.
+	Thanks to Yevgen Muntyan <muntyan@tamu.edu>.
+
+2007-06-01  Christian Neumair  <cneumair@gnome.org>
+
 	* src/xdgmimecache.c: (cache_glob_node_lookup_suffix): Don't return
 	MIME types if cache suffix lookup returns empty string, #9544.
 	Thanks to Yevgen Muntyan <muntyan@tamu.edu>.

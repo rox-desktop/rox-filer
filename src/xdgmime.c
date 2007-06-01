@@ -583,7 +583,17 @@ xdg_mime_shutdown (void)
       _xdg_mime_parent_list_free (parent_list);
       parent_list = NULL;
     }
-  
+
+  if (_xdg_mime_caches)
+    {
+      int i;
+      for (i = 0; i < n_caches; i++)
+        _xdg_mime_cache_unref (_xdg_mime_caches[i]);
+      free (_xdg_mime_caches);
+      _xdg_mime_caches = NULL;
+      n_caches = 0;
+    }
+
   for (list = callback_list; list; list = list->next)
     (list->callback) (list->data);
 
