@@ -1,5 +1,20 @@
 2007-06-02  Christian Neumair  <cneumair@gnome.org>
 
+	* src/xdgmime.[ch]: Move xdg_mime_type_unknown to .rodata.
+	* src/xdgmime.h: Add XDG_ENTRY() entry for xdg_mime_dump.
+	GTK+ resync.
+
+	* src/xdgmime.c: (_xdg_mime_alias_list_lookup): Initialize mime_type
+	to NULL instead of 0, GNOME #341812. Thanks to Kjartan Maraas
+	<kmaraas@gnome.org>.
+
+	* src/xdgmime.[ch]: (xdg_mime_media_type_equal),
+	(_xdg_mime_media_type_equal): Add private version of
+	xdg_mime_media_type_equal that doesn't call xdg_mime_init(), use it in
+	_xdg_mime_mime_type_subclass.
+
+2007-06-02  Christian Neumair  <cneumair@gnome.org>
+
 	* src/xdgmimemagic.c: Fallback to getc() if getc_unlocked() is not
 	available, GNOME #381499. Thanks to Paul <ephraim_owns@hotmail.com>.
 

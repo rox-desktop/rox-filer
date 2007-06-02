@@ -60,7 +60,7 @@ static XdgCallbackList *callback_list = NULL;
 XdgMimeCache **_caches = NULL;
 static int n_caches = 0;
 
-const char *xdg_mime_type_unknown = "application/octet-stream";
+const char xdg_mime_type_unknown[] = "application/octet-stream";
 
 
 enum
@@ -677,8 +677,8 @@ xdg_mime_mime_type_equal (const char *mime_a,
 }
 
 int
-xdg_mime_media_type_equal (const char *mime_a,
-			   const char *mime_b)
+_xdg_mime_media_type_equal (const char *mime_a,
+			    const char *mime_b)
 {
   char *sep;
 
@@ -690,6 +690,15 @@ xdg_mime_media_type_equal (const char *mime_a,
     return 1;
 
   return 0;
+}
+
+int
+xdg_mime_media_type_equal (const char *mime_a,
+			   const char *mime_b)
+{
+  xdg_mime_init ();
+
+  return _xdg_mime_media_type_equal (mime_a, mime_b);
 }
 
 #if 0
@@ -728,7 +737,7 @@ _xdg_mime_mime_type_subclass (const char *mime,
 #if 0  
   /* Handle supertypes */
   if (xdg_mime_is_super_type (ubase) &&
-      xdg_mime_media_type_equal (umime, ubase))
+      _xdg_mime_media_type_equal (umime, ubase))
     return 1;
 #endif
 
