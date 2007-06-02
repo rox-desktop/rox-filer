@@ -1,3 +1,8 @@
+2007-06-02  Christian Neumair  <cneumair@gnome.org>
+
+	* src/xdgmimemagic.c: Fallback to getc() if getc_unlocked() is not
+	available, GNOME #381499. Thanks to Paul <ephraim_owns@hotmail.com>.
+
 2007-06-01  Christian Neumair  <cneumair@gnome.org>
 
 	* src/xdgmime.c: (xdg_mime_get_mime_type_for_file): Only request two
