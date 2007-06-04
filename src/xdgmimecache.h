@@ -32,12 +32,23 @@
 typedef struct _XdgMimeCache XdgMimeCache;
 
 #ifdef XDG_PREFIX
-#define _xdg_mime_cache_new_from_file        XDG_ENTRY(cache_new_from_file)
-#define _xdg_mime_cache_ref                  XDG_ENTRY(cache_ref)
-#define _xdg_mime_cache_unref                XDG_ENTRY(cache_unref)
+#define _xdg_mime_cache_new_from_file                XDG_RESERVED_ENTRY(mime_cache_new_from_file)
+#define _xdg_mime_cache_ref                          XDG_RESERVED_ENTRY(mime_cache_ref)
+#define _xdg_mime_cache_unref                        XDG_RESERVED_ENTRY(mime_cache_unref)
+#define _xdg_mime_cache_get_mime_type_for_data       XDG_RESERVED_ENTRY(mime_cache_get_mime_type_for_data)
+#define _xdg_mime_cache_get_mime_type_for_file       XDG_RESERVED_ENTRY(mime_cache_get_mime_type_for_file)
+#define _xdg_mime_cache_get_mime_type_from_file_name XDG_RESERVED_ENTRY(mime_cache_get_mime_type_from_file_name)
+#define _xdg_mime_cache_is_valid_mime_type           XDG_RESERVED_ENTRY(mime_cache_is_valid_mime_type)
+#define _xdg_mime_cache_mime_type_equal              XDG_RESERVED_ENTRY(mime_cache_mime_type_equal)
+#define _xdg_mime_cache_media_type_equal             XDG_RESERVED_ENTRY(mime_cache_media_type_equal)
+#define _xdg_mime_cache_mime_type_subclass           XDG_RESERVED_ENTRY(mime_cache_mime_type_subclass)
+#define _xdg_mime_cache_list_mime_parents            XDG_RESERVED_ENTRY(mime_cache_list_mime_parents)
+#define _xdg_mime_cache_unalias_mime_type            XDG_RESERVED_ENTRY(mime_cache_unalias_mime_type)
+#define _xdg_mime_cache_get_max_buffer_extents       XDG_RESERVED_ENTRY(mime_cache_get_max_buffer_extents)
+#define _xdg_mime_caches                             XDG_RESERVED_ENTRY(mime_caches)
 #endif
 
-extern XdgMimeCache **_caches;
+extern XdgMimeCache **_xdg_mime_caches;
 
 XdgMimeCache *_xdg_mime_cache_new_from_file (const char   *file_name);
 XdgMimeCache *_xdg_mime_cache_ref           (XdgMimeCache *cache);

@@ -57,7 +57,7 @@ static XdgParentList *parent_list = NULL;
 static XdgDirTimeList *dir_time_list = NULL;
 static XdgCallbackList *callback_list = NULL;
 
-XdgMimeCache **_caches = NULL;
+XdgMimeCache **_xdg_mime_caches = NULL;
 static int n_caches = 0;
 
 const char xdg_mime_type_unknown[] = "application/octet-stream";
@@ -143,9 +143,9 @@ xdg_mime_init_from_directory (const char *directory)
 	  list->cache = cache;
 	  dir_time_list = list;
 
-	  _caches = realloc (_caches, sizeof (XdgMimeCache *) * (n_caches + 2));
-	  _caches[n_caches] = cache;
-          _caches[n_caches + 1] = NULL;
+	  _xdg_mime_caches = realloc (_xdg_mime_caches, sizeof (XdgMimeCache *) * (n_caches + 2));
+	  _xdg_mime_caches[n_caches] = cache;
+          _xdg_mime_caches[n_caches + 1] = NULL;
 	  n_caches++;
 
 	  return FALSE;
@@ -456,7 +456,7 @@ xdg_mime_get_mime_type_for_data (const void *data,
 
   xdg_mime_init ();
 
-  if (_caches)
+  if (_xdg_mime_caches)
     return _xdg_mime_cache_get_mime_type_for_data (data, len);
 
   mime_type = _xdg_mime_magic_lookup_data (global_magic, data, len, NULL, 0);
@@ -489,7 +489,7 @@ xdg_mime_get_mime_type_for_file (const char  *file_name,
 
   xdg_mime_init ();
 
-  if (_caches)
+  if (_xdg_mime_caches)
     return _xdg_mime_cache_get_mime_type_for_file (file_name, statbuf);
 
   base_name = _xdg_get_base_name (file_name);
@@ -551,7 +551,7 @@ xdg_mime_get_mime_type_from_file_name (const char *file_name)
 
   xdg_mime_init ();
 
-  if (_caches)
+  if (_xdg_mime_caches)
     return _xdg_mime_cache_get_mime_type_from_file_name (file_name);
 
   if (_xdg_glob_hash_lookup_file_name (global_hash, file_name, mime_types, 2) == 1)
@@ -603,13 +603,13 @@ xdg_mime_shutdown (void)
       parent_list = NULL;
     }
 
-  if (_caches)
+  if (_xdg_mime_caches)
     {
       int i;
       for (i = 0; i < n_caches; i++)
-        _xdg_mime_cache_unref (_caches[i]);
-      free (_caches);
-      _caches = NULL;
+        _xdg_mime_cache_unref (_xdg_mime_caches[i]);
+      free (_xdg_mime_caches);
+      _xdg_mime_caches = NULL;
       n_caches = 0;
     }
 
@@ -624,7 +624,7 @@ xdg_mime_get_max_buffer_extents (void)
 {
   xdg_mime_init ();
   
-  if (_caches)
+  if (_xdg_mime_caches)
     return _xdg_mime_cache_get_max_buffer_extents ();
 
   return _xdg_mime_magic_get_buffer_extents (global_magic);
@@ -635,7 +635,7 @@ _xdg_mime_unalias_mime_type (const char *mime_type)
 {
   const char *lookup;
 
-  if (_caches)
+  if (_xdg_mime_caches)
     return _xdg_mime_cache_unalias_mime_type (mime_type);
 
   if ((lookup = _xdg_mime_alias_list_lookup (alias_list, mime_type)) != NULL)
@@ -725,7 +725,7 @@ _xdg_mime_mime_type_subclass (const char *mime,
   const char *umime, *ubase;
   const char **parents;
 
-  if (_caches)
+  if (_xdg_mime_caches)
     return _xdg_mime_cache_mime_type_subclass (mime, base);
 
   umime = _xdg_mime_unalias_mime_type (mime);
@@ -775,7 +775,7 @@ xdg_mime_list_mime_parents (const char *mime)
   char **result;
   int i, n;
 
-  if (_caches)
+  if (_xdg_mime_caches)
     return _xdg_mime_cache_list_mime_parents (mime);
 
   parents = xdg_mime_get_mime_parents (mime);
