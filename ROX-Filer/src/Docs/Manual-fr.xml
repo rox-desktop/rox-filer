@@ -7,7 +7,7 @@
 <book lang="fr">
  <bookinfo>
   <title>
-   ROX-Filer 2.6 - Manuel de l'utilisateur
+   ROX-Filer 2.6.1 - Manuel de l'utilisateur
    <ulink url="http://rox.sourceforge.net/Manual/Manual/Manual-fr.html"/>
   </title>
 
@@ -3485,8 +3485,10 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filena
   </para></listitem></varlistentry>
 
   <varlistentry><term><option>-S</option></term><term><option>--rox-session</option></term>
-   <listitem><para>Démarrer sous une session 'ROX-Session', ouvre les panneau et punaiseur 
+   <listitem><para>Démarre avec un gestionnaire de sessions, et ouvre les panneau et punaiseur 
    par défaut (implique l'utilisation de --new).
+   Si un gestionnaire de sessions XSM est chargé, et que cette option est utilisée, ROX-Filer
+   demandera à redémarrer automatiquement s'il se ferme inopinément.
   </para></listitem></varlistentry>
 
   <varlistentry><term><option>-t</option></term><term><option>--top=PANEL</option></term>
