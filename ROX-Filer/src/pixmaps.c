@@ -1013,7 +1013,10 @@ static GList *thumbs_purge_cache(Option *option, xmlNode *node, guchar *label)
 	return g_list_append(NULL, align);
 }
 
-/* Exif reading */
+/* Exif reading.
+ * Based on Thierry Bousch's public domain exifdump.py.
+ */
+
 #define JPEG_FORMAT        0x201
 #define JPEG_FORMAT_LENGTH 0x202
 
