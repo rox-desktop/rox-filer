@@ -7,6 +7,45 @@
 * the end) and I'll update this file only when making a new release.
 
 
+Release 2.6.1 (2007-06-10)
+
+SESSION MANAGER CHANGES
+
+- When run with -S, restart with -S too rather than expanding the current
+  panels and pinboard on the command-line (Thomas Leonard).
+
+- If the filer was started with -S, ask the session manager to automatically
+  restart it if it crashes (Thomas Leonard).
+
+- If 0launch is available, use that as the session restart command when using a
+  session manager. Without this, restoring a session would always reload the
+  same version of ROX-Filer that was used when you saved it, not the current
+  version (Thomas Leonard).
+
+BUILDING
+
+- Shouldn't use == in /bin/sh scripts, that's a bashism (Stephen Watson).
+
+- Don't abort the build if we can't create debugging symbols (Thomas Leonard,
+  reported through 0compile as bug#1678076).
+
+OTHER CHANGES
+
+- Reduced panel border width to 1 pixel (Tony Houghton).
+
+- For JPEG files in Exif format attempt to read an embedded thumbnail first
+  (Stephen Watson).
+
+- Bugfix: The Thumb::Size tag is optional in the thumbnail spec (reported by
+  Jochen Seidel).
+
+TRANSLATIONS
+
+- Updated French manual translation (Arnaud Calvo).
+
+- Updated Chinese translations (Babyfai Cheung).
+
+
 Release 2.6 (2007-02-25)
 
 CHANGES
