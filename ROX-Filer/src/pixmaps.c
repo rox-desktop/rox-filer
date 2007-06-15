@@ -1073,7 +1073,7 @@ static int s2n(const unsigned char *dat, int off, int len, char format)
 static GdkPixbuf *extract_tiff_thumbnail(const gchar *path)
 {
     FILE *in;
-    char header[256];
+    unsigned char header[256];
     int i, n;
     int length;
     unsigned char *data;
@@ -1089,8 +1089,8 @@ static GdkPixbuf *extract_tiff_thumbnail(const gchar *path)
 
     /* Check for Exif format */
     n=fread(header, 1, 12, in);
-    if(n!=12 || strncmp(header, "\377\330\377\341", 4)!=0 ||
-       strncmp(header+6, "Exif", 4)!=0) {
+    if(n!=12 || strncmp((char *) header, "\377\330\377\341", 4)!=0 ||
+       strncmp((char *)header+6, "Exif", 4)!=0) {
         fclose(in);
         return NULL;
     }
