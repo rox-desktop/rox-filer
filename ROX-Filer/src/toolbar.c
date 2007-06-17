@@ -288,11 +288,33 @@ void toolbar_update_toolbar(FilerWindow *filer_window)
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
 
+/* Wrapper for gtk_get_current_event() which creates a fake release event
+ * if there is no current event. This is for ATK.
+ */
+static GdkEvent *get_current_event(int default_type)
+{
+	GdkEvent *event;
+
+	event = gtk_get_current_event();
+
+	if (event)
+		return event;
+
+	event = gdk_event_new(default_type);
+	if (default_type == GDK_BUTTON_PRESS || default_type == GDK_BUTTON_RELEASE)
+	{
+		GdkEventButton *bev;
+		bev = (GdkEventButton *) event;
+		bev->button = 1;
+	}
+	return event;
+}
+
 static void toolbar_help_clicked(GtkWidget *widget, FilerWindow *filer_window)
 {
 	GdkEvent	*event;
 
-	event = gtk_get_current_event();
+	event = get_current_event(GDK_BUTTON_RELEASE);
 	if (event->type == GDK_BUTTON_RELEASE &&
 			((GdkEventButton *) event)->button != 1)
 		menu_rox_help(NULL, HELP_MANUAL, NULL);
@@ -306,7 +328,7 @@ static void toolbar_refresh_clicked(GtkWidget *widget,
 {
 	GdkEvent	*event;
 
-	event = gtk_get_current_event();
+	event = get_current_event(GDK_BUTTON_RELEASE);
 	if (event->type == GDK_BUTTON_RELEASE &&
 			((GdkEventButton *) event)->button != 1)
 	{
@@ -321,7 +343,7 @@ static void toolbar_home_clicked(GtkWidget *widget, FilerWindow *filer_window)
 {
 	GdkEvent	*event;
 
-	event = gtk_get_current_event();
+	event = get_current_event(GDK_BUTTON_RELEASE);
 	if (event->type == GDK_BUTTON_RELEASE && NEW_WIN_BUTTON(event))
 	{
 		filer_opendir(home_dir, filer_window, NULL);
@@ -338,7 +360,7 @@ static void toolbar_bookmarks_clicked(GtkWidget *widget,
 
 	g_return_if_fail(filer_window != NULL);
 
-	event = gtk_get_current_event();
+	event = get_current_event(GDK_BUTTON_PRESS);
 	if (event->type == GDK_BUTTON_PRESS &&
 			((GdkEventButton *) event)->button == 1)
 	{
@@ -358,7 +380,7 @@ static void toolbar_close_clicked(GtkWidget *widget, FilerWindow *filer_window)
 
 	g_return_if_fail(filer_window != NULL);
 
-	event = gtk_get_current_event();
+	event = get_current_event(GDK_BUTTON_RELEASE);
 	if (event->type == GDK_BUTTON_RELEASE &&
 			((GdkEventButton *) event)->button != 1)
 	{
@@ -373,7 +395,7 @@ static void toolbar_up_clicked(GtkWidget *widget, FilerWindow *filer_window)
 {
 	GdkEvent	*event;
 
-	event = gtk_get_current_event();
+	event = get_current_event(GDK_BUTTON_RELEASE);
 	if (event->type == GDK_BUTTON_RELEASE && NEW_WIN_BUTTON(event))
 	{
 		filer_open_parent(filer_window);
@@ -387,7 +409,7 @@ static void toolbar_autosize_clicked(GtkWidget *widget, FilerWindow *filer_windo
 {
 	GdkEventButton	*bev;
 
-	bev = (GdkEventButton *) gtk_get_current_event();
+	bev = (GdkEventButton *) get_current_event(GDK_BUTTON_RELEASE);
 	if (bev->type == GDK_BUTTON_RELEASE)
 	{
 		display_set_layout(filer_window, AUTO_SIZE_ICONS, filer_window->details_type,
@@ -400,7 +422,7 @@ static void toolbar_size_clicked(GtkWidget *widget, FilerWindow *filer_window)
 {
 	GdkEventButton	*bev;
 
-	bev = (GdkEventButton *) gtk_get_current_event();
+	bev = (GdkEventButton *) get_current_event(GDK_BUTTON_RELEASE);
 	if (bev->type == GDK_BUTTON_RELEASE)
 		display_change_size(filer_window, bev->button == 1);
 	gdk_event_free((GdkEvent *) bev);
@@ -424,7 +446,7 @@ static void toolbar_sort_clicked(GtkWidget *widget,
 		N_("Sort by size"), N_("Sort by owner"), N_("Sort by group"), 
 	};
 
-	bev = (GdkEventButton *) gtk_get_current_event();
+	bev = (GdkEventButton *) get_current_event(GDK_BUTTON_RELEASE);
 	adjust = (bev->button != 1) && bev->type == GDK_BUTTON_RELEASE;
 	gdk_event_free((GdkEvent *) bev);
 
@@ -475,7 +497,7 @@ static void toolbar_hidden_clicked(GtkWidget *widget,
 {
 	GdkEvent	*event;
 
-	event = gtk_get_current_event();
+	event = get_current_event(GDK_BUTTON_RELEASE);
 	if (event->type == GDK_BUTTON_RELEASE &&
 			((GdkEventButton *) event)->button == 1)
 	{
@@ -496,7 +518,7 @@ static void toolbar_select_clicked(GtkWidget *widget, FilerWindow *filer_window)
 {
 	GdkEvent	*event;
 
-	event = gtk_get_current_event();
+	event = get_current_event(GDK_BUTTON_RELEASE);
 	if (event->type == GDK_BUTTON_RELEASE)
 	{
 		if (((GdkEventButton *) event)->button == 1)

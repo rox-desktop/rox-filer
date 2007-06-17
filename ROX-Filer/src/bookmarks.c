@@ -85,10 +85,13 @@ void bookmarks_show_menu(FilerWindow *filer_window)
 	int	button = 0;
 
 	event = gtk_get_current_event();
-	if (event->type == GDK_BUTTON_RELEASE ||
-	    event->type == GDK_BUTTON_PRESS)
-		button = ((GdkEventButton *) event)->button;
-	gdk_event_free(event);
+	if (event)
+	{
+		if (event->type == GDK_BUTTON_RELEASE ||
+		    event->type == GDK_BUTTON_PRESS)
+			button = ((GdkEventButton *) event)->button;
+		gdk_event_free(event);
+	}
 
 	menu = GTK_MENU(bookmarks_build_menu(filer_window));
 	gtk_menu_popup(menu, NULL, NULL, position_menu, filer_window,
