@@ -148,7 +148,7 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 
 	soap_register("SetBackdrop", rpc_SetBackdrop, "Filename,Style", NULL);
 	soap_register("SetBackdropApp", rpc_SetBackdropApp, "App", NULL);
-	soap_register("PinboardAdd", rpc_PinboardAdd, "Path,X,Y", "Label,Shortcut,Args,Locked");
+	soap_register("PinboardAdd", rpc_PinboardAdd, "Path", "X,Y,Label,Shortcut,Args,Locked,Update");
 	soap_register("PinboardRemove", rpc_PinboardRemove, "Path", "Label");
 	soap_register("PanelAdd", rpc_PanelAdd, "Side,Path", "Label,After,Shortcut,Args,Locked");
 	soap_register("PanelRemove", rpc_PanelRemove, "Side", "Path,Label");
@@ -912,23 +912,25 @@ static xmlNodePtr rpc_SetBackdropApp(GList *args)
 	return NULL;
 }
 
-/* args = Path, X, Y, [Label, Shortcut, Args, Locked] */
+/* args = Path, [X, Y, Label, Shortcut, Args, Locked, Update] */
 static xmlNodePtr rpc_PinboardAdd(GList *args)
 {
 	char *path = NULL;
 	gchar *name, *shortcut, *xargs;
-	int x, y, locked;
+	int x, y, locked, update;
 
 	path = string_value(ARG(0));
-	x = int_value(ARG(1), 0);
-	y = int_value(ARG(2), 0);
+	x = int_value(ARG(1), -1);
+	y = int_value(ARG(2), -1);
 	name = string_value(ARG(3));
 	shortcut = string_value(ARG(4));
 	xargs = string_value(ARG(5));
 	locked = bool_value(ARG(6));
+	update = bool_value(ARG(7));
 
 	pinboard_pin_with_args(path, name, x, y, shortcut, xargs, 
-						(locked==-1) ? FALSE : locked);
+						(locked==-1) ? FALSE : locked, 
+						(update==-1) ? FALSE : update);
 
 	g_free(path);
 	g_free(name);

@@ -26,7 +26,8 @@ void pinboard_activate(const gchar *name);
 void pinboard_pin(const gchar *path, const gchar *name, int x, int y,
 		  const gchar *shortcut);
 void pinboard_pin_with_args(const gchar *path, const gchar *name, int x, int y,
-			   const gchar *shortcut, const char *arg, gboolean locked);
+			   const gchar *shortcut, const char *arg, 
+			   gboolean locked, gboolean update);
 gboolean pinboard_remove(const gchar *path, const gchar *name);
 void pinboard_move_icons(void);
 const gchar *pinboard_get_name(void);

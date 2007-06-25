@@ -3318,15 +3318,19 @@ append to the item when run if it is a program.
    </para></listitem>
 
    <listitem><para><function>PinboardAdd</function>(<parameter>Path</parameter>,
-     <parameter>X</parameter>, <parameter>Y</parameter>,
-[<parameter>Label</parameter>, <parameter>Shortcut</parameter>, <parameter>Args</parameter>])
-     Add <parameter>Path</parameter> to the pinboard at position
-     (<parameter>X</parameter>, <parameter>Y</parameter>), giving it
-the (optional) label
-     <parameter>Label</parameter>.  If <parameter>Shortcut</parameter>
-is given it is the keyboard shortcut to trigger this item.  If
-<parameter>Args</parameter> is given it is the argument string to
-append to the item when run if it is a program.
+     [<parameter>X</parameter>, <parameter>Y</parameter>,
+<parameter>Label</parameter>, <parameter>Shortcut</parameter>, <parameter>Args</parameter>, <parameter>Update</parameter>])
+     Add <parameter>Path</parameter> to the pinboard with the (optional) 
+     label <parameter>Label</parameter>. If X or Y are negative or not given, 
+     the icon is placed automatically. The X and Y parameters then indicate 
+     where the icon should go (X=-1: left, X=-2: right, Y=-1: top, Y=-2: 
+     bottom). If X and Y are given, its position is (<parameter>X</parameter>, 
+     <parameter>Y</parameter>). If <parameter>Shortcut</parameter> is given it 
+     is the keyboard shortcut to trigger this item.  If 
+     <parameter>Args</parameter> is given it is the argument string to append 
+     to the item when run if it is a program. If <parameter>Update</parameter> 
+     is true and there is already an icon for the given path on the pinboard, 
+     the new values will be filled in instead of adding a new icon.
    </para></listitem>
 
    <listitem><para><function>PinboardRemove</function>(<parameter>Path</parameter>, [<parameter>Label</parameter>])

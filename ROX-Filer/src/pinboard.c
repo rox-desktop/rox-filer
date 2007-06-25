@@ -223,7 +223,7 @@ static void drag_backdrop_dropped(GtkWidget	*drop_box,
 				  GtkWidget	*dialog);
 static void backdrop_response(GtkWidget *dialog, gint response, gpointer data);
 static void find_free_rect(Pinboard *pinboard, GdkRectangle *rect,
-			   gboolean old);
+			   gboolean old, int start, int direction);
 static void update_pinboard_font(void);
 static void draw_lasso(void);
 static gint lasso_motion(GtkWidget *widget, GdkEventMotion *event, gpointer d);
@@ -418,7 +418,8 @@ void pinboard_add_widget(GtkWidget *widget, const gchar *name)
 	}
 	/*printf("%s at %d,%d %d\n", name? name: "(nil)", rect->x,
 	  rect->y, found);*/
-	find_free_rect(current_pinboard, rect, found);
+	find_free_rect(current_pinboard, rect, found, 
+			o_iconify_start.int_value, o_iconify_dir.int_value);
 	/*printf("%s at %d,%d %d\n", name? name: "(nil)", rect->x,
 	  rect->y, found);*/
 	
@@ -449,11 +450,16 @@ void pinboard_moved_widget(GtkWidget *widget, const gchar *name,
 /* Add a new icon to the background.
  * 'path' should be an absolute pathname.
  * 'x' and 'y' are the coordinates of the point in the middle of the text.
+ *   If they are negative, the icon is placed automatically. 
+ *   The values then indicate where they should be added.
+ *   x: -1 means left, -2 means right
+ *   y: -1 means top, -2 means bottom  
  * 'name' is the name to use. If NULL then the leafname of path is used.
+ * If update is TRUE and there's already an icon for that path, it is updated.
  */
 void pinboard_pin_with_args(const gchar *path, const gchar *name,
 				   int x, int y, const gchar *shortcut,
-				   const gchar *args, gboolean locked)
+				   const gchar *args, gboolean locked, gboolean update)
 {
 	GtkWidget	*align, *vbox;
 	GdkWindow	*events;
@@ -463,10 +469,34 @@ void pinboard_pin_with_args(const gchar *path, const gchar *name,
 	g_return_if_fail(path != NULL);
 	g_return_if_fail(current_pinboard != NULL);
 
+	pi = NULL;
+
+	if (update)
+	{
+		GList		*iter;
+		
+		for (iter = current_pinboard->icons; iter; iter = iter->next)
+		{
+			icon = (Icon *) iter->data;
+			if (strcmp(icon->path, path) == 0)
+			{
+				pi = (PinIcon *) icon;
+				break;
+			}
+		}
+		if (pi)
+		{
+			if (x < 0)
+				x = pi->x;
+			if (y < 0)
+				y = pi->y;
+			icon_set_path(icon, path, name);
+			goto out; /* The icon is already on the pinboard. */
+		}
+	}
+
 	pi = pin_icon_new(path, name);
 	icon = (Icon *) pi;
-	pi->x = x;
-	pi->y = y;
 
 	/* This is a bit complicated...
 	 * 
@@ -493,7 +523,7 @@ void pinboard_pin_with_args(const gchar *path, const gchar *name,
 	align = gtk_alignment_new(0.5, 0.5, 0, 0);
 	pi->widget = gtk_hbox_new(FALSE, 0);	/* Placeholder */
 	gtk_container_add(GTK_CONTAINER(align), pi->widget);
-	
+
 	gtk_box_pack_start(GTK_BOX(vbox), align, FALSE, TRUE, 0);
 	drag_set_pinicon_dest(pi);
 	g_signal_connect(pi->win, "drag_data_get",
@@ -504,13 +534,46 @@ void pinboard_pin_with_args(const gchar *path, const gchar *name,
 
 	gtk_fixed_put(GTK_FIXED(current_pinboard->fixed), pi->win, 0, 0);
 
-	snap_to_grid(&x, &y);
-	pi->x = x;
-	pi->y = y;
+	/* find free space for item if position is not given */
+	if (x < 0 || y < 0)
+	{
+		GtkRequisition req;
+		GdkRectangle rect;
+		int placement = CORNER_TOP_LEFT;
+
+		switch (x)
+		{
+			case -1:
+				if (y == -2)
+					placement = CORNER_BOTTOM_LEFT;
+				break;
+			case -2:
+				switch (y)
+				{
+					case -1:
+						placement = CORNER_TOP_RIGHT;
+						break;
+					case -2:
+						placement = CORNER_BOTTOM_RIGHT;
+						break;
+				}
+				break;
+		}
+
+		pinboard_reshape_icon((Icon *) pi);
+		gtk_widget_size_request(pi->widget, &req);
+		rect.width = req.width;
+		rect.height = req.height;
+		gtk_widget_size_request(pi->label, &req);
+		rect.width = MAX(rect.width, req.width);
+		rect.height += req.height;
+		find_free_rect(current_pinboard, &rect, FALSE, placement, DIR_VERT);
+		x = rect.x + rect.width/2;
+		y = rect.y + rect.height/2;
+	}
+
 	gtk_widget_show_all(pi->win);
-	pinboard_reshape_icon((Icon *) pi);
-	
-	gtk_widget_realize(pi->win);
+
 	events = GTK_BUTTON(pi->win)->event_window;
 	gdk_window_set_events(events,
 			GDK_EXPOSURE_MASK |
@@ -536,6 +599,17 @@ void pinboard_pin_with_args(const gchar *path, const gchar *name,
 			G_CALLBACK(pin_icon_destroyed), pi);
 
 	current_pinboard->icons = g_list_prepend(current_pinboard->icons, pi);
+	
+out:
+	snap_to_grid(&x, &y);
+
+	pi->x = x;
+	pi->y = y;
+
+	pinboard_reshape_icon((Icon *) pi);
+
+	gtk_widget_realize(pi->win);
+
 	pin_icon_set_tip(pi);
 
 	icon_set_shortcut(icon, shortcut);
@@ -549,7 +623,7 @@ void pinboard_pin_with_args(const gchar *path, const gchar *name,
 void pinboard_pin(const gchar *path, const gchar *name, int x, int y,
 		  const gchar *shortcut)
 {
-	pinboard_pin_with_args(path, name, x, y, shortcut, NULL, FALSE);
+	pinboard_pin_with_args(path, name, x, y, shortcut, NULL, FALSE, FALSE);
 }
 
 /*
@@ -1470,7 +1544,7 @@ static void pinboard_load_from_xml(xmlDocPtr doc)
 		else
 			locked = FALSE;
 
-		pinboard_pin_with_args(path, label, x, y, shortcut, args, locked);
+		pinboard_pin_with_args(path, label, x, y, shortcut, args, locked, FALSE);
 
 		g_free(path);
 		g_free(label);
@@ -2578,7 +2652,7 @@ static gboolean search_free_xinerama(GdkRectangle *rect, GdkRegion *used,
  * If no area is free, returns any old area.
  */
 static void find_free_rect(Pinboard *pinboard, GdkRectangle *rect,
-			   gboolean old)
+			   gboolean old, int start, int direction)
 {
 	GdkRegion *used;
 	GList *next;
@@ -2657,20 +2731,20 @@ static void find_free_rect(Pinboard *pinboard, GdkRectangle *rect,
 	 * it works). If you know a better (fast!) algorithm, let me know!
 	 */
 
-	if (o_iconify_start.int_value == CORNER_TOP_RIGHT ||
-	    o_iconify_start.int_value == CORNER_BOTTOM_RIGHT)
+	if (start == CORNER_TOP_RIGHT ||
+	    start == CORNER_BOTTOM_RIGHT)
 		dx = -SEARCH_STEP;
 
-	if (o_iconify_start.int_value == CORNER_BOTTOM_LEFT ||
-	    o_iconify_start.int_value == CORNER_BOTTOM_RIGHT)
+	if (start == CORNER_BOTTOM_LEFT ||
+	    start == CORNER_BOTTOM_RIGHT)
 		dy = -SEARCH_STEP;
 
 	/* If pinboard covers more than one monitor, try to find free space on
 	 * monitor under pointer first, then whole screen if that fails */
 	if (n_monitors == 1 || !search_free_xinerama(rect, used,
-			o_iconify_dir.int_value, dx, dy, rect->width, rect->height))
+			direction, dx, dy, rect->width, rect->height))
 	{
-		search_free_area(rect, used, o_iconify_dir.int_value, dx, dy,
+		search_free_area(rect, used, direction, dx, dy,
 			0, 0, screen_width - rect->width, screen_height - rect->height);
 	}
 	
