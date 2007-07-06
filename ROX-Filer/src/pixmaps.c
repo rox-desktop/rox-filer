@@ -701,7 +701,9 @@ static MaskedPixmap *image_from_desktop_file(const char *path)
 		 * Remove them.
 		 */
 		extension = strrchr(icon, '.');
-		if (extension && strcmp(extension, ".png") == 0)
+		if (extension && (strcmp(extension, ".png") == 0 
+						|| strcmp(extension, ".xpm") == 0
+						|| strcmp(extension, ".svg") == 0))
 		{
 			*extension = '\0';
 		}
