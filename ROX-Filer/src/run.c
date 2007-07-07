@@ -657,8 +657,8 @@ static gboolean run_desktop(const char *full_path,
 	expanded = g_ptr_array_new();
 
 	if (terminal && g_strcasecmp(terminal, "true") == 0) {
-		g_ptr_array_add(expanded, "xterm");
-		g_ptr_array_add(expanded, "-e");
+		g_ptr_array_add(expanded, g_strdup("xterm"));
+		g_ptr_array_add(expanded, g_strdup("-e"));
 	}
 
 	for (i = 0; i < argc; i++)
