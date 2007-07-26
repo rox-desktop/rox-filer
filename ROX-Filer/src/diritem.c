@@ -118,7 +118,7 @@ void diritem_restat(const guchar *path, DirItem *item, struct stat *parent)
 
 			item->flags |= ITEM_FLAG_SYMLINK;
 
-			target_path = readlink_dup(path);
+			target_path = pathdup(path);
 		}
 		else
 		{
