@@ -416,10 +416,10 @@ static void collection_realize(GtkWidget *widget)
 
 	gdk_window_set_user_data(widget->window, widget);
 	gdk_window_set_background(widget->window,
-			&widget->style->bg[GTK_STATE_NORMAL]);
+			&widget->style->base[GTK_STATE_NORMAL]);
 
-	bg = &widget->style->bg[GTK_STATE_NORMAL];
-	fg = &widget->style->fg[GTK_STATE_NORMAL];
+	bg = &widget->style->base[GTK_STATE_NORMAL];
+	fg = &widget->style->text[GTK_STATE_NORMAL];
 	xor_values.function = GDK_XOR;
 	xor_values.foreground.pixel = fg->pixel ^ bg->pixel;
 	collection->xor_gc = gdk_gc_new_with_values(widget->window,
@@ -544,10 +544,13 @@ static gint collection_expose(GtkWidget *widget, GdkEventExpose *event)
 	/* Note about 'detail' argument:
 	 * - If set to "base", lighthouse theme will crash
 	 * - If set to NULL, cleanice theme will crash
-	 */
+	 *
+	 * !!! We don't need to clear the background. GTK does it for us.
+	 *
 	gtk_paint_flat_box(widget->style, widget->window, GTK_STATE_NORMAL, 
 		      GTK_SHADOW_NONE, &event->area,
 		      widget, "collection", 0, 0, -1, -1);
+	*/
 
 	collection = COLLECTION(widget);
 
