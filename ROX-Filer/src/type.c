@@ -313,7 +313,7 @@ MIME_type *type_from_path(const char *path)
 		return mime_type;
 
 	/* Try name and contents next */
-	type_name = xdg_mime_get_mime_type_for_file(path);
+	type_name = xdg_mime_get_mime_type_for_file(path, NULL);
 	if (type_name)
 		return get_mime_type(type_name, TRUE);
 
