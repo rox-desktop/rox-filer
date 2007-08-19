@@ -47,6 +47,7 @@
 #include "global.h"
 
 #include "main.h"
+#include "log.h"
 #include "support.h"
 #include "gui_support.h"
 #include "filer.h"
@@ -583,6 +584,7 @@ int main(int argc, char **argv)
 
 	pixmaps_init();
 
+	log_init();
 	dnd_init();
 	bind_init();
 	dir_init();

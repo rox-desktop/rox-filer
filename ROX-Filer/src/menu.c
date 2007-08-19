@@ -147,6 +147,7 @@ static void open_parent_same(gpointer data, guint action, GtkWidget *widget);
 static void open_parent(gpointer data, guint action, GtkWidget *widget);
 static void home_directory(gpointer data, guint action, GtkWidget *widget);
 static void show_bookmarks(gpointer data, guint action, GtkWidget *widget);
+static void show_log(gpointer data, guint action, GtkWidget *widget);
 static void new_window(gpointer data, guint action, GtkWidget *widget);
 /* static void new_user(gpointer data, guint action, GtkWidget *widget); */
 static void close_window(gpointer data, guint action, GtkWidget *widget);
@@ -237,6 +238,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("New Window"),		NULL, new_window, 0, NULL},
 {">" N_("Home Directory"),	"<Ctrl>Home", home_directory, 0, "<StockItem>", GTK_STOCK_HOME},
 {">" N_("Show Bookmarks"),	"<Ctrl>B", show_bookmarks, 0, "<StockItem>", ROX_STOCK_BOOKMARKS},
+{">" N_("Show Log"),		NULL, show_log, 0, "<StockItem>", GTK_STOCK_INFO},
 {">" N_("Follow Symbolic Links"),	NULL, follow_symlinks, 0, NULL},
 {">" N_("Resize Window"),	"<Ctrl>E", resize, 0, NULL},
 /* {">" N_("New, As User..."),	NULL, new_user, 0, NULL}, */
@@ -1707,6 +1709,13 @@ static void show_bookmarks(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	bookmarks_show_menu(window_with_focus);
+}
+
+static void show_log(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	log_show_window();
 }
 
 static void follow_symlinks(gpointer data, guint action, GtkWidget *widget)
