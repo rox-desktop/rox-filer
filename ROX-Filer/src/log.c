@@ -32,7 +32,7 @@
 #include "main.h"
 #include "gui_support.h"
 
-static GtkListStore *log;
+static GtkTreeStore *log;
 
 /* The columns in the log list store */
 #define TIMESTAMP 0
@@ -47,9 +47,9 @@ static GtkListStore *log;
 
 void log_init()
 {
-	log = gtk_list_store_new(3, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
+	log = gtk_tree_store_new(3, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
 
-	log_info_paths("Logging system initialised", NULL, NULL);
+	log_info_paths(_("ROX-Filer started"), NULL, NULL);
 
 #if 0
 	GList *paths = NULL;
@@ -91,7 +91,7 @@ void log_info_paths(const gchar *message, GList *paths, const gchar *path)
 		strcpy(timestamp, "ERROR");
 	}
 
-	gtk_list_store_append(log, &iter);
+	gtk_tree_store_append(log, &iter, NULL);
 
 	n_paths = g_list_length(paths);
 
@@ -104,15 +104,26 @@ void log_info_paths(const gchar *message, GList *paths, const gchar *path)
 	}
 
 	if (n_paths == 1)
-		actual_message = g_strdup_printf("%s '%s'", message, (char *) paths->data);
+		actual_message = g_strdup_printf(_("%s '%s'"), message, g_basename((char *) paths->data));
 	else if (n_paths > 1)
-		actual_message = g_strdup_printf("%s on %d items", message, n_paths);
+		actual_message = g_strdup_printf(_("%s on %d items"), message, n_paths);
 
-	gtk_list_store_set(log, &iter,
+	gtk_tree_store_set(log, &iter,
 			TIMESTAMP, timestamp,
 			DIRECTORY, path,
 			MESSAGE, actual_message ? actual_message : message,
 			-1);
+
+	while (paths)
+	{
+		GtkTreeIter child_iter;
+		gtk_tree_store_append(log, &child_iter, &iter);
+		gtk_tree_store_set(log, &child_iter,
+				MESSAGE, _("Item"),
+				DIRECTORY, paths->data,
+				-1);
+		paths = paths->next;
+	}
 
 	g_free(actual_message);
 }
