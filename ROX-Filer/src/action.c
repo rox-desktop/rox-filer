@@ -51,6 +51,7 @@
 #include "mount.h"
 #include "type.h"
 #include "xtypes.h"
+#include "log.h"
 
 #if defined(HAVE_GETXATTR)
 # define ATTR_MAN_PAGE N_("See the attr(5) man page for full details.")
@@ -2049,6 +2050,8 @@ void action_mount(GList	*paths, gboolean open_dir, gboolean mount, int quiet)
 	if (!gui_side)
 		return;
 
+	log_info_paths("Mount", paths, NULL);
+
 	number_of_windows++;
 	gtk_widget_show(abox);
 #else
@@ -2084,6 +2087,8 @@ void action_delete(GList *paths)
 	abox_add_flag(ABOX(abox),
 		_("Brief"), _("Only log directories being deleted"),
 		'B', o_action_brief.int_value);
+
+	log_info_paths("Delete", paths, NULL);
 
 	number_of_windows++;
 	gtk_widget_show(abox);
@@ -2157,6 +2162,8 @@ void action_chmod(GList *paths, gboolean force_recurse, const char *action)
 			gui_side->yes);
 #endif
 
+	log_info_paths("Change permissions", paths, NULL);
+
 	number_of_windows++;
 	gtk_widget_show(abox);
 
@@ -2217,11 +2224,29 @@ void action_settype(GList *paths, gboolean force_recurse, const char *oldtype)
 	g_signal_connect(ABOX(abox)->entry, "changed",
 			G_CALLBACK(entry_changed), gui_side);
 
+	log_info_paths("Set file type", paths, NULL);
+
 	number_of_windows++;
 	gtk_widget_show(abox);
 
 out:
 	null_g_free(&new_entry_string);
+}
+
+static void log_info_paths_leaf(const gchar *message, GList *paths,
+				const gchar *dest, const char *leaf)
+{
+	if (leaf == NULL)
+	{
+		log_info_paths(message, paths, dest);
+	}
+	else
+	{
+		char *new_dest;
+		new_dest = g_build_filename(dest, leaf, NULL);
+		log_info_paths(message, paths, new_dest);
+		g_free(new_dest);
+	}
 }
 
 /* If leaf is NULL then the copy has the same name as the original.
@@ -2257,6 +2282,8 @@ void action_copy(GList *paths, const char *dest, const char *leaf, int quiet)
 	abox_add_flag(ABOX(abox),
 		_("Brief"), _("Only log directories as they are copied"),
 		'B', o_action_brief.int_value);
+
+	log_info_paths_leaf("Copy", paths, dest, leaf);
 
 	number_of_windows++;
 	gtk_widget_show(abox);
@@ -2295,6 +2322,9 @@ void action_move(GList *paths, const char *dest, const char *leaf, int quiet)
 	abox_add_flag(ABOX(abox),
 		_("Brief"), _("Don't log each file as it is moved"),
 		'B', o_action_brief.int_value);
+
+	log_info_paths_leaf("Move", paths, dest, leaf);
+
 	number_of_windows++;
 	gtk_widget_show(abox);
 }
@@ -2324,6 +2354,8 @@ void action_link(GList *paths, const char *dest, const char *leaf,
 	if (!gui_side)
 		return;
 
+	log_info_paths_leaf("Link", paths, dest, leaf);
+
 	number_of_windows++;
 	gtk_widget_show(abox);
 }
@@ -2344,6 +2376,8 @@ void action_eject(GList *paths)
 					 o_action_newer.int_value);
 	if (!gui_side)
 		return;
+
+	log_info_paths("Eject", paths, NULL);
 
 	number_of_windows++;
 	gtk_widget_show(abox);
