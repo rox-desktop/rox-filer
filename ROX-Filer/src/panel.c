@@ -200,7 +200,6 @@ static gboolean panel_check_xinerama(void);
 static GList *build_monitor_number(Option *option,
 					xmlNode *node, guchar *label);
 static gboolean may_autoscroll(Panel *panel);
-static void panel_show_options(gpointer data);
 
 
 static GtkWidget *dnd_highlight = NULL; /* (stops flickering) */
@@ -553,11 +552,10 @@ static void panel_destroyed(GtkWidget *widget, Panel *panel)
 {
 	if (panel_options_dialog)
 	{
-		PanelSide side;
-		side = GPOINTER_TO_INT(g_object_get_data(
-					G_OBJECT(panel_options_dialog),
-					 "rox-panel-side"));
-		if (side == panel->side)
+		Panel *dlg_panel = g_object_get_data(G_OBJECT(panel_options_dialog),
+					 "rox-panel");
+
+		if (dlg_panel == panel)
 			gtk_widget_destroy(panel_options_dialog);
 	}
 
@@ -2306,6 +2304,26 @@ static gboolean panel_want_show_text(PanelIcon *pi)
 	return TRUE;
 }
 
+static void panel_show_options(Panel *panel)
+{
+	GladeXML *glade = get_glade_xml("Panel Options");
+	GtkWidget *dialog = glade_xml_get_widget(glade, "Panel Options");
+
+	panel_options_dialog = dialog;
+	g_object_set_data(G_OBJECT(panel_options_dialog), "rox-panel", panel);
+	g_signal_connect(dialog, "destroy",
+			G_CALLBACK(gtk_widget_destroyed),
+			&panel_options_dialog);
+
+	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_MOUSE);
+
+	g_signal_connect(dialog, "response",
+			 G_CALLBACK(gtk_widget_destroy), NULL);
+	gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_CLOSE);
+
+	gtk_widget_show_all(dialog);
+}
+
 static void panel_position_menu(GtkMenu *menu, gint *x, gint *y,
 				gboolean  *push_in, gpointer data)
 {
@@ -2527,55 +2545,6 @@ static GList *build_monitor_number(Option *option, xmlNode *node, guchar *label)
 	adj = gtk_adjustment_new(MAX(0, panel_monitor),
 				0, n_monitors - 1, 1, 10, 1);
 	return build_numentry_base(option, node, label, GTK_ADJUSTMENT(adj));
-}
-
-static void side_changed(Radios *radios, gpointer data)
-{
-	Panel *panel;
-	PanelSide side, new_side;
-	GObject *dialog = G_OBJECT(data);
-	char *name, *other_side_name;
-
-	side = GPOINTER_TO_INT(g_object_get_data(dialog, "rox-panel-side"));
-	g_return_if_fail(side >= 0 && side < PANEL_NUMBER_OF_SIDES);
-	panel = current_panel[side];
-	g_return_if_fail(panel != NULL);
-
-	new_side = radios_get_value(radios);
-
-	if (new_side == side)
-		return;
-
-	name = g_strdup(panel->name);
-	other_side_name = current_panel[new_side]
-			? g_strdup(current_panel[new_side]->name)
-			: NULL;
-
-	panel_new(name, new_side);
-	g_object_set_data(G_OBJECT(dialog), "rox-panel-side",
-			GINT_TO_POINTER(new_side));
-	panel_new(other_side_name, side);
-
-	g_free(name);
-	g_free(other_side_name);
-}
-
-static void panel_show_options(Panel *panel)
-{
-	GladeXML *glade = get_glade_xml("Panel Options");
-	GtkWidget *dialog;
-
-	g_signal_connect(dialog, "destroy",
-			G_CALLBACK(gtk_widget_destroyed),
-			&panel_options_dialog);
-
-	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_MOUSE);
-
-	g_signal_connect(dialog, "response",
-			 G_CALLBACK(gtk_widget_destroy), NULL);
-	gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
-
-	gtk_widget_show_all(dialog);
 }
 
 /* Returns PANEL_NUMBER_OF_SIDES if name is invalid */
