@@ -2306,22 +2306,46 @@ static gboolean panel_want_show_text(PanelIcon *pi)
 
 static void panel_show_options(Panel *panel)
 {
-	GladeXML *glade = get_glade_xml("Panel Options");
-	GtkWidget *dialog = glade_xml_get_widget(glade, "Panel Options");
+	GtkWidget *dialog;
+	gboolean already_showing = FALSE;
 
-	panel_options_dialog = dialog;
+	if (panel_options_dialog)
+	{
+		dialog = panel_options_dialog;
+		already_showing = TRUE;
+	}
+	else
+	{
+		GladeXML *glade = get_glade_xml("Panel Options");
+
+		dialog = glade_xml_get_widget(glade, "Panel Options");
+		panel_options_dialog = dialog;
+		g_signal_connect(dialog, "destroy",
+				G_CALLBACK(gtk_widget_destroyed),
+				&panel_options_dialog);
+		g_signal_connect(dialog, "response",
+				 G_CALLBACK(gtk_widget_destroy), NULL);
+		gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_CLOSE);
+
+	}
 	g_object_set_data(G_OBJECT(panel_options_dialog), "rox-panel", panel);
-	g_signal_connect(dialog, "destroy",
-			G_CALLBACK(gtk_widget_destroyed),
-			&panel_options_dialog);
 
-	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_MOUSE);
+	if (already_showing)
+	{
+		GtkWindow *win = GTK_WINDOW(dialog);
 
-	g_signal_connect(dialog, "response",
-			 G_CALLBACK(gtk_widget_destroy), NULL);
-	gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_CLOSE);
-
-	gtk_widget_show_all(dialog);
+		gtk_widget_hide(dialog);
+		/* This extra set_position() should ensure it moves to new position
+		 * under pointer */
+		gtk_window_set_position(win, GTK_WIN_POS_CENTER_ALWAYS);
+		gtk_window_set_position(win, GTK_WIN_POS_MOUSE);
+		gtk_window_present(win);
+	}
+	else
+	{
+		gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_MOUSE);
+		gtk_widget_show_all(dialog);
+	}
 }
 
 static void panel_position_menu(GtkMenu *menu, gint *x, gint *y,
