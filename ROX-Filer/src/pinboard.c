@@ -2211,7 +2211,7 @@ static void pinboard_show_menu(GdkEventButton *event, PinIcon *pi)
 	option_item = gtk_image_menu_item_new_with_label(_("Backdrop..."));
 	g_signal_connect(option_item, "activate",
 			 G_CALLBACK(pinboard_set_backdrop_box), NULL);
-	icon_prepare_menu((Icon *) pi, option_item);
+	icon_prepare_menu((Icon *) pi, option_item, NULL);
 
 	list = gtk_container_get_children(GTK_CONTAINER(icon_menu));
 	pos[2] = g_list_length(list) - 6;

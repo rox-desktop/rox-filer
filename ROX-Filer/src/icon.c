@@ -31,6 +31,7 @@
 
 #include "config.h"
 
+#include <stdarg.h>
 #include <string.h>
 #include <gtk/gtk.h>
 #include <X11/keysym.h>
@@ -61,6 +62,7 @@ static GtkWidget	*icon_file_menu;	/* The file submenu */
 static GtkWidget	*icon_file_item;	/* 'File' label */
 static GtkWidget	*file_shift_item;	/* 'Shift Open' label */
 static GtkWidget	*current_options_item;	/* Pin/Pan Options */
+static GSList		*current_trailing_items = NULL;
 
 /* A list of selected Icons. Every icon in the list is from the same group
  * (eg, you can't have icons from two different panels selected at the
@@ -245,10 +247,13 @@ static gboolean any_selected_item_is_locked()
  * You should show icon_menu after calling this...
  * panel_name is NULL for the pinboard.
  */
-void icon_prepare_menu(Icon *icon, GtkWidget *options_item)
+void icon_prepare_menu(Icon *icon, GtkWidget *options_item, ...)
 {
 	GtkWidget *image;
 	gboolean shaded;
+	GSList *link;
+	va_list ap;
+	GtkWidget *trailing;
 
 	appmenu_remove();
 
@@ -256,6 +261,15 @@ void icon_prepare_menu(Icon *icon, GtkWidget *options_item)
 	{
 		gtk_widget_destroy(current_options_item);
 		current_options_item = NULL;
+	}
+	for (link = current_trailing_items; link; link = g_slist_next(link))
+	{
+		gtk_widget_destroy(link->data);
+	}
+	if (current_trailing_items)
+	{
+		g_slist_free(current_trailing_items);
+		current_trailing_items = NULL;
 	}
 
 	menu_icon = icon;
@@ -270,6 +284,16 @@ void icon_prepare_menu(Icon *icon, GtkWidget *options_item)
 
 	gtk_menu_shell_append(GTK_MENU_SHELL(icon_menu), options_item);
 	gtk_widget_show_all(options_item);
+
+	va_start(ap, options_item);
+	while ((trailing = va_arg(ap, GtkWidget *)) != NULL)
+	{
+		current_trailing_items = g_slist_prepend(current_trailing_items,
+				trailing);
+		gtk_menu_shell_append(GTK_MENU_SHELL(icon_menu), trailing);
+		gtk_widget_show(trailing);
+	}
+	va_end(ap);
 	
 	/* Shade Remove Item(s) if any item is locked or nothing is selected */
 	if (icon_selection)

@@ -2340,11 +2340,26 @@ static void panel_position_menu(GtkMenu *menu, gint *x, gint *y,
 	*push_in = FALSE;
 }
 
+static void append_pos_to_menu(GtkWidget *menu, const char *label,
+		PanelSide side, PanelSide current_side, GSList **pgroup, Panel *panel)
+{
+	GtkWidget *item = gtk_radio_menu_item_new_with_label(*pgroup, label);
+
+	*pgroup = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(item));
+	if (side == current_side)
+		gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), TRUE);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+	gtk_widget_show(item);
+}
+
 static void panel_show_menu(GdkEventButton *event, PanelIcon *pi, Panel *panel)
 {
 	GtkWidget	*option_item;
 	PanelSide	side = panel->side;
 	int		pos[4];
+	GtkWidget *pos_submenu;
+	GtkWidget *change_side_item;
+	GSList *pos_radio_group = NULL;
 
 	pos[0] = event->x_root;
 	pos[1] = event->y_root;
@@ -2360,7 +2375,19 @@ static void panel_show_menu(GdkEventButton *event, PanelIcon *pi, Panel *panel)
 			 G_CALLBACK(panel_show_options),
 			 GINT_TO_POINTER(panel->side));
 
-	icon_prepare_menu((Icon *) pi, option_item);
+	pos_submenu = gtk_menu_new();
+	append_pos_to_menu(pos_submenu, _("Top Edge"), PANEL_TOP, side,
+			&pos_radio_group, panel);
+	append_pos_to_menu(pos_submenu, _("Bottom Edge"), PANEL_BOTTOM, side,
+			&pos_radio_group, panel);
+	append_pos_to_menu(pos_submenu, _("Left Edge"), PANEL_LEFT, side,
+			&pos_radio_group, panel);
+	append_pos_to_menu(pos_submenu, _("Right Edge"), PANEL_RIGHT, side,
+			&pos_radio_group, panel);
+	change_side_item = gtk_menu_item_new_with_label(_("Change panel side"));
+	gtk_menu_item_set_submenu(GTK_MENU_ITEM(change_side_item), pos_submenu);
+
+	icon_prepare_menu((Icon *) pi, option_item, change_side_item, NULL);
 
 	if (side == PANEL_LEFT)
 		pos[0] = -2;
