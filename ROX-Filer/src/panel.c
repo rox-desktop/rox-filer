@@ -2340,6 +2340,32 @@ static void panel_position_menu(GtkMenu *menu, gint *x, gint *y,
 	*push_in = FALSE;
 }
 
+static void side_radio_toggled(GtkCheckMenuItem *item, Panel *panel)
+{
+	PanelSide new_side;
+	PanelSide old_side;
+	char *name, *other_side_name;
+	
+	if (!gtk_check_menu_item_get_active(item))
+		return;
+	new_side = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(item),
+				"rox-panel-side"));
+	old_side = panel->side;
+	if (new_side == old_side)
+		return;
+
+	name = g_strdup(panel->name);
+	other_side_name = current_panel[new_side]
+			? g_strdup(current_panel[new_side]->name)
+			: NULL;
+
+	panel_new(name, new_side);
+	panel_new(other_side_name, old_side);
+
+	g_free(name);
+	g_free(other_side_name);
+}
+
 static void append_pos_to_menu(GtkWidget *menu, const char *label,
 		PanelSide side, PanelSide current_side, GSList **pgroup, Panel *panel)
 {
@@ -2348,6 +2374,8 @@ static void append_pos_to_menu(GtkWidget *menu, const char *label,
 	*pgroup = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(item));
 	if (side == current_side)
 		gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), TRUE);
+	g_object_set_data(G_OBJECT(item), "rox-panel-side", GINT_TO_POINTER(side));
+	g_signal_connect(item, "toggled", G_CALLBACK(side_radio_toggled), panel);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
 	gtk_widget_show(item);
 }
@@ -2372,8 +2400,7 @@ static void panel_show_menu(GdkEventButton *event, PanelIcon *pi, Panel *panel)
 
 	option_item = gtk_image_menu_item_new_with_label(_("Panel Options..."));
 	g_signal_connect_swapped(option_item, "activate",
-			 G_CALLBACK(panel_show_options),
-			 GINT_TO_POINTER(panel->side));
+			 G_CALLBACK(panel_show_options), panel);
 
 	pos_submenu = gtk_menu_new();
 	append_pos_to_menu(pos_submenu, _("Top Edge"), PANEL_TOP, side,
@@ -2533,63 +2560,10 @@ static void side_changed(Radios *radios, gpointer data)
 	g_free(other_side_name);
 }
 
-static void panel_show_options(gpointer data)
+static void panel_show_options(Panel *panel)
 {
+	GladeXML *glade = get_glade_xml("Panel Options");
 	GtkWidget *dialog;
-	GtkWidget *vbox, *label;
-	Radios *radios;
-	Panel *panel;
-	PanelSide side = GPOINTER_TO_INT(data);
-	char *tmp;
-
-	g_return_if_fail(side >= 0 && side < PANEL_NUMBER_OF_SIDES);
-	panel = current_panel[side];
-	g_return_if_fail(panel != NULL);
-
-	if (panel_options_dialog)
-		gtk_widget_destroy(panel_options_dialog);
-
-	dialog = gtk_dialog_new_with_buttons(_("Panel Options"), NULL,
-			GTK_DIALOG_NO_SEPARATOR,
-			GTK_STOCK_CLOSE, GTK_RESPONSE_OK,
-			NULL);
-	panel_options_dialog = dialog;
-
-	g_object_set_data(G_OBJECT(dialog), "rox-panel-side",
-			GINT_TO_POINTER(panel->side));
-
-	vbox = gtk_vbox_new(FALSE, 0);
-	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox),
-			vbox, TRUE, TRUE, 0);
-
-	gtk_container_set_border_width(GTK_CONTAINER(vbox), 8);
-
-	tmp = g_strdup_printf(_("Panel: %s"), panel->name);
-	label = gtk_label_new(tmp);
-	make_heading(label, PANGO_SCALE_LARGE);
-	gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
-	gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
-	g_free(tmp);
-
-	gtk_box_pack_start(GTK_BOX(vbox),
-			gtk_label_new(_("Select the panel's position:")),
-			FALSE, TRUE, 4);
-
-	/* Radio buttons to set the side */
-	radios = radios_new(side_changed, dialog);
-
-	radios_add(radios, _("Top-edge panel"),
-			PANEL_TOP, _("Top edge"));
-	radios_add(radios, _("Bottom edge panel"),
-			PANEL_BOTTOM, _("Bottom edge"));
-	radios_add(radios, _("Left edge panel"),
-			PANEL_LEFT, _("Left edge"));
-	radios_add(radios, _("Right-edge panel"),
-			PANEL_RIGHT, _("Right edge"));
-
-	radios_set_value(radios, panel->side);
-
-	radios_pack(radios, GTK_BOX(vbox));
 
 	g_signal_connect(dialog, "destroy",
 			G_CALLBACK(gtk_widget_destroyed),
