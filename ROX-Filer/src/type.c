@@ -117,7 +117,9 @@ MIME_type *inode_door;
 static Option o_display_colour_types;
 static Option o_icon_theme;
 
-GtkIconTheme *icon_theme = NULL;
+static GtkIconTheme *icon_theme = NULL;
+static GtkIconTheme *rox_theme = NULL;
+static GtkIconTheme *gnome_theme = NULL;
 
 void type_init(void)
 {
@@ -377,6 +379,64 @@ MIME_type *mime_type_lookup(const char *type)
 	return get_mime_type(type, TRUE);
 }
 
+static void init_aux_theme(GtkIconTheme **ptheme, const char *name)
+{
+	if (*ptheme)
+		return;
+	*ptheme = gtk_icon_theme_new();
+	gtk_icon_theme_set_custom_theme(*ptheme, name);
+}
+
+inline static void init_rox_theme(void)
+{
+	init_aux_theme(&rox_theme, "ROX");
+}
+
+inline static void init_gnome_theme(void)
+{
+	init_aux_theme(&gnome_theme, "gnome");
+}
+
+/* We don't want ROX to override configured theme so try all possibilities
+ * in icon_theme first */
+static GtkIconInfo *mime_type_lookup_icon_info(GtkIconTheme *theme,
+		MIME_type *type)
+{
+	char *type_name = g_strconcat("mime-", type->media_type, ":",
+				type->subtype, NULL);
+	GtkIconInfo *full = gtk_icon_theme_lookup_icon(theme, type_name,
+			HUGE_HEIGHT, 0);
+
+	g_free(type_name);
+	if (!full)
+	{
+		/* Ugly hack... try for a GNOME icon */
+		if (type == inode_directory)
+			type_name = g_strdup("gnome-fs-directory");
+		else
+			type_name = g_strconcat("gnome-mime-", type->media_type,
+					"-", type->subtype, NULL);
+		full = gtk_icon_theme_lookup_icon(theme, type_name, HUGE_HEIGHT, 0);
+		g_free(type_name);
+	}
+	if (!full)
+	{
+		/* Try for a media type */
+		type_name = g_strconcat("mime-", type->media_type, NULL);
+		full = gtk_icon_theme_lookup_icon(theme, type_name, HUGE_HEIGHT, 0);
+		g_free(type_name);
+	}
+	if (!full)
+	{
+		/* Ugly hack... try for a GNOME default media icon */
+		type_name = g_strconcat("gnome-mime-", type->media_type, NULL);
+
+		full = gtk_icon_theme_lookup_icon(theme, type_name, HUGE_HEIGHT, 0);
+		g_free(type_name);
+	}
+	return full;
+}
+
 /*			Actions for types 			*/
 
 /* Return the image for this type, loading it if needed.
@@ -427,41 +487,16 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 	if (type->image)
 		goto out;
 
-	type_name = g_strconcat("mime-", type->media_type, ":",
-				type->subtype, NULL);
-	full = gtk_icon_theme_lookup_icon(icon_theme, type_name, HUGE_HEIGHT, 0);
-	g_free(type_name);
-	if (!full)
+	full = mime_type_lookup_icon_info(icon_theme, type);
+	if (!full && icon_theme != rox_theme)
 	{
-		/* Ugly hack... try for a GNOME icon */
-                if (type == inode_directory)
-			type_name = g_strdup("gnome-fs-directory");
-		else
-			type_name = g_strconcat("gnome-mime-", type->media_type,
-					"-", type->subtype, NULL);
-		full = gtk_icon_theme_lookup_icon(icon_theme,
-						type_name,
-						HUGE_HEIGHT, 0);
-		g_free(type_name);
+		init_rox_theme();
+		full = mime_type_lookup_icon_info(rox_theme, type);
 	}
-	if (!full)
+	if (!full && icon_theme != gnome_theme)
 	{
-		/* Try for a media type */
-		type_name = g_strconcat("mime-", type->media_type, NULL);
-		full = gtk_icon_theme_lookup_icon(icon_theme,
-						type_name,
-						HUGE_HEIGHT, 0);
-		g_free(type_name);
-	}
-	if (!full)
-	{
-		/* Ugly hack... try for a GNOME default media icon */
-		type_name = g_strconcat("gnome-mime-", type->media_type, NULL);
-
-		full = gtk_icon_theme_lookup_icon(icon_theme,
-				type_name,
-				HUGE_HEIGHT, 0);
-		g_free(type_name);
+		init_rox_theme();
+		full = mime_type_lookup_icon_info(gnome_theme, type);
 	}
 	if (full)
 	{
@@ -1206,6 +1241,12 @@ const char *mime_type_comment(MIME_type *type)
 	return type->comment;
 }
 
+static void unref_icon_theme(void)
+{
+	if (icon_theme && icon_theme != rox_theme && icon_theme != gnome_theme)
+		g_object_unref(icon_theme);
+}
+
 static void set_icon_theme(void)
 {
 	GtkIconInfo *info;
@@ -1215,32 +1256,36 @@ static void set_icon_theme(void)
 	if (!theme_name || !*theme_name)
 		theme_name = "ROX";
 
-	while (1)
+	if (!strcmp(theme_name, "ROX"))
 	{
+		unref_icon_theme();
+		init_rox_theme();
+		icon_theme = rox_theme;
+	}
+	else if (!strcmp(theme_name, "gnome"))
+	{
+		unref_icon_theme();
+		init_gnome_theme();
+		icon_theme = gnome_theme;
+	}
+	else
+	{
+		if (icon_theme == rox_theme || icon_theme == gnome_theme)
+			icon_theme = gtk_icon_theme_new();
 		gtk_icon_theme_set_custom_theme(icon_theme, theme_name);
-		info = gtk_icon_theme_lookup_icon(icon_theme,
-				"mime-application:postscript",
+	}
+
+	info = theme_lookup_icon("mime-application:postscript",
+			ICON_HEIGHT, 0);
+	if (!info)
+	{
+		info = theme_lookup_icon("gnome-mime-application-postscript",
 				ICON_HEIGHT, 0);
-		if (!info)
-		{
-			info = gtk_icon_theme_lookup_icon(icon_theme,
-					"gnome-mime-application-postscript",
-					ICON_HEIGHT, 0);
-		}
-		if (info)
-		{
-			gtk_icon_info_free(info);
-			return;
-		}
-
-		if (strcmp(theme_name, "ROX") == 0)
-			break;
-
-		delayed_error(_("Icon theme '%s' does not contain MIME icons. "
-				"Using ROX default theme instead."),
-				theme_name);
-		
-		theme_name = "ROX";
+	}
+	if (info)
+	{
+		gtk_icon_info_free(info);
+		return;
 	}
 
 	icon_home = g_build_filename(home_dir, ".icons", NULL);
@@ -1252,10 +1297,9 @@ static void set_icon_theme(void)
 	if (symlink(make_path(app_dir, "ROX"), icon_home))
 	{
 		delayed_error(_("Failed to create symlink '%s':\n%s\n\n"
-		"(this may mean that the ROX theme already exists there, but "
-		"the 'mime-application:postscript' icon couldn't be loaded for "
-		"some reason, or %s is a link to an invalid directory; try "
-		"deleting it)"), icon_home, g_strerror(errno), icon_home);
+		"(this may mean that %s already exists as a link to an invalid "
+		"directory; try deleting it)"),
+		icon_home, g_strerror(errno), icon_home);
 		open_to_show(icon_home);
 	}
 	g_free(icon_home);
@@ -1392,3 +1436,59 @@ static GList *build_icon_theme(Option *option, xmlNode *node, guchar *label)
 
 	return g_list_append(NULL, hbox);
 }
+
+GtkIconInfo *theme_lookup_icon(const gchar *icon_name, gint size,
+		GtkIconLookupFlags flags)
+{
+	GtkIconInfo *result = gtk_icon_theme_lookup_icon(icon_theme,
+			icon_name, size, flags);
+
+	if (!result && icon_theme != rox_theme)
+	{
+		init_rox_theme();
+		result = gtk_icon_theme_lookup_icon(rox_theme,
+			icon_name, size, flags);
+	}
+	if (!result && icon_theme != gnome_theme)
+	{
+		init_gnome_theme();
+		result = gtk_icon_theme_lookup_icon(gnome_theme,
+			icon_name, size, flags);
+	}
+	return result;
+}
+
+GdkPixbuf *theme_load_icon(const gchar *icon_name, gint size,
+		GtkIconLookupFlags flags, GError **perror)
+{
+	GError *err = NULL;
+	GdkPixbuf *result = gtk_icon_theme_load_icon(icon_theme,
+			icon_name, size, flags, &err);
+
+	if (!result && icon_theme != gnome_theme)
+	{
+		if (err)
+		{
+			g_error_free(err);
+			err = NULL;
+		}
+		init_gnome_theme();
+		result = gtk_icon_theme_load_icon(gnome_theme,
+			icon_name, size, flags, &err);
+	}
+	if (!result && icon_theme != rox_theme)
+	{
+		if (err)
+		{
+			g_error_free(err);
+			err = NULL;
+		}
+		init_rox_theme();
+		result = gtk_icon_theme_load_icon(rox_theme,
+			icon_name, size, flags, &err);
+	}
+	if (perror)
+		*perror = err;
+	return result;
+}
+
