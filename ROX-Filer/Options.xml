@@ -219,27 +219,6 @@ indicator'>If this is on then files which have one or more extended attributes s
     </section>
   </section>
 
-  <section title='Panels'>
-    <label help='1'>Panels are bars of icons that run along the side of the screen. See the manual for information about using panels.</label>
-    <frame label='Panel style'>
-      <radio-group name='panel_style'>
-        <radio label='Image and text' value='0'>Every panel icon is shown with an image and some text.</radio>
-        <radio label='Image only for applications' value='1'>Applications have just an image, everything else has both an image and text.</radio>
-        <radio label='Image only' value='2'>Only the image is shown.</radio>
-      </radio-group>
-      <spacer/>
-      <slider name='panel_width' label='Panel width (thin)' min='16' max='96' end='(thick)'>The size of the panels.</slider>
-      <spacer/>
-      <toggle name='panel_avoid' label='Do not cover panel'>Ask the window manager not to cover panels at all when you maximise windows. Some window managers may not honour this. If unset, the filer asks for just a couple of pixels at the edge of the screen to remain uncovered, so that auto-raising works.</toggle>
-    </frame>
-    <frame label='Xinerama'>
-      <hbox>
-	<toggle name='panel_xinerama' label='Confine to Xinerama monitor'>If you have an Xinerama multi-monitor setup, use this option to confine the panels to one monitor instead of spanning them.</toggle>
-	<monitor-number name='panel_monitor' label='' min='0' max='1' width='1'>The monitor the panels are confined to in Xinerama mode (numbered from 0).</monitor-number>
-      </hbox>
-    </frame>
-  </section>
-
   <section title='Desktop'>
     <label help='1'>When run by a session manager program (such as ROX-Session) the filer can open up a panel and/or the pinboard.  Here you configure which.</label>
 

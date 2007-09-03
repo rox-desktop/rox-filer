@@ -2116,44 +2116,6 @@ static void panel_style_changed(void)
 
 		g_idle_add((GtkFunction) recreate_panels, names);
 	}
-	
-	if (o_panel_style.has_changed)
-	{
-		for (i = 0; i < PANEL_NUMBER_OF_SIDES; i++)
-		{
-			if (current_panel[i])
-				panel_set_style(current_panel[i]);
-		}
-	}
-	if (o_panel_width.has_changed)
-	{
-		for (i = 0; i < PANEL_NUMBER_OF_SIDES; i++)
-		{
-			if (current_panel[i])
-				panel_update(current_panel[i]);
-		}
-	}
-
-	if (o_panel_xinerama.has_changed || o_panel_monitor.has_changed ||
-	    o_panel_avoid.has_changed)
-	{
-		//if (panel_check_xinerama() || o_panel_avoid.has_changed)
-		{
-			for (i = 0; i < PANEL_NUMBER_OF_SIDES; i++)
-			{
-				if (current_panel[i])
-				{
-					reposition_panel(
-						current_panel[i]->window,
-						&current_panel[i]->
-						    window->allocation,
-						current_panel[i]);
-					gtk_widget_queue_resize(
-						current_panel[i]->window);
-				}
-			}
-		}
-	}
 }
 
 static gboolean draw_panel_edge(GtkWidget *widget, GdkEventExpose *event,
