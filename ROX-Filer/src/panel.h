@@ -32,6 +32,13 @@ struct _Panel {
 
 	int		autoscroll_to;	/* Timeout */
 	int		autoscroll_speed; /* 0 => not scrolling */
+	GdkRectangle	geometry;
+	/* Options */
+	int			style;		/* Possible values defined in panel.c */
+	int			width;
+	gboolean	xinerama;
+	int			monitor;
+	gboolean	avoid;
 };
 
 extern Panel *current_panel[PANEL_NUMBER_OF_SIDES];

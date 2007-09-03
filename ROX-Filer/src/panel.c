@@ -196,10 +196,10 @@ static void panel_show_menu(GdkEventButton *event, PanelIcon *pi, Panel *panel);
 static void panel_style_changed(void);
 static void motion_may_raise(Panel *panel, int x, int y);
 static void panel_update(Panel *panel);
-static gboolean panel_check_xinerama(void);
 static GList *build_monitor_number(Option *option,
 					xmlNode *node, guchar *label);
 static gboolean may_autoscroll(Panel *panel);
+static void panel_update_geometry(Panel *panel);
 
 
 static GtkWidget *dnd_highlight = NULL; /* (stops flickering) */
@@ -215,7 +215,6 @@ static Option o_panel_avoid;
 static Option o_panel_is_dock;
 
 static gint panel_monitor = -1;
-GdkRectangle panel_geometry;
 
 static int closing_panel = 0;	/* Don't panel_save; destroying! */
 
@@ -237,8 +236,6 @@ void panel_init(void)
 	option_add_notify(panel_style_changed);
 
 	option_register_widget("monitor-number", build_monitor_number);
-
-	panel_check_xinerama();
 }
 
 /* Return a free edge for a new panel.
@@ -336,6 +333,14 @@ Panel *panel_new(const gchar *name, PanelSide side)
 	panel->side = side;
 	panel->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	panel->autoscroll_speed = 0;
+
+	panel->style = o_panel_style.int_value;
+	panel->width = o_panel_width.int_value;
+	panel->xinerama = o_panel_xinerama.int_value;
+	panel->monitor = o_panel_monitor.int_value;
+	panel->avoid = o_panel_avoid.int_value;
+	panel_update_geometry(panel);
+
 	gtk_window_set_resizable(GTK_WINDOW(panel->window), FALSE);
 	gtk_window_set_wmclass(GTK_WINDOW(panel->window), "ROX-Panel", PROJECT);
 	gtk_widget_set_name(panel->window, "rox-panel");
@@ -520,8 +525,6 @@ void panel_mark_used(GdkRegion *used)
 void panel_update_size(void)
 {
 	int i;
-
-	panel_check_xinerama();
 
 	for (i = 0; i < PANEL_NUMBER_OF_SIDES; i++)
 	{
@@ -899,11 +902,12 @@ static void size_request(GtkWidget *widget, GtkRequisition *req, PanelIcon *pi)
 	int max_width = 100;
 	int max_height = 100;
 	int image_width, image_height;
+	Panel *panel = pi->panel;
 
 	if (horz)
-		max_height = o_panel_width.int_value - req->height;
+		max_height = panel->width - req->height;
 	else
-		max_width = MAX(o_panel_width.int_value, req->width);
+		max_width = MAX(panel->width, req->width);
 
 	/* TODO: really need to recreate? */
 	if (pi->image)
@@ -1133,15 +1137,15 @@ static gint icon_button_press(GtkWidget *widget,
 static void reposition_panel(GtkWidget *window,
 				GtkAllocation *alloc, Panel *panel)
 {
-	int		x = panel_geometry.x;
-	int		y = panel_geometry.y;
+	int		x = panel->geometry.x;
+	int		y = panel->geometry.y;
 	int		thickness;
 	PanelSide	side = panel->side;
 
 	if (side == PANEL_LEFT || side == PANEL_RIGHT)
 	{
 		if (side == PANEL_RIGHT)
-			x += panel_geometry.width - alloc->width;
+			x += panel->geometry.width - alloc->width;
 
 		if (current_panel[PANEL_TOP])
 		{
@@ -1151,7 +1155,7 @@ static void reposition_panel(GtkWidget *window,
 	}
 
 	if (side == PANEL_BOTTOM)
-		y += panel_geometry.height - alloc->height;
+		y += panel->geometry.height - alloc->height;
 	
 	gtk_window_move(GTK_WINDOW(panel->window), x, y);
 	gdk_window_move(panel->window->window, x, y);
@@ -1176,7 +1180,7 @@ static void reposition_panel(GtkWidget *window,
 			gulong bottom_start_x, bottom_end_x;
 		} strut = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-		if (o_panel_avoid.int_value == FALSE)
+		if (panel->avoid == FALSE)
 			thickness = 2;
 		else if (panel->side == PANEL_TOP ||
 			 panel->side == PANEL_BOTTOM)
@@ -1187,15 +1191,12 @@ static void reposition_panel(GtkWidget *window,
 		switch (panel->side)
 		{
 			case PANEL_LEFT:
-				if (!o_panel_xinerama.int_value ||
-					!monitor_adjacent
-					[o_panel_monitor.int_value].left)
+				if (!panel->xinerama || !monitor_adjacent[panel->monitor].left)
 				{
-					strut.left = panel_geometry.x +
-						thickness;
-					strut.left_start_y = panel_geometry.y;
-					strut.left_end_y = panel_geometry.y +
-						panel_geometry.height - 1;
+					strut.left = panel->geometry.x + thickness;
+					strut.left_start_y = panel->geometry.y;
+					strut.left_end_y = panel->geometry.y +
+						panel->geometry.height - 1;
 				}
 				/* else there is (part of) a monitor
 				 * to the left */
@@ -1205,19 +1206,17 @@ static void reposition_panel(GtkWidget *window,
 				}
 				break;
 			case PANEL_RIGHT:
-				if (!o_panel_xinerama.int_value ||
-					!monitor_adjacent
-					[o_panel_monitor.int_value].right)
+				if (!panel->xinerama || !monitor_adjacent[panel->monitor].right)
 				{
 					/* RHS of monitor might not abut edge
 					 * of total virtual screen */
 					strut.right = screen_width -
-						panel_geometry.x -
-						panel_geometry.width +
+						panel->geometry.x -
+						panel->geometry.width +
 						thickness;
-					strut.right_start_y = panel_geometry.y;
-					strut.right_end_y = panel_geometry.y +
-						panel_geometry.height - 1;
+					strut.right_start_y = panel->geometry.y;
+					strut.right_end_y = panel->geometry.y +
+						panel->geometry.height - 1;
 				}
 				/* else there is (part of) a monitor
 				 * to the right */
@@ -1227,15 +1226,12 @@ static void reposition_panel(GtkWidget *window,
 				}
 				break;
 			case PANEL_TOP:
-				if (!o_panel_xinerama.int_value ||
-					!monitor_adjacent
-					[o_panel_monitor.int_value].top)
+				if (!panel->xinerama || !monitor_adjacent[panel->monitor].top)
 				{
-					strut.top = panel_geometry.y +
-						thickness;
-					strut.top_start_x = panel_geometry.x;
-					strut.top_end_x = panel_geometry.x +
-						panel_geometry.width - 1;
+					strut.top = panel->geometry.y + thickness;
+					strut.top_start_x = panel->geometry.x;
+					strut.top_end_x = panel->geometry.x +
+						panel->geometry.width - 1;
 				}
 				/* else there is (part of) a monitor above */
 				else
@@ -1244,19 +1240,18 @@ static void reposition_panel(GtkWidget *window,
 				}
 				break;
 			default:	/* PANEL_BOTTOM */
-				if (!o_panel_xinerama.int_value ||
-					!monitor_adjacent
-					[o_panel_monitor.int_value].bottom)
+				if (!panel->xinerama ||
+						!monitor_adjacent[panel->monitor].bottom)
 				{
 					/* Bottom of monitor might not abut
 					 * edge of total virtual screen */
 					strut.bottom = screen_height -
-						panel_geometry.y -
-						panel_geometry.height +
+						panel->geometry.y -
+						panel->geometry.height +
 						thickness;
-					strut.bottom_start_x = panel_geometry.x;
-					strut.bottom_end_x = panel_geometry.x +
-						panel_geometry.width - 1;
+					strut.bottom_start_x = panel->geometry.x;
+					strut.bottom_end_x = panel->geometry.x +
+						panel->geometry.width - 1;
 				}
 				/* else there is (part of) a monitor below */
 				else
@@ -1965,12 +1960,12 @@ static void panel_post_resize(GtkWidget *win, GtkRequisition *req, Panel *panel)
 {
 	if (panel->side == PANEL_TOP || panel->side == PANEL_BOTTOM)
 	{
-		req->width = panel_geometry.width;
+		req->width = panel->geometry.width;
 		req->height += EDGE_WIDTH;
 	}
 	else
 	{
-		int h = panel_geometry.height;
+		int h = panel->geometry.height;
 
 		if (current_panel[PANEL_TOP])
 		{
@@ -2092,7 +2087,7 @@ static void panel_style_changed(void)
 	if (o_panel_xinerama.has_changed || o_panel_monitor.has_changed ||
 	    o_panel_avoid.has_changed)
 	{
-		if (panel_check_xinerama() || o_panel_avoid.has_changed)
+		//if (panel_check_xinerama() || o_panel_avoid.has_changed)
 		{
 			for (i = 0; i < PANEL_NUMBER_OF_SIDES; i++)
 			{
@@ -2118,7 +2113,7 @@ static gboolean draw_panel_edge(GtkWidget *widget, GdkEventExpose *event,
 
 	if (panel->side == PANEL_TOP || panel->side == PANEL_BOTTOM)
 	{
-		width = panel_geometry.width;
+		width = panel->geometry.width;
 		height = EDGE_WIDTH;
 
 		x = 0;
@@ -2130,7 +2125,7 @@ static gboolean draw_panel_edge(GtkWidget *widget, GdkEventExpose *event,
 	else
 	{
 		width = EDGE_WIDTH;
-		height = panel_geometry.height;
+		height = panel->geometry.height;
 
 		y = 0;
 		if (panel->side == PANEL_RIGHT)
@@ -2286,13 +2281,14 @@ static PanelIcon *panel_icon_new(Panel *panel,
 static gboolean panel_want_show_text(PanelIcon *pi)
 {
 	Icon *icon = (Icon *) pi;
+	Panel *panel = pi->panel;
 
 	if (!icon->item->leafname[0])
 		return FALSE;
 
-	if (o_panel_style.int_value == SHOW_BOTH)
+	if (panel->style == SHOW_BOTH)
 		return TRUE;
-	if (o_panel_style.int_value == SHOW_ICON)
+	if (panel->style == SHOW_ICON)
 		return FALSE;
 
 	if (icon->item->flags & ITEM_FLAG_APPDIR)
@@ -2308,27 +2304,31 @@ static void panel_show_options(Panel *panel)
 {
 	GtkWidget *dialog;
 	gboolean already_showing = FALSE;
+	GladeXML *glade = NULL;
 
 	if (panel_options_dialog)
 	{
 		dialog = panel_options_dialog;
 		already_showing = TRUE;
+		glade = glade_get_widget_tree(dialog);
 	}
 	else
 	{
-		GladeXML *glade = get_glade_xml("Panel Options");
-
+		glade = get_glade_xml("Panel Options");
 		dialog = glade_xml_get_widget(glade, "Panel Options");
 		panel_options_dialog = dialog;
 		g_signal_connect(dialog, "destroy",
 				G_CALLBACK(gtk_widget_destroyed),
 				&panel_options_dialog);
-		g_signal_connect(dialog, "response",
-				 G_CALLBACK(gtk_widget_destroy), NULL);
+		glade_xml_signal_autoconnect(glade);
 		gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_CLOSE);
-
 	}
 	g_object_set_data(G_OBJECT(panel_options_dialog), "rox-panel", panel);
+
+	gtk_spin_button_set_adjustment(GTK_SPIN_BUTTON(
+				glade_xml_get_widget(glade, "panel_xinerama_monitor")),
+			GTK_ADJUSTMENT(gtk_adjustment_new(MAX(0, panel->monitor),
+				0, n_monitors - 1, 1, 10, 1)));
 
 	if (already_showing)
 	{
@@ -2529,37 +2529,24 @@ static void panel_drag_leave(GtkWidget	*widget,
 	}
 }
 
-static gboolean panel_check_xinerama(void)
+static void panel_update_geometry(Panel *panel)
 {
-	gint old_monitor = panel_monitor;
-
-	panel_monitor = -1;
-
-	if (o_panel_xinerama.int_value)
+	if (panel->xinerama && panel->monitor >= n_monitors)
 	{
-		if (o_panel_monitor.int_value < n_monitors)
-		{
-			panel_monitor = o_panel_monitor.int_value; 
-		}
-		else
-		{
-			g_warning(_("Xinerama monitor %d unavailable"),
-					o_panel_monitor.int_value); 
-		}
+		g_warning(_("Xinerama monitor %d unavailable"), panel->monitor); 
+		panel->xinerama = FALSE;
 	}
 
-	if (panel_monitor == -1)
+	if (panel->xinerama)
 	{
-		panel_geometry.x = panel_geometry.y = 0;
-		panel_geometry.width = screen_width;
-		panel_geometry.height = screen_height;
+		panel->geometry = monitor_geom[panel->monitor];
 	}
 	else
 	{
-		panel_geometry = monitor_geom[panel_monitor];
+		panel->geometry.x = panel->geometry.y = 0;
+		panel->geometry.width = screen_width;
+		panel->geometry.height = screen_height;
 	}
-
-	return old_monitor != panel_monitor;
 }
 
 static GList *build_monitor_number(Option *option, xmlNode *node, guchar *label)
@@ -2585,5 +2572,65 @@ PanelSide panel_name_to_side(gchar *side)
 	else
 		g_warning("Unknown panel side '%s'", side);
 	return PANEL_NUMBER_OF_SIDES;
+}
+
+inline static Panel *panel_from_opts_widget(GtkWidget *widget)
+{
+	return g_object_get_data(G_OBJECT(gtk_widget_get_toplevel(widget)),
+			"rox-panel");
+}
+
+static void panel_style_radio_toggled(GtkToggleButton *widget, int which)
+{
+	Panel *panel;
+
+	if (!gtk_toggle_button_get_active(widget))
+		return;
+	panel = panel_from_opts_widget(GTK_WIDGET(widget));
+}
+
+/* Handlers autoconnected by glade can't be static but aren't called from
+ * elsewhere so declare prototypes first to prevent warnings */
+void panel_style_radio_0_toggled_cb(GtkToggleButton *widget);
+void panel_style_radio_1_toggled_cb(GtkToggleButton *widget);
+void panel_style_radio_2_toggled_cb(GtkToggleButton *widget);
+void panel_width_changed_cb(GtkSpinButton *widget);
+void panel_dont_cover_toggled_cb(GtkToggleButton *widget);
+void panel_xinerama_confine_toggled_cb(GtkToggleButton *widget);
+void panel_xinerama_monitor_changed_cb(GtkSpinButton *widget);
+
+void panel_style_radio_0_toggled_cb(GtkToggleButton *widget)
+{
+	panel_style_radio_toggled(widget, 0);
+}
+
+void panel_style_radio_1_toggled_cb(GtkToggleButton *widget)
+{
+	panel_style_radio_toggled(widget, 1);
+}
+
+void panel_style_radio_2_toggled_cb(GtkToggleButton *widget)
+{
+	panel_style_radio_toggled(widget, 2);
+}
+
+void panel_width_changed_cb(GtkSpinButton *widget)
+{
+	Panel *panel = panel_from_opts_widget(GTK_WIDGET(widget));
+}
+
+void panel_dont_cover_toggled_cb(GtkToggleButton *widget)
+{
+	Panel *panel = panel_from_opts_widget(GTK_WIDGET(widget));
+}
+
+void panel_xinerama_confine_toggled_cb(GtkToggleButton *widget)
+{
+	Panel *panel = panel_from_opts_widget(GTK_WIDGET(widget));
+}
+
+void panel_xinerama_monitor_changed_cb(GtkSpinButton *widget)
+{
+	Panel *panel = panel_from_opts_widget(GTK_WIDGET(widget));
 }
 
