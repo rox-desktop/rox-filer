@@ -22,6 +22,7 @@
 #include "config.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 #include <ctype.h>
@@ -258,6 +259,33 @@ static PanelSide find_free_side()
 	return PANEL_BOTTOM;
 }
 
+static void get_int_prop(xmlNodePtr node, const char *name, int *target)
+{
+	char *prop = xmlGetProp(node, name);
+
+	if (prop)
+	{
+		*target = atoi(prop);
+		g_free(prop);
+	}
+}
+
+static void panel_load_options_from_xml(Panel *panel, xmlDocPtr doc)
+{
+	xmlNodePtr root;
+	xmlNodePtr options;
+
+	root = xmlDocGetRootElement(doc);
+	options = get_subnode(root, NULL, "options");
+	if (!options)
+		return;
+	get_int_prop(options, "style", &panel->style);
+	get_int_prop(options, "width", &panel->width);
+	get_int_prop(options, "avoid", &panel->avoid);
+	get_int_prop(options, "xinerama", &panel->xinerama);
+	get_int_prop(options, "monitor", &panel->monitor);
+}
+
 /* 'name' may be NULL or "" to remove the panel */
 Panel *panel_new(const gchar *name, PanelSide side)
 {
@@ -334,11 +362,17 @@ Panel *panel_new(const gchar *name, PanelSide side)
 	panel->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	panel->autoscroll_speed = 0;
 
+	/* These are fallbacks from legacy global options */
 	panel->style = o_panel_style.int_value;
 	panel->width = o_panel_width.int_value;
 	panel->xinerama = o_panel_xinerama.int_value;
 	panel->monitor = o_panel_monitor.int_value;
 	panel->avoid = o_panel_avoid.int_value;
+
+	/* Now try to load options from this panel's XML */
+	if (panel_doc)
+		panel_load_options_from_xml(panel, panel_doc);
+
 	panel_update_geometry(panel);
 
 	gtk_window_set_resizable(GTK_WINDOW(panel->window), FALSE);
@@ -1486,8 +1520,10 @@ void panel_save(Panel *panel)
 {
 	xmlDocPtr doc;
 	xmlNodePtr root;
+	xmlNodePtr options;
 	guchar	*save = NULL;
 	guchar	*save_new = NULL;
+	char prop[16];
 
 	g_return_if_fail(panel != NULL);
 
@@ -1515,6 +1551,18 @@ void panel_save(Panel *panel)
 			panel->side == PANEL_BOTTOM ? "Bottom" :
 			panel->side == PANEL_LEFT ? "Left" :
 			"Right");
+
+	options = xmlNewChild(root, NULL, "options", NULL);
+	sprintf(prop, "%d", panel->style);
+	xmlSetProp(options, "style", prop);
+	sprintf(prop, "%d", panel->width);
+	xmlSetProp(options, "width", prop);
+	sprintf(prop, "%d", panel->avoid);
+	xmlSetProp(options, "avoid", prop);
+	sprintf(prop, "%d", panel->xinerama);
+	xmlSetProp(options, "xinerama", prop);
+	sprintf(prop, "%d", panel->monitor);
+	xmlSetProp(options, "monitor", prop);
 	
 	make_widgets(xmlNewChild(root, NULL, "start", NULL),
 		gtk_container_get_children(GTK_CONTAINER(panel->before)));
@@ -2605,12 +2653,6 @@ PanelSide panel_name_to_side(gchar *side)
 	return PANEL_NUMBER_OF_SIDES;
 }
 
-/* FIXME: Simply replace all calls with panel_save() when ready */
-inline static void panel_save_options(Panel *panel)
-{
-	(void) panel;
-}
-
 inline static Panel *panel_from_opts_widget(GtkWidget *widget)
 {
 	return g_object_get_data(G_OBJECT(gtk_widget_get_toplevel(widget)),
@@ -2628,7 +2670,7 @@ static void panel_style_radio_toggled(GtkToggleButton *widget, int style)
 	{
 		panel->style = style;
 		panel_set_style(panel);
-		panel_save_options(panel);
+		panel_save(panel);
 	}
 }
 
@@ -2637,7 +2679,7 @@ static void panel_xinerama_changed(Panel *panel)
 	panel_update_geometry(panel);
 	reposition_panel(panel->window, &panel->window->allocation, panel);
 	gtk_widget_queue_resize(panel->window);
-	panel_save_options(panel);
+	panel_save(panel);
 }
 
 /* Handlers autoconnected by glade can't be static but aren't called from
@@ -2674,7 +2716,7 @@ void panel_width_changed_cb(GtkSpinButton *widget)
 	{
 		panel->width = width;
 		panel_update(panel);
-		panel_save_options(panel);
+		panel_save(panel);
 	}
 }
 
@@ -2687,7 +2729,7 @@ void panel_avoid_toggled_cb(GtkToggleButton *widget)
 	{
 		panel->avoid = avoid;
 		panel_setup_struts(panel, &panel->window->allocation);
-		panel_save_options(panel);
+		panel_save(panel);
 	}
 }
 
