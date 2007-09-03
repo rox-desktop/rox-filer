@@ -7,6 +7,7 @@ CC = @CC@
 .SUFFIXES: .c .o
 
 PKG_CONFIG = @PKG_CONFIG@
+LIBTOOL = @LIBTOOL@
 LIBS = @LIBS@ @LFS_LDFLAGS@ -lICE -lSM
 #PROF = -fprofile-arcs -pg
 
@@ -14,7 +15,7 @@ PKG_CONFIG_FLAGS=
 
 CFLAGS = -I. -I${srcdir} ${PROF} @CFLAGS@ @LFS_CFLAGS@ \
 	 `${PKG_CONFIG} ${PKG_CONFIG_FLAGS} --cflags gtk+-2.0 libxml-2.0 libglade-2.0`
-LDFLAGS = ${PROF} @LDFLAGS@ `${PKG_CONFIG} ${PKG_CONFIG_FLAGS} --libs gtk+-2.0 libxml-2.0 libglade-2.0 | sed 's/-lpangoxft-[^ ]*//'` ${LIBS}
+LDFLAGS = ${PROF} @LDFLAGS@ -export-dynamic `${PKG_CONFIG} ${PKG_CONFIG_FLAGS} --libs gtk+-2.0 libxml-2.0 libglade-2.0 | sed 's/-lpangoxft-[^ ]*//'` ${LIBS}
 
 ############ Things to change for different programs
 
@@ -45,7 +46,7 @@ OBJECTS = abox.o action.o appinfo.o appmenu.o bind.o bookmarks.o	\
 ############ Things to keep the same
 
 ${PROG}: ${OBJECTS}
-	${CC} -o "${PROG}" ${OBJECTS} ${LDFLAGS}
+	$(LIBTOOL) --mode=link ${CC} -o "${PROG}" ${OBJECTS} ${LDFLAGS}
 	mv "${PROG}" "${PLATFORM_DIR}"
 	-(cd "${PLATFORM_DIR}" && \
 	 objcopy --only-keep-debug ROX-Filer ROX-Filer.dbg && \
