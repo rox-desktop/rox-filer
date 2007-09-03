@@ -1134,12 +1134,132 @@ static gint icon_button_press(GtkWidget *widget,
 	return TRUE;
 }
 
+/* Stop windows from maximising over all/part of us */
+static void panel_setup_struts(Panel *panel, GtkAllocation *alloc)
+{
+	int thickness;
+	struct {
+		gulong left, right, top, bottom;
+		gulong left_start_y, left_end_y;
+		gulong right_start_y, right_end_y;
+		gulong top_start_x, top_end_x;
+		gulong bottom_start_x, bottom_end_x;
+	} strut = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+	if (panel->avoid == FALSE)
+		thickness = 2;
+	else if (panel->side == PANEL_TOP ||
+		 panel->side == PANEL_BOTTOM)
+		thickness = alloc->height;
+	else
+		thickness = alloc->width;
+
+	switch (panel->side)
+	{
+		case PANEL_LEFT:
+			if (!panel->xinerama || !monitor_adjacent[panel->monitor].left)
+			{
+				strut.left = panel->geometry.x + thickness;
+				strut.left_start_y = panel->geometry.y;
+				strut.left_end_y = panel->geometry.y +
+					panel->geometry.height - 1;
+			}
+			/* else there is (part of) a monitor
+			 * to the left */
+			else
+			{
+				thickness = 0;
+			}
+			break;
+		case PANEL_RIGHT:
+			if (!panel->xinerama || !monitor_adjacent[panel->monitor].right)
+			{
+				/* RHS of monitor might not abut edge
+				 * of total virtual screen */
+				strut.right = screen_width -
+					panel->geometry.x -
+					panel->geometry.width +
+					thickness;
+				strut.right_start_y = panel->geometry.y;
+				strut.right_end_y = panel->geometry.y +
+					panel->geometry.height - 1;
+			}
+			/* else there is (part of) a monitor
+			 * to the right */
+			else
+			{
+				thickness = 0;
+			}
+			break;
+		case PANEL_TOP:
+			if (!panel->xinerama || !monitor_adjacent[panel->monitor].top)
+			{
+				strut.top = panel->geometry.y + thickness;
+				strut.top_start_x = panel->geometry.x;
+				strut.top_end_x = panel->geometry.x +
+					panel->geometry.width - 1;
+			}
+			/* else there is (part of) a monitor above */
+			else
+			{
+				thickness = 0;
+			}
+			break;
+		default:	/* PANEL_BOTTOM */
+			if (!panel->xinerama ||
+					!monitor_adjacent[panel->monitor].bottom)
+			{
+				/* Bottom of monitor might not abut
+				 * edge of total virtual screen */
+				strut.bottom = screen_height -
+					panel->geometry.y -
+					panel->geometry.height +
+					thickness;
+				strut.bottom_start_x = panel->geometry.x;
+				strut.bottom_end_x = panel->geometry.x +
+					panel->geometry.width - 1;
+			}
+			/* else there is (part of) a monitor below */
+			else
+			{
+				thickness = 0;
+			}
+			break;
+	}
+
+	if (thickness)
+	{
+		/* Set full-width strut as well as partial in case
+		 * partial isn't supported by wm */
+		gdk_property_change(panel->window->window,
+				gdk_atom_intern("_NET_WM_STRUT",
+					FALSE),
+				gdk_atom_intern("CARDINAL", FALSE),
+				32, GDK_PROP_MODE_REPLACE,
+				(gchar *) &strut, 4);
+		gdk_property_change(panel->window->window,
+				gdk_atom_intern("_NET_WM_STRUT_PARTIAL",
+					FALSE),
+				gdk_atom_intern("CARDINAL", FALSE),
+				32, GDK_PROP_MODE_REPLACE,
+				(gchar *) &strut, 12);
+	}
+	else
+	{
+		gdk_property_delete(panel->window->window,
+				gdk_atom_intern("_NET_WM_STRUT_PARTIAL",
+					FALSE));
+		gdk_property_delete(panel->window->window,
+				gdk_atom_intern("_NET_WM_STRUT",
+					FALSE));
+	}
+}
+
 static void reposition_panel(GtkWidget *window,
 				GtkAllocation *alloc, Panel *panel)
 {
 	int		x = panel->geometry.x;
 	int		y = panel->geometry.y;
-	int		thickness;
 	PanelSide	side = panel->side;
 
 	if (side == PANEL_LEFT || side == PANEL_RIGHT)
@@ -1170,125 +1290,7 @@ static void reposition_panel(GtkWidget *window,
 					current_panel[PANEL_LEFT]->window);
 	}
 
-	/* Stop windows from maximising over all/part of us */
-	{
-		struct {
-			gulong left, right, top, bottom;
-			gulong left_start_y, left_end_y;
-			gulong right_start_y, right_end_y;
-			gulong top_start_x, top_end_x;
-			gulong bottom_start_x, bottom_end_x;
-		} strut = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-
-		if (panel->avoid == FALSE)
-			thickness = 2;
-		else if (panel->side == PANEL_TOP ||
-			 panel->side == PANEL_BOTTOM)
-			thickness = alloc->height;
-		else
-			thickness = alloc->width;
-
-		switch (panel->side)
-		{
-			case PANEL_LEFT:
-				if (!panel->xinerama || !monitor_adjacent[panel->monitor].left)
-				{
-					strut.left = panel->geometry.x + thickness;
-					strut.left_start_y = panel->geometry.y;
-					strut.left_end_y = panel->geometry.y +
-						panel->geometry.height - 1;
-				}
-				/* else there is (part of) a monitor
-				 * to the left */
-				else
-				{
-					thickness = 0;
-				}
-				break;
-			case PANEL_RIGHT:
-				if (!panel->xinerama || !monitor_adjacent[panel->monitor].right)
-				{
-					/* RHS of monitor might not abut edge
-					 * of total virtual screen */
-					strut.right = screen_width -
-						panel->geometry.x -
-						panel->geometry.width +
-						thickness;
-					strut.right_start_y = panel->geometry.y;
-					strut.right_end_y = panel->geometry.y +
-						panel->geometry.height - 1;
-				}
-				/* else there is (part of) a monitor
-				 * to the right */
-				else
-				{
-					thickness = 0;
-				}
-				break;
-			case PANEL_TOP:
-				if (!panel->xinerama || !monitor_adjacent[panel->monitor].top)
-				{
-					strut.top = panel->geometry.y + thickness;
-					strut.top_start_x = panel->geometry.x;
-					strut.top_end_x = panel->geometry.x +
-						panel->geometry.width - 1;
-				}
-				/* else there is (part of) a monitor above */
-				else
-				{
-					thickness = 0;
-				}
-				break;
-			default:	/* PANEL_BOTTOM */
-				if (!panel->xinerama ||
-						!monitor_adjacent[panel->monitor].bottom)
-				{
-					/* Bottom of monitor might not abut
-					 * edge of total virtual screen */
-					strut.bottom = screen_height -
-						panel->geometry.y -
-						panel->geometry.height +
-						thickness;
-					strut.bottom_start_x = panel->geometry.x;
-					strut.bottom_end_x = panel->geometry.x +
-						panel->geometry.width - 1;
-				}
-				/* else there is (part of) a monitor below */
-				else
-				{
-					thickness = 0;
-				}
-				break;
-		}
-
-		if (thickness)
-		{
-			/* Set full-width strut as well as partial in case
-			 * partial isn't supported by wm */
-			gdk_property_change(panel->window->window,
-					gdk_atom_intern("_NET_WM_STRUT",
-						FALSE),
-					gdk_atom_intern("CARDINAL", FALSE),
-					32, GDK_PROP_MODE_REPLACE,
-					(gchar *) &strut, 4);
-			gdk_property_change(panel->window->window,
-					gdk_atom_intern("_NET_WM_STRUT_PARTIAL",
-						FALSE),
-					gdk_atom_intern("CARDINAL", FALSE),
-					32, GDK_PROP_MODE_REPLACE,
-					(gchar *) &strut, 12);
-		}
-		else
-		{
-			gdk_property_delete(panel->window->window,
-					gdk_atom_intern("_NET_WM_STRUT_PARTIAL",
-						FALSE));
-			gdk_property_delete(panel->window->window,
-					gdk_atom_intern("_NET_WM_STRUT",
-						FALSE));
-		}
-	}
-
+	panel_setup_struts(panel, alloc);
 }
 
 /* Same as drag_set_dest(), but for panel icons */
@@ -2300,6 +2302,38 @@ static gboolean panel_want_show_text(PanelIcon *pi)
 	return TRUE;
 }
 
+static void xinerama_sensitive(GladeXML *glade, gboolean sensitive)
+{
+	gtk_widget_set_sensitive(
+			glade_xml_get_widget(glade, "panel_xinerama_monitor"),
+			sensitive);
+}
+
+static void panel_setup_options_dialog(GladeXML *glade, Panel *panel)
+{
+	char *wnm;
+
+	wnm = g_strdup_printf("panel_style_radio_%d", panel->style);
+	gtk_toggle_button_set_active(
+			GTK_TOGGLE_BUTTON(glade_xml_get_widget(glade, wnm)),
+			TRUE);
+	gtk_spin_button_set_value(
+		GTK_SPIN_BUTTON(glade_xml_get_widget(glade, "panel_width")),
+		panel->width);
+	gtk_toggle_button_set_active(
+		GTK_TOGGLE_BUTTON(glade_xml_get_widget(glade, "panel_avoid")),
+		panel->avoid);
+	gtk_toggle_button_set_active(
+		GTK_TOGGLE_BUTTON(glade_xml_get_widget(glade,
+				"panel_xinerama_confine")),
+		panel->xinerama);
+	gtk_spin_button_set_adjustment(
+		GTK_SPIN_BUTTON(glade_xml_get_widget(glade, "panel_xinerama_monitor")),
+		GTK_ADJUSTMENT(gtk_adjustment_new(MAX(0, panel->monitor),
+				0, n_monitors - 1, 1, 10, 1)));
+	xinerama_sensitive(glade, panel->xinerama);
+}
+
 static void panel_show_options(Panel *panel)
 {
 	GtkWidget *dialog;
@@ -2325,10 +2359,7 @@ static void panel_show_options(Panel *panel)
 	}
 	g_object_set_data(G_OBJECT(panel_options_dialog), "rox-panel", panel);
 
-	gtk_spin_button_set_adjustment(GTK_SPIN_BUTTON(
-				glade_xml_get_widget(glade, "panel_xinerama_monitor")),
-			GTK_ADJUSTMENT(gtk_adjustment_new(MAX(0, panel->monitor),
-				0, n_monitors - 1, 1, 10, 1)));
+	panel_setup_options_dialog(glade, panel);
 
 	if (already_showing)
 	{
@@ -2574,19 +2605,39 @@ PanelSide panel_name_to_side(gchar *side)
 	return PANEL_NUMBER_OF_SIDES;
 }
 
+/* FIXME: Simply replace all calls with panel_save() when ready */
+inline static void panel_save_options(Panel *panel)
+{
+	(void) panel;
+}
+
 inline static Panel *panel_from_opts_widget(GtkWidget *widget)
 {
 	return g_object_get_data(G_OBJECT(gtk_widget_get_toplevel(widget)),
 			"rox-panel");
 }
 
-static void panel_style_radio_toggled(GtkToggleButton *widget, int which)
+static void panel_style_radio_toggled(GtkToggleButton *widget, int style)
 {
 	Panel *panel;
 
 	if (!gtk_toggle_button_get_active(widget))
 		return;
 	panel = panel_from_opts_widget(GTK_WIDGET(widget));
+	if (style != panel->style)
+	{
+		panel->style = style;
+		panel_set_style(panel);
+		panel_save_options(panel);
+	}
+}
+
+static void panel_xinerama_changed(Panel *panel)
+{
+	panel_update_geometry(panel);
+	reposition_panel(panel->window, &panel->window->allocation, panel);
+	gtk_widget_queue_resize(panel->window);
+	panel_save_options(panel);
 }
 
 /* Handlers autoconnected by glade can't be static but aren't called from
@@ -2595,8 +2646,8 @@ void panel_style_radio_0_toggled_cb(GtkToggleButton *widget);
 void panel_style_radio_1_toggled_cb(GtkToggleButton *widget);
 void panel_style_radio_2_toggled_cb(GtkToggleButton *widget);
 void panel_width_changed_cb(GtkSpinButton *widget);
-void panel_dont_cover_toggled_cb(GtkToggleButton *widget);
-void panel_xinerama_confine_toggled_cb(GtkToggleButton *widget);
+void panel_avoid_toggled_cb(GtkToggleButton *widget);
+void panel_xinerama_confine_toggled_cb(GtkWidget *widget);
 void panel_xinerama_monitor_changed_cb(GtkSpinButton *widget);
 
 void panel_style_radio_0_toggled_cb(GtkToggleButton *widget)
@@ -2617,20 +2668,52 @@ void panel_style_radio_2_toggled_cb(GtkToggleButton *widget)
 void panel_width_changed_cb(GtkSpinButton *widget)
 {
 	Panel *panel = panel_from_opts_widget(GTK_WIDGET(widget));
+	int width = gtk_spin_button_get_value_as_int(widget);
+
+	if (width != panel->width)
+	{
+		panel->width = width;
+		panel_update(panel);
+		panel_save_options(panel);
+	}
 }
 
-void panel_dont_cover_toggled_cb(GtkToggleButton *widget)
+void panel_avoid_toggled_cb(GtkToggleButton *widget)
 {
 	Panel *panel = panel_from_opts_widget(GTK_WIDGET(widget));
+	gboolean avoid = gtk_toggle_button_get_active(widget);
+
+	if (avoid != panel->avoid)
+	{
+		panel->avoid = avoid;
+		panel_setup_struts(panel, &panel->window->allocation);
+		panel_save_options(panel);
+	}
 }
 
-void panel_xinerama_confine_toggled_cb(GtkToggleButton *widget)
+void panel_xinerama_confine_toggled_cb(GtkWidget *widget)
 {
-	Panel *panel = panel_from_opts_widget(GTK_WIDGET(widget));
+	Panel *panel = panel_from_opts_widget(widget);
+	gboolean xinerama = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
+
+	xinerama_sensitive(glade_get_widget_tree(gtk_widget_get_toplevel(widget)),
+			xinerama);
+	if (xinerama != panel->xinerama)
+	{
+		panel->xinerama = xinerama;
+		panel_xinerama_changed(panel);
+	}
 }
 
 void panel_xinerama_monitor_changed_cb(GtkSpinButton *widget)
 {
 	Panel *panel = panel_from_opts_widget(GTK_WIDGET(widget));
+	int monitor = gtk_spin_button_get_value_as_int(widget);
+
+	if (monitor != panel->monitor)
+	{
+		panel->monitor = monitor;
+		panel_xinerama_changed(panel);
+	}
 }
 

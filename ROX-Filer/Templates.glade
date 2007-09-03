@@ -258,7 +258,7 @@
                           </packing>
                         </child>
                         <child>
-                          <widget class="GtkCheckButton" id="panel_dont_cover">
+                          <widget class="GtkCheckButton" id="panel_avoid">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
@@ -266,7 +266,7 @@
                             <property name="label" translatable="yes">Do not cover panel</property>
                             <property name="response_id">0</property>
                             <property name="draw_indicator">True</property>
-                            <signal name="toggled" handler="panel_dont_cover_toggled_cb"/>
+                            <signal name="toggled" handler="panel_avoid_toggled_cb"/>
                           </widget>
                           <packing>
                             <property name="position">4</property>
