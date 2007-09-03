@@ -371,7 +371,14 @@ Panel *panel_new(const gchar *name, PanelSide side)
 
 	/* Now try to load options from this panel's XML */
 	if (panel_doc)
+	{
 		panel_load_options_from_xml(panel, panel_doc);
+	}
+	else
+	{
+		/* Otherwise ensure old settings are migrated */
+		need_resave = TRUE;
+	}
 
 	panel_update_geometry(panel);
 
