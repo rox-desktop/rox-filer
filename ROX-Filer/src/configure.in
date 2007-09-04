@@ -45,13 +45,6 @@ pkg-config comes with the developement packages for GTK+-2.4, available at:
     http://www.gtk.org])
 fi
 
-AC_PATH_PROG(LIBTOOL, libtool)
-if test -z "$LIBTOOL"
-then
-	AC_MSG_ERROR([*** libtool missing ***])
-fi
-AC_SUBST(LIBTOOL)
-
 AC_DEFUN(ROX_REQUIRE, [
 AC_MSG_CHECKING(that $1 (version >= $2) is installed)
 if "$PKG_CONFIG" --atleast-version=$2 $1 ; then

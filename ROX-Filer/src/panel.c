@@ -2326,6 +2326,117 @@ static void xinerama_sensitive(GladeXML *glade, gboolean sensitive)
 			sensitive);
 }
 
+inline static Panel *panel_from_opts_widget(GtkWidget *widget)
+{
+	return g_object_get_data(G_OBJECT(gtk_widget_get_toplevel(widget)),
+			"rox-panel");
+}
+
+static void panel_style_radio_toggled(GtkToggleButton *widget, int style)
+{
+	Panel *panel;
+
+	if (!gtk_toggle_button_get_active(widget))
+		return;
+	panel = panel_from_opts_widget(GTK_WIDGET(widget));
+	if (style != panel->style)
+	{
+		panel->style = style;
+		panel_set_style(panel);
+		panel_save(panel);
+	}
+}
+
+static void panel_xinerama_changed(Panel *panel)
+{
+	panel_update_geometry(panel);
+	reposition_panel(panel->window, &panel->window->allocation, panel);
+	gtk_widget_queue_resize(panel->window);
+	panel_save(panel);
+}
+
+static void panel_style_radio_0_toggled_cb(GtkToggleButton *widget)
+{
+	panel_style_radio_toggled(widget, 0);
+}
+
+static void panel_style_radio_1_toggled_cb(GtkToggleButton *widget)
+{
+	panel_style_radio_toggled(widget, 1);
+}
+
+static void panel_style_radio_2_toggled_cb(GtkToggleButton *widget)
+{
+	panel_style_radio_toggled(widget, 2);
+}
+
+static void panel_width_changed_cb(GtkSpinButton *widget)
+{
+	Panel *panel = panel_from_opts_widget(GTK_WIDGET(widget));
+	int width = gtk_spin_button_get_value_as_int(widget);
+
+	if (width != panel->width)
+	{
+		panel->width = width;
+		panel_update(panel);
+		panel_save(panel);
+	}
+}
+
+static void panel_avoid_toggled_cb(GtkToggleButton *widget)
+{
+	Panel *panel = panel_from_opts_widget(GTK_WIDGET(widget));
+	gboolean avoid = gtk_toggle_button_get_active(widget);
+
+	if (avoid != panel->avoid)
+	{
+		panel->avoid = avoid;
+		panel_setup_struts(panel, &panel->window->allocation);
+		panel_save(panel);
+	}
+}
+
+static void panel_xinerama_confine_toggled_cb(GtkWidget *widget)
+{
+	Panel *panel = panel_from_opts_widget(widget);
+	gboolean xinerama = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
+
+	xinerama_sensitive(glade_get_widget_tree(gtk_widget_get_toplevel(widget)),
+			xinerama);
+	if (xinerama != panel->xinerama)
+	{
+		panel->xinerama = xinerama;
+		panel_xinerama_changed(panel);
+	}
+}
+
+static void panel_xinerama_monitor_changed_cb(GtkSpinButton *widget)
+{
+	Panel *panel = panel_from_opts_widget(GTK_WIDGET(widget));
+	int monitor = gtk_spin_button_get_value_as_int(widget);
+
+	if (monitor != panel->monitor)
+	{
+		panel->monitor = monitor;
+		panel_xinerama_changed(panel);
+	}
+}
+
+#define CONNECT_GLADE_CB(glade, handler) \
+	glade_xml_signal_connect(glade, #handler, G_CALLBACK(handler))
+
+static void panel_connect_dialog_signal_handlers(GladeXML *glade)
+{
+	CONNECT_GLADE_CB(glade, gtk_widget_destroy);
+	CONNECT_GLADE_CB(glade, panel_style_radio_0_toggled_cb);
+	CONNECT_GLADE_CB(glade, panel_style_radio_1_toggled_cb);
+	CONNECT_GLADE_CB(glade, panel_style_radio_2_toggled_cb);
+	CONNECT_GLADE_CB(glade, panel_width_changed_cb);
+	CONNECT_GLADE_CB(glade, panel_avoid_toggled_cb);
+	CONNECT_GLADE_CB(glade, panel_xinerama_confine_toggled_cb);
+	CONNECT_GLADE_CB(glade, panel_xinerama_monitor_changed_cb);
+}
+
 static void panel_setup_options_dialog(GladeXML *glade, Panel *panel)
 {
 	char *wnm;
@@ -2371,8 +2482,7 @@ static void panel_show_options(Panel *panel)
 		g_signal_connect(dialog, "destroy",
 				G_CALLBACK(gtk_widget_destroyed),
 				&panel_options_dialog);
-		glade_xml_signal_autoconnect(glade);
-		gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_CLOSE);
+		panel_connect_dialog_signal_handlers(glade);
 	}
 	g_object_set_data(G_OBJECT(panel_options_dialog), "rox-panel", panel);
 
@@ -2620,111 +2730,5 @@ PanelSide panel_name_to_side(gchar *side)
 	else
 		g_warning("Unknown panel side '%s'", side);
 	return PANEL_NUMBER_OF_SIDES;
-}
-
-inline static Panel *panel_from_opts_widget(GtkWidget *widget)
-{
-	return g_object_get_data(G_OBJECT(gtk_widget_get_toplevel(widget)),
-			"rox-panel");
-}
-
-static void panel_style_radio_toggled(GtkToggleButton *widget, int style)
-{
-	Panel *panel;
-
-	if (!gtk_toggle_button_get_active(widget))
-		return;
-	panel = panel_from_opts_widget(GTK_WIDGET(widget));
-	if (style != panel->style)
-	{
-		panel->style = style;
-		panel_set_style(panel);
-		panel_save(panel);
-	}
-}
-
-static void panel_xinerama_changed(Panel *panel)
-{
-	panel_update_geometry(panel);
-	reposition_panel(panel->window, &panel->window->allocation, panel);
-	gtk_widget_queue_resize(panel->window);
-	panel_save(panel);
-}
-
-/* Handlers autoconnected by glade can't be static but aren't called from
- * elsewhere so declare prototypes first to prevent warnings */
-void panel_style_radio_0_toggled_cb(GtkToggleButton *widget);
-void panel_style_radio_1_toggled_cb(GtkToggleButton *widget);
-void panel_style_radio_2_toggled_cb(GtkToggleButton *widget);
-void panel_width_changed_cb(GtkSpinButton *widget);
-void panel_avoid_toggled_cb(GtkToggleButton *widget);
-void panel_xinerama_confine_toggled_cb(GtkWidget *widget);
-void panel_xinerama_monitor_changed_cb(GtkSpinButton *widget);
-
-void panel_style_radio_0_toggled_cb(GtkToggleButton *widget)
-{
-	panel_style_radio_toggled(widget, 0);
-}
-
-void panel_style_radio_1_toggled_cb(GtkToggleButton *widget)
-{
-	panel_style_radio_toggled(widget, 1);
-}
-
-void panel_style_radio_2_toggled_cb(GtkToggleButton *widget)
-{
-	panel_style_radio_toggled(widget, 2);
-}
-
-void panel_width_changed_cb(GtkSpinButton *widget)
-{
-	Panel *panel = panel_from_opts_widget(GTK_WIDGET(widget));
-	int width = gtk_spin_button_get_value_as_int(widget);
-
-	if (width != panel->width)
-	{
-		panel->width = width;
-		panel_update(panel);
-		panel_save(panel);
-	}
-}
-
-void panel_avoid_toggled_cb(GtkToggleButton *widget)
-{
-	Panel *panel = panel_from_opts_widget(GTK_WIDGET(widget));
-	gboolean avoid = gtk_toggle_button_get_active(widget);
-
-	if (avoid != panel->avoid)
-	{
-		panel->avoid = avoid;
-		panel_setup_struts(panel, &panel->window->allocation);
-		panel_save(panel);
-	}
-}
-
-void panel_xinerama_confine_toggled_cb(GtkWidget *widget)
-{
-	Panel *panel = panel_from_opts_widget(widget);
-	gboolean xinerama = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
-
-	xinerama_sensitive(glade_get_widget_tree(gtk_widget_get_toplevel(widget)),
-			xinerama);
-	if (xinerama != panel->xinerama)
-	{
-		panel->xinerama = xinerama;
-		panel_xinerama_changed(panel);
-	}
-}
-
-void panel_xinerama_monitor_changed_cb(GtkSpinButton *widget)
-{
-	Panel *panel = panel_from_opts_widget(GTK_WIDGET(widget));
-	int monitor = gtk_spin_button_get_value_as_int(widget);
-
-	if (monitor != panel->monitor)
-	{
-		panel->monitor = monitor;
-		panel_xinerama_changed(panel);
-	}
 }
 
