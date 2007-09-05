@@ -2355,17 +2355,16 @@ static void panel_xinerama_changed(Panel *panel)
 	panel_save(panel);
 }
 
-static void panel_side_radio_toggled(GtkToggleButton *widget,
-		PanelSide new_side)
+static void panel_side_radio_toggled(GtkWidget *widget, PanelSide new_side)
 {
 	Panel *panel;
 	PanelSide old_side;
 	char *name, *other_side_name;
 	
-	if (!gtk_toggle_button_get_active(widget))
+	if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)))
 		return;
 
-	panel = panel_from_opts_widget(GTK_WIDGET(widget));
+	panel = panel_from_opts_widget(widget);
 	old_side = panel->side;
 	if (new_side == old_side)
 		return;
@@ -2376,6 +2375,8 @@ static void panel_side_radio_toggled(GtkToggleButton *widget,
 			: NULL;
 
 	panel_new(name, new_side);
+	g_object_set_data(G_OBJECT(gtk_widget_get_toplevel(widget)),
+			"rox-panel", current_panel[new_side]);
 	panel_new(other_side_name, old_side);
 
 	g_free(name);
@@ -2449,22 +2450,22 @@ static void panel_xinerama_monitor_changed_cb(GtkSpinButton *widget)
 	}
 }
 
-static void panel_pos_top_toggled_cb(GtkToggleButton *widget)
+static void panel_pos_top_toggled_cb(GtkWidget *widget)
 {
 	panel_side_radio_toggled(widget, PANEL_TOP);
 }
 
-static void panel_pos_bottom_toggled_cb(GtkToggleButton *widget)
+static void panel_pos_bottom_toggled_cb(GtkWidget *widget)
 {
 	panel_side_radio_toggled(widget, PANEL_BOTTOM);
 }
 
-static void panel_pos_left_toggled_cb(GtkToggleButton *widget)
+static void panel_pos_left_toggled_cb(GtkWidget *widget)
 {
 	panel_side_radio_toggled(widget, PANEL_LEFT);
 }
 
-static void panel_pos_right_toggled_cb(GtkToggleButton *widget)
+static void panel_pos_right_toggled_cb(GtkWidget *widget)
 {
 	panel_side_radio_toggled(widget, PANEL_RIGHT);
 }
