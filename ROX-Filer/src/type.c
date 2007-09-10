@@ -495,7 +495,7 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 	}
 	if (!full && icon_theme != gnome_theme)
 	{
-		init_rox_theme();
+		init_gnome_theme();
 		full = mime_type_lookup_icon_info(gnome_theme, type);
 	}
 	if (full)

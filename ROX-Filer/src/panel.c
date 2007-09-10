@@ -259,7 +259,9 @@ static PanelSide find_free_side()
 	return PANEL_BOTTOM;
 }
 
-static void get_int_prop(xmlNodePtr node, const char *name, int *target)
+/* Returns TRUE and sets *target if the property exists, otherwise returns
+ * FALSE and leaves *target unchanged */
+static gboolean get_int_prop(xmlNodePtr node, const char *name, int *target)
 {
 	char *prop = xmlGetProp(node, name);
 
@@ -267,7 +269,17 @@ static void get_int_prop(xmlNodePtr node, const char *name, int *target)
 	{
 		*target = atoi(prop);
 		g_free(prop);
+		return TRUE;
 	}
+	return FALSE;
+}
+
+static void set_int_prop(xmlNodePtr node, const char *name, int value)
+{
+	char prop[16];
+
+	sprintf(prop, "%d", value);
+	xmlSetProp(node, name, prop);
 }
 
 static void panel_load_options_from_xml(Panel *panel, xmlDocPtr doc)
@@ -1530,7 +1542,6 @@ void panel_save(Panel *panel)
 	xmlNodePtr options;
 	guchar	*save = NULL;
 	guchar	*save_new = NULL;
-	char prop[16];
 
 	g_return_if_fail(panel != NULL);
 
@@ -1560,16 +1571,11 @@ void panel_save(Panel *panel)
 			"Right");
 
 	options = xmlNewChild(root, NULL, "options", NULL);
-	sprintf(prop, "%d", panel->style);
-	xmlSetProp(options, "style", prop);
-	sprintf(prop, "%d", panel->width);
-	xmlSetProp(options, "width", prop);
-	sprintf(prop, "%d", panel->avoid);
-	xmlSetProp(options, "avoid", prop);
-	sprintf(prop, "%d", panel->xinerama);
-	xmlSetProp(options, "xinerama", prop);
-	sprintf(prop, "%d", panel->monitor);
-	xmlSetProp(options, "monitor", prop);
+	set_int_prop(options, "style", panel->style);
+	set_int_prop(options, "width", panel->width);
+	set_int_prop(options, "avoid", panel->avoid);
+	set_int_prop(options, "xinerama", panel->xinerama);
+	set_int_prop(options, "monitor", panel->monitor);
 	
 	make_widgets(xmlNewChild(root, NULL, "start", NULL),
 		gtk_container_get_children(GTK_CONTAINER(panel->before)));

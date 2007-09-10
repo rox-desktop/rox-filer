@@ -31,7 +31,6 @@
 
 #include "config.h"
 
-#include <stdarg.h>
 #include <string.h>
 #include <gtk/gtk.h>
 #include <X11/keysym.h>
