@@ -1461,34 +1461,21 @@ GtkIconInfo *theme_lookup_icon(const gchar *icon_name, gint size,
 GdkPixbuf *theme_load_icon(const gchar *icon_name, gint size,
 		GtkIconLookupFlags flags, GError **perror)
 {
-	GError *err = NULL;
 	GdkPixbuf *result = gtk_icon_theme_load_icon(icon_theme,
-			icon_name, size, flags, &err);
+			icon_name, size, flags, NULL);
 
 	if (!result && icon_theme != gnome_theme)
 	{
-		if (err)
-		{
-			g_error_free(err);
-			err = NULL;
-		}
 		init_gnome_theme();
 		result = gtk_icon_theme_load_icon(gnome_theme,
-			icon_name, size, flags, &err);
+			icon_name, size, flags, NULL);
 	}
 	if (!result && icon_theme != rox_theme)
 	{
-		if (err)
-		{
-			g_error_free(err);
-			err = NULL;
-		}
 		init_rox_theme();
 		result = gtk_icon_theme_load_icon(rox_theme,
-			icon_name, size, flags, &err);
+			icon_name, size, flags, perror);
 	}
-	if (perror)
-		*perror = err;
 	return result;
 }
 
