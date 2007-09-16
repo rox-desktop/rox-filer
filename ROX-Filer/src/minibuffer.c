@@ -175,9 +175,12 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 				gtk_entry_set_text(mini, " \"$@\"");
 			else if (item)
 			{
+				guchar *escaped;
 				guchar *tmp;
 
-				tmp = g_strconcat(" ", item->leafname, NULL);
+				escaped = shell_escape(item->leafname);
+				tmp = g_strconcat(" ", escaped, NULL);
+				g_free(escaped);
 				gtk_entry_set_text(mini, tmp);
 				g_free(tmp);
 			}

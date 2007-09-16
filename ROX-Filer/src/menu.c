@@ -61,6 +61,7 @@
 #include "panel.h"
 #include "bulk_rename.h"
 #include "xtypes.h"
+#include "log.h"
 
 typedef enum {
 	FILE_COPY_ITEM,
