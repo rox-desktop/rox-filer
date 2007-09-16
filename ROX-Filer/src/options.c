@@ -837,8 +837,6 @@ static void null_widget(gpointer key, gpointer value, gpointer data)
 {
 	Option	*option = (Option *) value;
 
-	g_return_if_fail(option->widget != NULL);
-
 	option->widget = NULL;
 }
 
@@ -1183,10 +1181,8 @@ static void update_cb(gpointer key, gpointer value, gpointer data)
 	Option *option = (Option *) value;
 
 	g_return_if_fail(option != NULL);
-	if (option->widget == NULL) {
-		g_warning("No widget for option %s", (char *) key);
+	if (option->widget == NULL)
 		return;
-	}
 
 	updating_widgets++;
 	

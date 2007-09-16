@@ -270,7 +270,7 @@ void icon_prepare_menu(Icon *icon, GtkWidget *options_item)
 
 	gtk_menu_shell_append(GTK_MENU_SHELL(icon_menu), options_item);
 	gtk_widget_show_all(options_item);
-	
+
 	/* Shade Remove Item(s) if any item is locked or nothing is selected */
 	if (icon_selection)
 		shaded = any_selected_item_is_locked();

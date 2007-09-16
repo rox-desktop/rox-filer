@@ -1571,3 +1571,23 @@ error:
 	g_object_ref(src);
 	return src;
 }
+
+/* Load the Templates.glade file and build a component.
+ * Note that libglade caches the XML itself.
+ */
+GladeXML *get_glade_xml(const char *component)
+{
+	GladeXML *widgets;
+	char *path;
+
+	path = g_build_filename(app_dir, "Templates.glade", NULL);
+	widgets = glade_xml_new(path, component, NULL);
+
+	if (widgets == NULL)
+		g_warning("Failed to load widget '%s' from '%s'",
+				component, path);
+	
+	g_free(path);
+
+	return widgets;
+}

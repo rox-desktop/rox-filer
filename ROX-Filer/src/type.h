@@ -22,8 +22,6 @@ extern MIME_type *application_octet_stream;
 extern MIME_type *application_x_shellscript;
 extern MIME_type *application_x_desktop;
 
-extern GtkIconTheme *icon_theme;
-
 struct _MIME_type
 {
 	char		*media_type;
@@ -55,6 +53,11 @@ extern const char *mime_type_comment(MIME_type *type);
 extern MIME_type *mime_type_lookup(const char *type);
 extern GList *mime_type_name_list(gboolean only_regular);
 char *handler_for(MIME_type *type);
+
+GtkIconInfo *theme_lookup_icon(const gchar *icon_name, gint size,
+		GtkIconLookupFlags flags);
+GdkPixbuf *theme_load_icon(const gchar *icon_name, gint size,
+		GtkIconLookupFlags flags, GError **error);
 
 #define EXECUTABLE_FILE(item) ((item)->mime_type && (item)->mime_type->executable && \
 				((item)->flags & ITEM_FLAG_EXEC_FILE))
