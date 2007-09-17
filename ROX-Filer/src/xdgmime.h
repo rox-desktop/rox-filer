@@ -30,6 +30,7 @@
 #define __XDG_MIME_H__
 
 #include <stdlib.h>
+#include <sys/stat.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,6 +40,10 @@ extern "C" {
 #define XDG_ENTRY(func) _XDG_ENTRY2(XDG_PREFIX,func)
 #define _XDG_ENTRY2(prefix,func) _XDG_ENTRY3(prefix,func)
 #define _XDG_ENTRY3(prefix,func) prefix##_##func
+
+#define XDG_RESERVED_ENTRY(func) _XDG_RESERVED_ENTRY2(XDG_PREFIX,func)
+#define _XDG_RESERVED_ENTRY2(prefix,func) _XDG_RESERVED_ENTRY3(prefix,func)
+#define _XDG_RESERVED_ENTRY3(prefix,func) _##prefix##_##func
 #endif
 
 typedef void (*XdgMimeCallback) (void *user_data);
@@ -46,32 +51,35 @@ typedef void (*XdgMimeDestroy)  (void *user_data);
 
   
 #ifdef XDG_PREFIX
-#define xdg_mime_get_mime_type_for_data       XDG_ENTRY(get_mime_type_for_data)
-#define xdg_mime_get_mime_type_for_file       XDG_ENTRY(get_mime_type_for_file)
-#define xdg_mime_get_mime_type_from_file_name XDG_ENTRY(get_mime_type_from_file_name)
-#define xdg_mime_is_valid_mime_type           XDG_ENTRY(is_valid_mime_type)
-#define xdg_mime_mime_type_equal              XDG_ENTRY(mime_type_equal)
-#define xdg_mime_media_type_equal             XDG_ENTRY(media_type_equal)
-#define xdg_mime_mime_type_subclass           XDG_ENTRY(mime_type_subclass)
-#define xdg_mime_get_mime_parents             XDG_ENTRY(get_mime_parents)
-#define xdg_mime_list_mime_parents            XDG_ENTRY(list_mime_parents)
-#define xdg_mime_unalias_mime_type            XDG_ENTRY(unalias_mime_type)
-#define xdg_mime_get_max_buffer_extents       XDG_ENTRY(get_max_buffer_extents)
-#define xdg_mime_shutdown                     XDG_ENTRY(shutdown)
-#define xdg_mime_register_reload_callback     XDG_ENTRY(register_reload_callback)
-#define xdg_mime_remove_callback              XDG_ENTRY(remove_callback)
-#define xdg_mime_type_unknown                 XDG_ENTRY(type_unknown)
-#define xdg_mime_type_unknown_text            XDG_ENTRY(type_unknown_text)
+#define xdg_mime_get_mime_type_for_data       XDG_ENTRY(mime_get_mime_type_for_data)
+#define xdg_mime_get_mime_type_for_file       XDG_ENTRY(mime_get_mime_type_for_file)
+#define xdg_mime_get_mime_type_from_file_name XDG_ENTRY(mime_get_mime_type_from_file_name)
+#define xdg_mime_is_valid_mime_type           XDG_ENTRY(mime_is_valid_mime_type)
+#define xdg_mime_mime_type_equal              XDG_ENTRY(mime_mime_type_equal)
+#define xdg_mime_media_type_equal             XDG_ENTRY(mime_media_type_equal)
+#define xdg_mime_mime_type_subclass           XDG_ENTRY(mime_mime_type_subclass)
+#define xdg_mime_get_mime_parents             XDG_ENTRY(mime_get_mime_parents)
+#define xdg_mime_list_mime_parents            XDG_ENTRY(mime_list_mime_parents)
+#define xdg_mime_unalias_mime_type            XDG_ENTRY(mime_unalias_mime_type)
+#define xdg_mime_get_max_buffer_extents       XDG_ENTRY(mime_get_max_buffer_extents)
+#define xdg_mime_shutdown                     XDG_ENTRY(mime_shutdown)
+#define xdg_mime_dump                         XDG_ENTRY(mime_dump)
+#define xdg_mime_register_reload_callback     XDG_ENTRY(mime_register_reload_callback)
+#define xdg_mime_remove_callback              XDG_ENTRY(mime_remove_callback)
+#define xdg_mime_type_unknown                 XDG_ENTRY(mime_type_unknown)
+
+#define _xdg_mime_mime_type_equal             XDG_RESERVED_ENTRY(mime_mime_type_equal)
+#define _xdg_mime_media_type_equal            XDG_RESERVED_ENTRY(mime_media_type_equal)
+#define _xdg_mime_mime_type_subclass          XDG_RESERVED_ENTRY(mime_mime_type_subclass)
 #endif
 
-extern const char *xdg_mime_type_unknown;
-extern const char *xdg_mime_type_unknown_text;
+extern const char xdg_mime_type_unknown[];
 #define XDG_MIME_TYPE_UNKNOWN xdg_mime_type_unknown
-#define XDG_MIME_TYPE_UNKNOWN_TEXT xdg_mime_type_unknown_text
 
 const char  *xdg_mime_get_mime_type_for_data       (const void *data,
 						    size_t      len);
-const char  *xdg_mime_get_mime_type_for_file       (const char *file_name);
+const char  *xdg_mime_get_mime_type_for_file       (const char *file_name,
+                                                    struct stat *statbuf);
 const char  *xdg_mime_get_mime_type_from_file_name (const char *file_name);
 int          xdg_mime_is_valid_mime_type           (const char *mime_type);
 int          xdg_mime_mime_type_equal              (const char *mime_a,
@@ -95,6 +103,14 @@ int          xdg_mime_register_reload_callback     (XdgMimeCallback  callback,
 						    void            *data,
 						    XdgMimeDestroy   destroy);
 void         xdg_mime_remove_callback              (int              callback_id);
+
+  /* Private versions of functions that don't call xdg_mime_init () */
+int          _xdg_mime_mime_type_equal             (const char *mime_a,
+						    const char *mime_b);
+int          _xdg_mime_media_type_equal            (const char *mime_a,
+						    const char *mime_b);
+int          _xdg_mime_mime_type_subclass          (const char *mime,
+						    const char *base);
 
 #ifdef __cplusplus
 }

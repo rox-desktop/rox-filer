@@ -210,8 +210,7 @@ static GtkWidget *create_menu_item(xmlNode *node)
 			GdkPixbuf* pixbuf;
 			int size;
 			gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, NULL, &size);
-			pixbuf = gtk_icon_theme_load_icon(icon_theme, icon_name, 
-							size, 0, NULL);
+			pixbuf = theme_load_icon(icon_name, size, 0, NULL);
 			if (pixbuf)
 			{
 				icon = gtk_image_new_from_pixbuf(pixbuf);

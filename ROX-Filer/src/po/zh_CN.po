@@ -2,12 +2,13 @@
 # Chinese messages for ROX-Filer.
 # Copyright (C) 2001 Free Software Foundation, Inc.
 # Babyfai Cheung <babyfai1@yahoo.com.hk>,2001.
+# Modified by simplified chinese puppy linux 217 translator 2007
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 1.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-02-26 23:50+0800\n"
+"POT-Creation-Date: 2007-09-08 00:57+0800\n"
 "PO-Revision-Date: 2007-02-27 00:32+0100\n"
 "Last-Translator: Babyfai Cheung<babyfai1@yahoo.com.hk>\n"
 "Language-Team: none\n"
@@ -21,15 +22,15 @@ msgstr "<目录>"
 
 #: abox.c:218
 msgid "_Quiet"
-msgstr "离开(_Q)"
+msgstr "静默(_Q)"
 
 #: abox.c:227
 msgid "Quiet"
-msgstr "离开"
+msgstr "静默"
 
 #: abox.c:227
 msgid "Don't confirm every operation"
-msgstr "不确认操作"
+msgstr "不用对每次操作进行确认"
 
 #: abox.c:454 infobox.c:771 tips:63
 msgid "Name"
@@ -53,7 +54,7 @@ msgstr "详情请参阅 fsattr(5) man page"
 
 #: action.c:60
 msgid "You do not appear to have OS support."
-msgstr "系统不支援的 OS"
+msgstr "系统不支持的 OS"
 
 #: action.c:190
 msgid "Find expression reference"
@@ -161,9 +162,9 @@ msgstr ""
 "ROX-Filer 会对应文件的'user.mime_type'\n"
 "扩展属性，来储存文件的类型。\n"
 "\n"
-"文件类型的设置只支援常规文件，不会对\n"
+"文件类型的设置只支持常规文件，不会对\n"
 "目录，装置，管导或套节等类型有效\n"
-"并且只有某些操作系统及文件系统才会有支援\n"
+"并且只有某些操作系统及文件系统才会有支持\n"
 
 #: action.c:418
 msgid ""
@@ -198,11 +199,11 @@ msgstr ""
 msgid "ERROR"
 msgstr "错误"
 
-#: action.c:713 main.c:690 main.c:697 main.c:711
+#: action.c:713 main.c:691 main.c:698 main.c:712
 msgid "Yes"
 msgstr "是"
 
-#: action.c:716 main.c:692 main.c:699 main.c:711
+#: action.c:716 main.c:693 main.c:700 main.c:712
 msgid "No"
 msgstr "否"
 
@@ -220,7 +221,7 @@ msgid ""
 "Trying to KILL run-away process...\n"
 msgstr ""
 "\n"
-"尝试杀掉已遗失之程序... \n"
+"尝试杀掉已遗失的程序... \n"
 
 #: action.c:894
 #, c-format
@@ -313,8 +314,8 @@ msgid "'Changing type of '%s' to '%s'\n"
 msgstr "'正在改变类型从 '%s' 为 '%s'\n"
 
 #: action.c:1275
-#, c-format
-msgid "'Not changing type of directory\n"
+#, fuzzy, c-format
+msgid "'Not changing type of directory '%s'\n"
 msgstr "'目录 '%s' 的类型没有改变'\n"
 
 #: action.c:1281
@@ -401,12 +402,12 @@ msgstr "!错误: 不能移动/改名物件到本身内\n"
 #: action.c:1587
 #, c-format
 msgid "'Linking %s as %s\n"
-msgstr "'连接 %s 为 %s\n"
+msgstr "'链接 %s 为 %s\n"
 
 #: action.c:1592
 #, c-format
 msgid "?Link %s as %s?"
-msgstr "?连接 %s 为 %s?"
+msgstr "?链接 %s 为 %s?"
 
 #: action.c:1635
 #, c-format
@@ -490,7 +491,7 @@ msgstr "?其他的搜寻？"
 #: action.c:1887 action.c:1918
 #, c-format
 msgid "!'%s' is a symbolic link\n"
-msgstr "!'%s' 是一符号连接\n"
+msgstr "!'%s' 是一符号链接\n"
 
 #: action.c:1958
 msgid "You need to select some items to search through"
@@ -506,7 +507,7 @@ msgstr "你需要选择一些项目来计算"
 
 #: action.c:2005
 msgid "Disk Usage"
-msgstr "磁碟用量"
+msgstr "磁盘用量"
 
 #: action.c:2041
 msgid "Mount / Unmount"
@@ -514,7 +515,7 @@ msgstr "挂载 / 解除挂载"
 
 #: action.c:2056
 msgid "ROX-Filer does not yet support mount points on your system. Sorry."
-msgstr "ROX-Filer 对系统上的挂载点尚未支援"
+msgstr "ROX-Filer 对系统上的挂载点尚未支持"
 
 #: action.c:2070 menu.c:210 tips:218
 msgid "Delete"
@@ -526,7 +527,7 @@ msgstr "强制"
 
 #: action.c:2082
 msgid "Don't confirm deletion of non-writeable items"
-msgstr "不可确认删除唯读的项目"
+msgstr "不可确认删除只读的项目"
 
 #: action.c:2085 action.c:2142 action.c:2203 action.c:2258 action.c:2296
 #: tips:225
@@ -623,7 +624,7 @@ msgstr "不记录每个移动的文件"
 
 #: action.c:2316 tips:216
 msgid "Link"
-msgstr "连接"
+msgstr "链接"
 
 #: action.c:2337 appmenu.c:111 filer.c:593
 msgid "Eject"
@@ -663,7 +664,7 @@ msgid ""
 "Symlink any programs you want into this directory. They will appear in the "
 "menu for all items of this type (%s/%s)."
 msgstr ""
-"连接任何合用程式到此目录内，该等程式将会出现於此类型 (%s/%s) 项目的菜单中"
+"链接任何合用程序到此目录内，该等程序将会出现于此类型 (%s/%s) 项目的菜单中"
 
 #: appmenu.c:364 menu.c:233
 msgid "Customise Menu..."
@@ -673,50 +674,50 @@ msgstr "自定菜单..."
 msgid "Help"
 msgstr "帮助"
 
-#: bookmarks.c:145
+#: bookmarks.c:148
 msgid "Path"
 msgstr "路径"
 
-#: bookmarks.c:153
+#: bookmarks.c:156
 msgid "Title"
 msgstr "标题"
 
-#: bookmarks.c:302
+#: bookmarks.c:305
 #, c-format
 msgid "Can't bookmark non-local resource '%s'\n"
 msgstr "不能书签化非本地的资源 '%s'\n"
 
-#: bookmarks.c:310 bookmarks.c:628
+#: bookmarks.c:313 bookmarks.c:631
 #, c-format
 msgid "'%s' isn't a directory"
 msgstr "'%s'并非一个目录"
 
-#: bookmarks.c:516
+#: bookmarks.c:519
 msgid "You should first select some rows to delete"
 msgstr "请先选择行数以删除"
 
-#: bookmarks.c:540
+#: bookmarks.c:543
 msgid "Put the cursor on an entry in the list to move it"
 msgstr "将鼠标指向想要移动的项目上"
 
-#: bookmarks.c:560
+#: bookmarks.c:563
 msgid "This item is already at the end"
 msgstr "此项目已排在最后"
 
-#: bookmarks.c:634
+#: bookmarks.c:637
 #, c-format
 msgid "Can't bookmark non-local directories like '%s'"
 msgstr "不能书签化非本地目录如 '%s'"
 
-#: bookmarks.c:776
+#: bookmarks.c:779
 msgid "Add New Bookmark"
 msgstr "加入新书签"
 
-#: bookmarks.c:783
+#: bookmarks.c:786
 msgid "Edit Bookmarks"
 msgstr "编辑书签"
 
-#: bookmarks.c:788
+#: bookmarks.c:791
 msgid "Recently Visited"
 msgstr "最近存取的"
 
@@ -752,7 +753,7 @@ msgstr ""
 "^ 对应文件名称的最前部份\n"
 "$ 对应文件名称的最后部份\n"
 "\\. 对应点号\n"
-"\\.htm$ 对应 '.htm' 於 'index.html', 等等"
+"\\.htm$ 对应 '.htm' 于 'index.html', 等等"
 
 #: bulk_rename.c:107
 msgid "With:"
@@ -875,15 +876,15 @@ msgstr "lstat(2) 失败：%s"
 
 #: dnd.c:124
 msgid "Link (relative)"
-msgstr "连接 (相关路径)"
+msgstr "链接 (相关路径)"
 
 #: dnd.c:125
 msgid "Link (absolute)"
-msgstr "连接 (绝对路径)"
+msgstr "链接 (绝对路径)"
 
 #: dnd.c:424
 msgid "Internal error - bad info type"
-msgstr "内部错误 - 讯息已损坏"
+msgstr "内部错误 -信息已损坏"
 
 #: dnd.c:563
 msgid "Drag a directory here to bookmark it."
@@ -928,7 +929,7 @@ msgstr "不明目标"
 
 #: dnd.c:797
 msgid "Remote app can't or won't send me the data - sorry"
-msgstr "远端机器上的程式，不会向本机送出资料 - 抱歉"
+msgstr "远端机器上的程序，不会向本机送出资料 - 抱歉"
 
 #: dnd.c:810
 msgid "XDS protocol error: return code should be 'S', 'F' or 'E'\n"
@@ -936,7 +937,7 @@ msgstr "XDS错误，回传码必须为'S','F'或'E'\n"
 
 #: dnd.c:843
 msgid "Sorry, can't display a menu of actions for a remote file / raw data."
-msgstr "抱歉，不能显示远端机器上的程式菜单。"
+msgstr "抱歉，不能显示远端机器上的程序菜单。"
 
 #: dnd.c:859
 msgid "UntitledData"
@@ -992,7 +993,7 @@ msgstr "<空的>"
 msgid ""
 "I can't show you the currently set item, because nothing is currently set. "
 "Drag something onto me!"
-msgstr "未能显示设定中的项目，因没有项目存在. 请拖放东西到这裹！"
+msgstr "未能显示设定中的项目，因没有项目存在. 请拖放东西到这里！"
 
 #: dropbox.c:261
 msgid "Sorry, you need to drop exactly one file onto the drop area."
@@ -1003,7 +1004,7 @@ msgstr "抱歉，您每次只可拖放一个文件."
 msgid "Sorry, I can't use '%s' because it's not a local file."
 msgstr "抱歉，未能运用 '%s' 因其并非本机文件."
 
-#: dropbox.c:278 pinboard.c:858
+#: dropbox.c:278 pinboard.c:932
 #, c-format
 msgid ""
 "Can't access '%s':\n"
@@ -1018,7 +1019,7 @@ msgid ""
 "Error scanning '%s':\n"
 "%s\n"
 msgstr ""
-"错误检视 '%s'：\n"
+"错误扫描 '%s'：\n"
 "%s\n"
 
 #: filer.c:460
@@ -1027,7 +1028,7 @@ msgid ""
 "Error scanning '%s':\n"
 "%s"
 msgstr ""
-"错误检视 '%s'：\n"
+"错误扫描 '%s'：\n"
 "%s"
 
 #: filer.c:576
@@ -1104,15 +1105,15 @@ msgstr ""
 
 #: filer.c:2053
 msgid "Scanning, "
-msgstr "从新检视中, "
+msgstr "重新扫描中, "
 
 #: filer.c:2055
 msgid "Thumbs, "
-msgstr "显示缩图, "
+msgstr "显示缩略图, "
 
 #: filer.c:2331
 msgid "Symbolic link to "
-msgstr "连接指向 "
+msgstr "链接指向 "
 
 #: filer.c:2373
 msgid "This filename is not valid UTF-8. You should rename it.\n"
@@ -1152,7 +1153,7 @@ msgstr "详述"
 
 #: filer.c:3450 tips:119 tips:120
 msgid "Thumbnails"
-msgstr "缩图"
+msgstr "缩略图"
 
 #: filer.c:3456
 msgid "Filter"
@@ -1188,7 +1189,7 @@ msgstr "匹配常规档"
 
 #: find.c:746
 msgid "IsLink"
-msgstr "匹配连接档"
+msgstr "匹配链接档"
 
 #: find.c:748
 msgid "IsDir"
@@ -1393,7 +1394,7 @@ msgid ""
 "Drag the icon to a directory viewer\n"
 "(or enter a full pathname)"
 msgstr ""
-"拖放该图标至一个目录检视器内\n"
+"拖放该图标至一个目录查看器内\n"
 "(或输入一个完整路径)"
 
 #: gui_support.c:329
@@ -1405,7 +1406,7 @@ msgstr ""
 #: gui_support.c:398
 #, c-format
 msgid "Attempt to read an XML file as a text file. File '%s' may be corrupted."
-msgstr "尝试以文字档开启XML文件。发现文件 '%s' 已损坏."
+msgstr "尝试以文本方式读取XML文件。发现文件 '%s' 已损坏."
 
 #: gui_support.c:415
 #, c-format
@@ -1417,19 +1418,19 @@ msgid ""
 "the file to be resaved).\n"
 "Further errors will be ignored."
 msgstr ""
-"发现错误於文件 '%s' 的行数 %d：\n"
+"发现错误于文件 '%s' 的行数 %d：\n"
 "\"%s\"\n"
 "原因可能是从旧版本上升级 ROX-Filer，请打开选项窗口并点选储存确定.\n"
 "往后的错误会被忽略."
 
 #: gui_support.c:1007
 msgid "Incorrect or missing line break in text/uri-list data"
-msgstr "开启 文字/连接 档时发生错误"
+msgstr "打开 文字/链接 档时发生错误"
 
 #: gui_support.c:1339
 #, c-format
 msgid "Failed to open file '%s': %s"
-msgstr "未能开启文件 '%s': %s"
+msgstr "未能打开文件 '%s': %s"
 
 #: gui_support.c:1383
 #, c-format
@@ -1465,7 +1466,7 @@ msgstr "ROX-Filer"
 
 #: icon.c:132 menu.c:251
 msgid "About ROX-Filer..."
-msgstr "关於 ROX-Filer..."
+msgstr "关于 ROX-Filer..."
 
 #: icon.c:133 menu.c:252
 msgid "Show Help Files"
@@ -1489,11 +1490,11 @@ msgstr "文件"
 
 #: icon.c:139 menu.c:212 menu.c:878
 msgid "Shift Open"
-msgstr "以新窗口开启"
+msgstr "以新窗口打开"
 
 #: icon.c:140 menu.c:217
 msgid "Properties"
-msgstr "讯息"
+msgstr "属性"
 
 #: icon.c:141 menu.c:215
 msgid "Set Run Action..."
@@ -1543,11 +1544,11 @@ msgstr "每个项目必先解除锁定，才可把它移除"
 
 #: icon.c:666
 msgid "You must open the menu over an item"
-msgstr "请在项目上开启菜单"
+msgstr "请在项目上打开菜单"
 
 #: icon.c:691 menu.c:1274
 msgid "You can only set the run action for a regular file"
-msgstr "只可对常规文件设定开启的程式"
+msgstr "只可对常规文件设定打开的程序"
 
 #: icon.c:777
 msgid "Press the desired shortcut (eg, Control+F1)"
@@ -1559,15 +1560,15 @@ msgstr "找取按键错误！"
 
 #: icon.c:849
 msgid "Clicking the icon opens:"
-msgstr "点击图标以开启："
+msgstr "点击图标以打开："
 
 #: icon.c:859
 msgid "Arguments to pass (for executables):"
-msgstr "参数(用於可执行档)："
+msgstr "参数(用于可执行档)："
 
 #: icon.c:873
 msgid "The text displayed under the icon is:"
-msgstr "图标下的讯息为："
+msgstr "图标下的文字为："
 
 #: icon.c:886
 msgid "The keyboard shortcut is:"
@@ -1584,11 +1585,11 @@ msgstr "锁定一个项目以免被意外删除"
 #: infobox.c:111
 #, c-format
 msgid "Are you sure you want to open %d windows?"
-msgstr "您想开启 %d 窗口"
+msgstr "您想打开 %d 窗口"
 
 #: infobox.c:112
 msgid "Show Info"
-msgstr "显示讯息"
+msgstr "显示信息"
 
 #: infobox.c:134 menu.c:772
 msgid "(bad utf-8)"
@@ -1612,12 +1613,12 @@ msgstr "bytes"
 
 #: infobox.c:450
 msgid "Failed to read size"
-msgstr "未能检视文件之大小"
+msgstr "未能查看文件之大小"
 
 #: infobox.c:511
 #, c-format
 msgid "'%s' is no longer a symlink"
-msgstr "'%s' 不是一个符号连接"
+msgstr "'%s' 不是一个符号链接"
 
 #: infobox.c:518
 #, c-format
@@ -1625,7 +1626,7 @@ msgid ""
 "Failed to unlink '%s':\n"
 "%s"
 msgstr ""
-"未能移除符号连接 '%s':\n"
+"未能移除符号链接 '%s':\n"
 "%s"
 
 #: infobox.c:523
@@ -1635,9 +1636,9 @@ msgid ""
 "%s\n"
 "(note: old link has been deleted)"
 msgstr ""
-"未能建立符号连接 '%s'：\n"
+"未能建立符号链接 '%s'：\n"
 "%s\n"
-"(注意:旧的连接已被删除)"
+"(注意:旧的链接已被删除)"
 
 #: infobox.c:547 tips:287
 msgid "Error:"
@@ -1657,11 +1658,11 @@ msgstr "大小："
 
 #: infobox.c:589
 msgid "Scanning"
-msgstr "检视中"
+msgstr "扫描中"
 
 #: infobox.c:614
 msgid "Failed to scan"
-msgstr "检视失败"
+msgstr "扫描失败"
 
 #: infobox.c:621
 msgid "Change time:"
@@ -1689,11 +1690,11 @@ msgstr "没有"
 
 #: infobox.c:637
 msgid "Not supported"
-msgstr "不支援"
+msgstr "不支持"
 
 #: infobox.c:649
 msgid "Link target:"
-msgstr "连接目标："
+msgstr "链接目标："
 
 #: infobox.c:661 infobox.c:664
 msgid "Run action:"
@@ -1715,74 +1716,74 @@ msgstr "运行文件"
 msgid "<nothing yet>"
 msgstr "<还是空的>"
 
-#: infobox.c:859
+#: infobox.c:860
 #, c-format
 msgid "file(1) says... %s"
 msgstr "文件(1) 显示...%s"
 
-#: infobox.c:916
+#: infobox.c:917
 #, c-format
 msgid "Could not change permissions: %s"
 msgstr "不能改变 '%s' 的权限"
 
-#: infobox.c:934
+#: infobox.c:935
 msgid "Owner"
 msgstr "用户"
 
-#: infobox.c:936
+#: infobox.c:937
 msgid "Group"
 msgstr "组别"
 
-#: infobox.c:938
+#: infobox.c:939
 msgid "World"
 msgstr "其他"
 
-#: infobox.c:941
+#: infobox.c:942
 msgid "Read"
 msgstr "可读"
 
-#: infobox.c:943
+#: infobox.c:944
 msgid "Write"
 msgstr "可写"
 
-#: infobox.c:945
+#: infobox.c:946
 msgid "Exec"
 msgstr "可执行"
 
-#: infobox.c:962
+#: infobox.c:963
 msgid "SUID"
 msgstr "SUID"
 
-#: infobox.c:969
+#: infobox.c:970
 msgid "SGID"
 msgstr "SGID"
 
-#: infobox.c:976
+#: infobox.c:977
 msgid "Sticky"
 msgstr "Sticky"
 
-#: infobox.c:998
+#: infobox.c:999
 msgid "Symbolic link"
-msgstr "是一符号连接"
+msgstr "是一符号链接"
 
-#: infobox.c:1001
+#: infobox.c:1002
 msgid "ROX application"
 msgstr "ROX 应用程序"
 
-#: infobox.c:1009
+#: infobox.c:1010
 msgid "mounted"
 msgstr "已挂载"
 
-#: infobox.c:1009
+#: infobox.c:1010
 msgid "unmounted"
 msgstr "已解除挂载"
 
-#: infobox.c:1013
+#: infobox.c:1014
 #, c-format
 msgid "Mount point for %s (%s)"
 msgstr "挂载点为 %s (%s)"
 
-#: infobox.c:1016
+#: infobox.c:1017
 #, c-format
 msgid "Mount point (%s)"
 msgstr "挂载点 (%s)"
@@ -1857,50 +1858,50 @@ msgid ""
 "the Options box instead."
 msgstr ""
 
-#: main.c:522
+#: main.c:523
 #, c-format
 msgid "Running as user '%s'"
 msgstr "执行用户为 '%s'"
 
-#: main.c:682
+#: main.c:683
 #, c-format
 msgid "Compiled with GTK version %s\n"
 msgstr ""
 
-#: main.c:683
+#: main.c:684
 #, c-format
 msgid "Running with GTK version %d.%d.%d\n"
 msgstr ""
 
-#: main.c:687
+#: main.c:688
 msgid "features set at compile time"
 msgstr ""
 
-#: main.c:688
+#: main.c:689
 msgid "Large File Support"
 msgstr ""
 
-#: main.c:695
+#: main.c:696
 msgid "Dnotify support"
 msgstr ""
 
-#: main.c:702
+#: main.c:703
 msgid "Binary compatibility"
 msgstr ""
 
-#: main.c:704
+#: main.c:705
 msgid "Yes (can run with older glibc versions)"
 msgstr ""
 
-#: main.c:706
+#: main.c:707
 msgid "No (apsymbols.h not found)"
 msgstr ""
 
-#: main.c:710
+#: main.c:711
 msgid "Extended attribute support"
 msgstr ""
 
-#: main.c:867
+#: main.c:868
 #, c-format
 msgid ""
 "Left-click to run %s.\n"
@@ -1991,7 +1992,7 @@ msgstr ""
 
 #: menu.c:203
 msgid "Show Thumbnails"
-msgstr "显示缩图"
+msgstr "显示缩略图"
 
 #: menu.c:204
 msgid "Refresh"
@@ -2011,7 +2012,7 @@ msgstr "改名..."
 
 #: menu.c:209
 msgid "Link..."
-msgstr "连接..."
+msgstr "链接..."
 
 #: menu.c:213
 msgid "Send To..."
@@ -2079,7 +2080,7 @@ msgstr "显示书签"
 
 #: menu.c:240
 msgid "Follow Symbolic Links"
-msgstr "跟踪符号连接"
+msgstr "跟踪符号链接"
 
 #: menu.c:241
 msgid "Resize Window"
@@ -2107,7 +2108,7 @@ msgstr "切换成终端机"
 
 #: menu.c:718
 msgid "You should Shift+Menu click over a file to send it somewhere"
-msgstr "你可用鼠标在文件上点击菜单，并同时按下Shift键，开启`传送至'功能"
+msgstr "你可用鼠标在文件上点击菜单，并同时按下Shift键，打开`传送至'功能"
 
 #: menu.c:757
 msgid "Next Click"
@@ -2128,11 +2129,11 @@ msgstr "显示目标"
 
 #: menu.c:872
 msgid "Look Inside"
-msgstr "察看内部"
+msgstr "查看内部"
 
 #: menu.c:874
 msgid "Open As Text"
-msgstr "以文字模式开启"
+msgstr "以文字模式打开"
 
 #: menu.c:1045
 msgid ""
@@ -2142,8 +2143,8 @@ msgid ""
 "it may simply be that the filesystem needs to be mounted with the right "
 "mount option ('user_xattr' on Linux)."
 msgstr ""
-"此文件不支援 '扩展属性'这个新功能.\n"
-"可能是阁下的文件系统或 C 函式库不支援，又或在挂载文件系统时,没有套用正确的参"
+"此文件不支持 '扩展属性'这个新功能.\n"
+"可能是阁下的文件系统或 C 函式库不支持，又或在挂载文件系统时,没有套用正确的参"
 "数，挂载选项 ('user_xattr' on Linux)."
 
 #: menu.c:1051
@@ -2152,7 +2153,7 @@ msgstr "某些文件不能以此类型设定"
 
 #: menu.c:1086
 msgid "_Relative link"
-msgstr "相关连接(_R)"
+msgstr "相关链接(_R)"
 
 #: menu.c:1092
 msgid ""
@@ -2161,9 +2162,9 @@ msgid ""
 "If off, the path from the root directory is stored - use this if the symlink "
 "may move but the target will stay put."
 msgstr ""
-"开启后,连接会储存从本身到目标的路径，这选项适用於当连接及目标，会同时移动的时"
+"开启后,链接会储存从本身到目标的路径，这选项适用于当链接及目标，会同时移动的时"
 "侯.\n"
-"关闭时,连接会储存从根目录到目标的路径，这选项适用於当连接移动，但目标不变的时"
+"关闭时,链接会储存从根目录到目标的路径，这选项适用于当链接移动，但目标不变的时"
 "侯."
 
 #: menu.c:1162
@@ -2173,7 +2174,7 @@ msgstr "新的路径名称属不绝对"
 #: menu.c:1228
 #, c-format
 msgid "Symlink from '%s' already exists. Replace it with a link to '%s'?"
-msgstr " '%' 的连接档已存在，是否要替换？"
+msgstr " '%' 的链接档已存在，是否要替换？"
 
 #: menu.c:1234
 msgid "_Replace"
@@ -2217,21 +2218,21 @@ msgid ""
 "will only be shown for files of that type. `.group' is shown only when "
 "multiple files are selected."
 msgstr ""
-"利用'传送至'此功能，你可快速的将要开启的文件送到某个应用程式上，该等应用程式"
-"在以下的目录内:\n"
+"利用'传送至'此功能，你可快速的将要打开的文件发送到某个应用程序上，该等应用程"
+"序在以下的目录内:\n"
 "\n"
 "%s\n"
 "%s\n"
-"这'传送至'功能，可用鼠标和Shift+Menu来快速开启.\n"
-"进阶用途:\n"
-"您亦可建立子目录 `.text_html', `.text'等等，该子目录只会在开启该类型文件时出"
+"'传送至'功能，可用鼠标和Shift+Menu来快速打开.\n"
+"高级用法:\n"
+"您亦可建立子目录 `.text_html', `.text'等等，该子目录只会在打开该类型文件时出"
 "现。 `.group' 只会在选择多个文件时出现."
 
 #: menu.c:1496
 msgid ""
 "I'll show you your SendTo directory now; you should symlink (Ctrl+Shift "
 "drag) any applications you want into it."
-msgstr "请将适用的程式以符号连接 (Ctrl+Shift并拖放)到'传送至'的目录内."
+msgstr "请将适用的程序以符号链接 (Ctrl+Shift并拖放)到'传送至'的目录内."
 
 #: menu.c:1499 menu.c:1539
 msgid "Your CHOICESPATH variable setting prevents customisations - sorry."
@@ -2275,7 +2276,7 @@ msgid ""
 "You can't open a second view onto this directory because the `Unique "
 "Windows' option is turned on in the Options window."
 msgstr ""
-"你不能对此目录开启第二个窗口，因为你已在选项->Filer窗口内选了「唯一的窗口」的"
+"你不能对此目录打开第二个窗口，因为你已在选项->Filer窗口内选了「唯一的窗口」的"
 "功能."
 
 #: menu.c:1877
@@ -2288,15 +2289,15 @@ msgstr "改名为...？"
 
 #: menu.c:1883
 msgid "Symlink ... ?"
-msgstr "符号连接...？"
+msgstr "符号链接...？"
 
 #: menu.c:1886
 msgid "Shift Open ... ?"
-msgstr "新窗口开启...？"
+msgstr "新窗口打开...？"
 
 #: menu.c:1889
 msgid "Properties of ... ?"
-msgstr "讯息...？"
+msgstr "属性...？"
 
 #: menu.c:1892
 msgid "Set type of ... ?"
@@ -2304,7 +2305,7 @@ msgstr "设定类型...？"
 
 #: menu.c:1895
 msgid "Set run action for ... ?"
-msgstr "设定执行程式予... ？"
+msgstr "设定执行程序予... ？"
 
 #: menu.c:1898
 msgid "Set icon for ... ?"
@@ -2340,7 +2341,7 @@ msgstr "改名"
 
 #: menu.c:2014
 msgid "Symlink"
-msgstr "符号连接"
+msgstr "符号链接"
 
 #: menu.c:2043
 msgid ""
@@ -2374,12 +2375,12 @@ msgid ""
 msgstr ""
 "对菜单上某一项目配置热键：\n"
 "\n"
-"- 先在窗口中开启菜单,\n"
+"- 先在窗口中打开菜单,\n"
 "- 再以鼠标指向该项目,\n"
 "- 在键盘上按下某些你想配置的按键.\n"
 "\n"
-"对应的热键会出现在菜单的某个项目上，而日后你想开启这项目，祗须按下热键而不需"
-"先开启菜单."
+"对应的热键会出现在菜单的某个项目上，而日后你想打开这一项目，只须按下热键而不"
+"需先打开菜单."
 
 #: menu.c:2069
 msgid "Set keyboard shortcuts"
@@ -2510,7 +2511,7 @@ msgstr "你要从Window Manger中关闭面板，确定要关闭？"
 
 #: panel.c:648
 msgid "Missing < or > in panel config file"
-msgstr "没有 < 或 > 於面板的设定档"
+msgstr "没有 < 或 > 于面板的设定档"
 
 #: panel.c:1533
 #, c-format
@@ -2588,14 +2589,14 @@ msgstr "右部边沿"
 msgid "Your old pinboard file has been converted to the new XML format."
 msgstr "你的旧桌面资源文件已转为新的XML格式."
 
-#: pinboard.c:637
+#: pinboard.c:711
 msgid ""
 "The backdrop handler must be an application directory. Drag an application "
 "directory into the Set Backdrop dialog box, or (for programmers) pass it to "
 "the SOAP SetBackdropApp method."
-msgstr "桌面处理工具是一个程式目录，请於设定对话框内，拖进要加入的程序."
+msgstr "桌面处理工具是一个程序目录，请于设定对话框内，拖进要加入的程序."
 
-#: pinboard.c:656
+#: pinboard.c:730
 msgid ""
 "You can only set the backdrop to an image or to a program which knows how to "
 "manage ROX-Filer's backdrop.\n"
@@ -2603,96 +2604,96 @@ msgid ""
 "Programmers: the application's AppInfo.xml must contain the CanSetBackdrop "
 "element, as described in ROX-Filer's manual."
 msgstr ""
-"只可给背景设为影像文件，或设给一个可管理 ROX-Filer 背景的程式.\n"
+"只可给背景设为影像文件，或设给一个可管理 ROX-Filer 背景的程序.\n"
 "\n"
-"程式员注意: 程式内的 AppInfo.xml 必须包含 CanSetBackdrop 这元素，可参阅 ROX-"
+"程序员注意: 程序内的 AppInfo.xml 必须包含 CanSetBackdrop 这元素，可参阅 ROX-"
 "Filer 的指南."
 
-#: pinboard.c:676
+#: pinboard.c:750
 msgid "Set backdrop"
 msgstr "设定背景"
 
-#: pinboard.c:687
+#: pinboard.c:761
 msgid "Choose a style and drag an image in:"
 msgstr "选取一风格并将影像拖进 :"
 
-#: pinboard.c:700
+#: pinboard.c:774
 msgid "Centre the image without scaling it"
 msgstr "影像置中及不作调整"
 
-#: pinboard.c:701
+#: pinboard.c:775
 msgid "Centre"
 msgstr "置中"
 
-#: pinboard.c:702
+#: pinboard.c:776
 msgid "Scale the image to fit the backdrop area, without distorting it"
 msgstr "调整影像致全屏幕"
 
-#: pinboard.c:704
+#: pinboard.c:778
 msgid "Scale"
 msgstr "调整"
 
-#: pinboard.c:705
+#: pinboard.c:779
 msgid ""
 "Scale the image to fit the backdrop area, regardless of image dimensions - "
 "overscale"
 msgstr "调整影像致匹配全个背景区，不管影像的任何大小"
 
-#: pinboard.c:707
+#: pinboard.c:781
 msgid "Fit"
 msgstr "适配"
 
-#: pinboard.c:708
+#: pinboard.c:782
 msgid "Stretch the image to fill the backdrop area"
-msgstr "伸延影像致全屏幕"
+msgstr "伸延影像至全屏幕"
 
-#: pinboard.c:709
+#: pinboard.c:783
 msgid "Stretch"
 msgstr "伸延"
 
-#: pinboard.c:710
+#: pinboard.c:784
 msgid "Tile the image over the backdrop area"
-msgstr "平铺影像致全屏幕"
+msgstr "平铺影像至全屏幕"
 
-#: pinboard.c:711
+#: pinboard.c:785
 msgid "Tile"
 msgstr "平铺"
 
-#: pinboard.c:716
+#: pinboard.c:790
 msgid "Drop an image here"
 msgstr "拖放图像到此处"
 
-#: pinboard.c:777
+#: pinboard.c:851
 msgid ""
 "No pinboard was in use... the 'Default' pinboard has been selected. Use 'rox "
 "-p=Default' to turn it on in future."
 msgstr ""
 "没有设定所用桌面，桌面将会选用缺省值，亦可用指令 'rox -p=Default' 来启动."
 
-#: pinboard.c:871
+#: pinboard.c:945
 msgid ""
 "Only files (and certain applications) can be used to set the background "
 "image."
-msgstr "只有文件(及某些应用程式)才可用作设定背景"
+msgstr "只有文件(及某些应用程序)才可用作设定背景"
 
-#: pinboard.c:1496
+#: pinboard.c:1570
 msgid "Missing '>' in icon label"
 msgstr "没有 '>' 在图标标签内"
 
-#: pinboard.c:1505
+#: pinboard.c:1579
 msgid "Missing ',' after icon label"
 msgstr "没有 ',' 在图标标签后"
 
-#: pinboard.c:1593
+#: pinboard.c:1667
 #, c-format
 msgid "Error saving pinboard %s: %s"
 msgstr "错误储存桌面 %s: %s"
 
-#: pinboard.c:2137
+#: pinboard.c:2211
 msgid "Backdrop..."
 msgstr "背景..."
 
-#: pinboard.c:2230
+#: pinboard.c:2304
 #, c-format
 msgid ""
 "Error loading backdrop image:\n"
@@ -2703,22 +2704,22 @@ msgstr ""
 "%s\n"
 "背景被移除."
 
-#: pixmaps.c:971
+#: pixmaps.c:977
 #, c-format
 msgid ""
 "Can't delete thumbnails in %s:\n"
 "%s"
 msgstr ""
-"不能删除缩图於 %s：\n"
+"不能删除缩略图于 %s：\n"
 "%s"
 
-#: pixmaps.c:992
+#: pixmaps.c:998
 msgid "There are no thumbnails to delete"
-msgstr "没有缩图可供移除"
+msgstr "没有缩略图可供移除"
 
-#: pixmaps.c:1005
+#: pixmaps.c:1011
 msgid "Purge thumbnails disk cache"
-msgstr "清除缓存区内的缩图"
+msgstr "清除缓存区内的缩略图"
 
 #: remote.c:722
 #, c-format
@@ -2735,7 +2736,7 @@ msgstr "不明详细类型 '%s'"
 msgid "Unknown sorting type '%s'"
 msgstr "不明排列类型 '%s'"
 
-#: remote.c:1245
+#: remote.c:1247
 #, c-format
 msgid "Attempt to invoke unknown SOAP method '%s'"
 msgstr "尝试呼叫不明的 SOAP 方式 '%s'"
@@ -2763,7 +2764,7 @@ msgstr "文件不存在，或不能被存取：%s"
 #: run.c:307
 #, c-format
 msgid "I don't know how to open '%s'"
-msgstr "不能开启不明的文件 '%s'"
+msgstr "不能打开不明的文件 '%s'"
 
 #: run.c:338
 #, c-format
@@ -2771,7 +2772,7 @@ msgid "'%s' is not a valid URI"
 msgstr "'%s' 不是一个正确位址"
 
 #: run.c:349
-#,, c-format
+#, c-format
 msgid "%s not accessable"
 msgstr "'%s' 不接受存取"
 
@@ -2781,7 +2782,7 @@ msgid "Non-local URL %s"
 msgstr "非本机 位址 %s"
 
 #: run.c:374
-#,, c-format
+#, c-format
 msgid "%s: no handler for %s"
 msgstr "%s: 没有工具处理 %s"
 
@@ -2793,23 +2794,23 @@ msgid ""
 "help here, but this one doesn't."
 msgstr ""
 "应用程序：\n"
-"这是一个执行程式的目录 - 你可执行或开启它(开启时按下Shift键)，但此程式并没有"
+"这是一个执行程序的目录 - 你可执行或打开它(打开时按下Shift键)，但此程序并没有"
 "帮助档."
 
 #: run.c:478
 #, c-format
 msgid "Could not send data to program: %s"
-msgstr "不能传送资料至程式：%s"
+msgstr "不能传送资料至程序：%s"
 
 #: run.c:508
 #, c-format
 msgid "Could not read link: %s"
-msgstr "不能读取连接档：%s"
+msgstr "不能读取链接档：%s"
 
 #: run.c:536
 #, c-format
 msgid "Broken symlink (or you don't have permission to follow it): %s"
-msgstr "无效的连接档 (或权限问题)：%s"
+msgstr "无效的链接档 (或权限问题)：%s"
 
 #: run.c:573
 #, c-format
@@ -2819,7 +2820,7 @@ msgid ""
 "the file to an application.%s"
 msgstr ""
 "没有标记的执行动作对应此类文件 (%s/%s) - 你可在菜单中的 `设定运行程序' 设入程"
-"式，或将此文件拖放到指定的程式上.%s"
+"式，或将此文件拖放到指定的程序上.%s"
 
 #: run.c:579
 msgid ""
@@ -2847,10 +2848,10 @@ msgid ""
 "actions."
 msgstr ""
 "可执行档 '%s' 是一个共享写入的文件！现被拒绝执行。请先将其权限更改 (这个问题"
-"可能是源於早期版本的ROX-Filer 的一些臭虫)。\n"
+"可能是源于早期版本的ROX-Filer 的一些臭虫)。\n"
 "\n"
-"在电脑上有共享写入的可执行文件(非连接性)，意味著您电脑上的其他用户可将这文件"
-"用恶意程式替换。\n"
+"在电脑上有共享写入的可执行文件(非链接性)，意味着您电脑上的其他用户可将这文件"
+"用恶意程序替换。\n"
 "\n"
 "假如您认为其他用户是可靠的，便无需理会这问题。否则，您便应该检查或删除所有这"
 "类文件"
@@ -2870,7 +2871,7 @@ msgstr "byte"
 #: support.c:1589 support.c:1643
 #, c-format
 msgid "Failed to open and stat file '%s': %s"
-msgstr "未能开启描述文件 '%s': %s"
+msgstr "未能打开描述文件 '%s': %s"
 
 #: support.c:1600 support.c:1654
 #, c-format
@@ -2911,11 +2912,11 @@ msgstr "书签菜单"
 
 #: toolbar.c:129
 msgid "Scan"
-msgstr "检视"
+msgstr "扫描"
 
 #: toolbar.c:129
 msgid "Rescan directory contents"
-msgstr "重新检视内容"
+msgstr "重新扫描内容"
 
 #: toolbar.c:133
 msgid "Change icon size"
@@ -2947,7 +2948,7 @@ msgid ""
 "Right: Show/hide thumbnails"
 msgstr ""
 "左： 显示 隐藏档\n"
-"右： 显示 缩图"
+"右： 显示 缩略图"
 
 #: toolbar.c:154
 msgid "Select all/invert selection"
@@ -2980,41 +2981,41 @@ msgstr "没有项目%s"
 msgid "%u selected (%s)"
 msgstr "%u 已选择 (%s)"
 
-#: toolbar.c:423
+#: toolbar.c:445
 msgid "Sort by name"
 msgstr "以名称排序"
 
-#: toolbar.c:423
+#: toolbar.c:445
 msgid "Sort by type"
 msgstr "以类型排序"
 
-#: toolbar.c:423
+#: toolbar.c:445
 msgid "Sort by date"
 msgstr "以日期排序"
 
-#: toolbar.c:424
+#: toolbar.c:446
 msgid "Sort by size"
 msgstr "以大小排序"
 
-#: toolbar.c:424
+#: toolbar.c:446
 msgid "Sort by owner"
 msgstr "以用户排序"
 
-#: toolbar.c:424
+#: toolbar.c:446
 msgid "Sort by group"
 msgstr "以组别排序"
 
-#: toolbar.c:458
+#: toolbar.c:480
 msgid "ascending"
 msgstr "提升"
 
-#: toolbar.c:458
+#: toolbar.c:480
 msgid "descending"
 msgstr "下降"
 
 #: type.c:212
 msgid "Sym link"
-msgstr "符号连接"
+msgstr "符号链接"
 
 #: type.c:214
 msgid "Mount point"
@@ -3064,7 +3065,7 @@ msgstr ""
 
 #: type.c:692
 msgid "This is not a program! Give me an application instead!"
-msgstr "这不是一个程式！请给予一个可执行的程式！"
+msgstr "这不是一个程序！请给予一个可执行的程序！"
 
 #: type.c:752
 msgid "No run action defined"
@@ -3073,12 +3074,12 @@ msgstr "没有执行动作被定义"
 #: type.c:756
 #, c-format
 msgid "Error in handler %s: %s"
-msgstr "错误於处理工具 %s: %s"
+msgstr "错误于处理工具 %s: %s"
 
 #: type.c:771
 #, c-format
 msgid "Invalid application %s (bad AppRun)"
-msgstr "非法的执行程式 %s (错误执行)"
+msgstr "非法的执行程序 %s (错误执行)"
 
 #: type.c:782
 #, c-format
@@ -3101,7 +3102,7 @@ msgstr "设为缺省值予全部的 `%s/<anything>'"
 
 #: type.c:827
 msgid "Use this application for all files with this MIME type."
-msgstr "用这个程式来开启属於此 MIME 类型的文件"
+msgstr "用这个程序来打开属于此 MIME 类型的文件"
 
 #: type.c:829
 #, c-format
@@ -3110,7 +3111,7 @@ msgstr "仅对应此类型 `%s' (%s/%s)"
 
 #: type.c:835
 msgid "Drop a suitable application here"
-msgstr "请拖放一个合适的程式在此处"
+msgstr "请拖放一个合适的程序在此处"
 
 #: type.c:850
 msgid "OR"
@@ -3155,7 +3156,7 @@ msgid ""
 "application:postscript' icon couldn't be loaded for some reason, or %s is a "
 "link to an invalid directory; try deleting it)"
 msgstr ""
-"未能建立连接 '%s'：\n"
+"未能建立链接 '%s'：\n"
 "%s\n"
 "\n"
 "(可能是 ROX 布景已经存在，但有些 'mime-application:postscript' 图标，会在某些"
@@ -3195,7 +3196,7 @@ msgstr "设定图标"
 #: usericons.c:281
 msgid ""
 "Use a copy of the image as the default for all files of these MIME types."
-msgstr "用这个图像作为所有属於此种 MIME 类型的文件的缺省图标."
+msgstr "用这个图像作为所有属于此种 MIME 类型的文件的缺省图标."
 
 #: usericons.c:283
 #, c-format
@@ -3204,7 +3205,7 @@ msgstr "设定图标予全部的 `%s/<anything>'"
 
 #: usericons.c:288
 msgid "Use a copy of the image for all files of this MIME type."
-msgstr "用这个图像作为所有属於此种 MIME 类型的文件的图标"
+msgstr "用这个图像作为所有属于此种 MIME 类型的文件的图标"
 
 #: usericons.c:290
 #, c-format
@@ -3302,7 +3303,7 @@ msgstr "系统缺省"
 
 #: tips:4
 msgid "Basque"
-msgstr "巴斯克文"
+msgstr "巴斯克语"
 
 #: tips:5
 msgid "Chinese (traditional)"
@@ -3314,91 +3315,91 @@ msgstr "中文(简体)"
 
 #: tips:7
 msgid "Czech"
-msgstr "捷克"
+msgstr "捷克语"
 
 #: tips:8
 msgid "Danish"
-msgstr "丹麦"
+msgstr "丹麦语"
 
 #: tips:9
 msgid "Dutch"
-msgstr "荷兰"
+msgstr "荷兰语"
 
 #: tips:10
 msgid "English (no translation)"
-msgstr "英文"
+msgstr "英语"
 
 #: tips:11
 msgid "Estonian"
-msgstr "爱沙尼亚"
+msgstr "爱沙尼亚语"
 
 #: tips:12
 msgid "Finnish"
-msgstr "芬兰"
+msgstr "芬兰语"
 
 #: tips:13
 msgid "French"
-msgstr "法文"
+msgstr "法语"
 
 #: tips:14
 msgid "German"
-msgstr "德文"
+msgstr "德语"
 
 #: tips:15
 msgid "Hungarian"
-msgstr "匈牙利"
+msgstr "匈牙利语"
 
 #: tips:16
 msgid "Japanese"
-msgstr "日本"
+msgstr "日语"
 
 #: tips:17
 msgid "Norwegian"
-msgstr "挪威"
+msgstr "挪威语"
 
 #: tips:18
 msgid "Italian"
-msgstr "意大利"
+msgstr "意大利语"
 
 #: tips:19
 msgid "Polish"
-msgstr "波兰"
+msgstr "波兰语"
 
 #: tips:20
 msgid "Portuguese (Portugal)"
-msgstr "葡萄牙 (葡文)"
+msgstr "葡萄牙语（葡萄牙）"
 
 #: tips:21
 msgid "Portuguese (Brasil)"
-msgstr "葡萄牙 (巴西)"
+msgstr "葡萄牙语(巴西)"
 
 #: tips:22
 msgid "Romanian"
-msgstr "罗马尼亚"
+msgstr "罗马尼亚语"
 
 #: tips:23
 msgid "Russian"
-msgstr "俄罗斯"
+msgstr "俄罗斯语"
 
 #: tips:24
 msgid "Spanish"
-msgstr "西班牙"
+msgstr "西班牙语"
 
 #: tips:25
 msgid "Swedish"
-msgstr "瑞典"
+msgstr "瑞典语"
 
 #: tips:26
 msgid "Ukrainian"
-msgstr "乌黑兰"
+msgstr "乌克兰语"
 
 #: tips:27
 msgid "Vietnamese"
-msgstr "越南"
+msgstr "越南语"
 
 #: tips:28
 msgid "Filer windows"
-msgstr "Filer 窗口"
+msgstr "文件管理员窗口"
 
 #: tips:29
 msgid "Auto-resize filer windows"
@@ -3460,7 +3461,7 @@ msgstr "简化标题"
 msgid ""
 "Use single letters instead of words for Scanning, All and Thumbs indicators "
 "in the titlebar."
-msgstr "以单字母代替文件及缩图全名作标题"
+msgstr "以单字母代替文件及缩略图全名作标题"
 
 #: tips:42
 msgid "Unique windows"
@@ -3471,12 +3472,12 @@ msgid ""
 "If you open a directory and that directory is already displayed in another "
 "window, then this option causes the other window to be closed."
 msgstr ""
-"如你要开启一个目录而此目录已经存在於另一窗口内，开启此选项后你已经存在的窗口"
+"如你要打开一个目录而此目录已经存在于另一窗口内，开启此选项后你已经存在的窗口"
 "便会被关闭."
 
 #: tips:44
 msgid "New window on button 1"
-msgstr "按鼠标1(左)键以开启新窗口"
+msgstr "按鼠标1(左)键以打开新窗口"
 
 #: tips:45
 msgid ""
@@ -3484,7 +3485,7 @@ msgid ""
 "a new window with this turned on. Clicking with the button-2 (middle) will "
 "reuse the current window."
 msgstr ""
-"单击鼠标1(左)键以开启目录於新窗口内，单击鼠标2(中)键会开启目录於原有的窗口内."
+"单击鼠标1(左)键以打开目录于新窗口内，单击鼠标2(中)键会打开目录于原有的窗口内."
 
 #: tips:46
 msgid "Single-click navigation"
@@ -3495,7 +3496,7 @@ msgid ""
 "Clicking on an item opens it with this on. Hold down Control to select the "
 "item instead. If off, clicking once selects an item; double click to open "
 "things."
-msgstr "单击项目以开启及浏览，反之则单击以选择，双击以开启."
+msgstr "单击项目以打开及浏览，反之则单击以选择，双击以打开."
 
 #: tips:48
 msgid "Double-click on background resizes"
@@ -3519,7 +3520,7 @@ msgstr "目录先行 (以名称排序)"
 msgid ""
 "If this is on then directories will always appear before anything else when "
 "sorting by name."
-msgstr "如开启此功能，则永远以目录先排序，并忽略其他排序方式及以名称排序."
+msgstr "如打开此功能，则永远以目录先排序，并忽略其他排序方式及以名称排序."
 
 #: tips:53
 msgid "Capitalised names first (for sort by name)"
@@ -3529,7 +3530,7 @@ msgstr "大小写先行 (以名称排序)"
 msgid ""
 "If on, all filenames starting with a capital letter come before filenames "
 "starting with lowercase ones."
-msgstr "如开启此功能，则永远以大写名称先行，及小写名称在后."
+msgstr "如打开此功能，则永远以大写名称先行，及小写名称在后."
 
 #: tips:56
 msgid "Default settings for new windows"
@@ -3543,11 +3544,11 @@ msgstr "从源窗口中继承选项"
 msgid ""
 "If this is on then display options for a new window are inherited from the "
 "source window if possible, otherwise they are set to the defaults below."
-msgstr "如开启此功能，则新窗口会从源窗口之风格相同；反之，则以缺省值开启."
+msgstr "如打开此功能，则新窗口会从源窗口之风格相同；反之，则以缺省值打开."
 
 #: tips:59
 msgid "View type:"
-msgstr "检视模式："
+msgstr "查看模式："
 
 #: tips:62
 msgid "Sort by:"
@@ -3569,7 +3570,7 @@ msgstr "显示隐藏档"
 msgid ""
 "If this is on then files whose names start with a dot are shown too, "
 "otherwise they are hidden."
-msgstr "如启动此功能，会颢示所有点文件；否之，点文件会被隐藏."
+msgstr "如启动此功能，点文件也将被显示；否之，点文件会被隐藏."
 
 #: tips:69
 msgid "Show extended attribute indicator"
@@ -3579,9 +3580,7 @@ msgstr "显示扩展属性指标"
 msgid ""
 "If this is on then files which have one or more extended attributes set will "
 "have an emblem added to indicate this."
-msgstr ""
-"此选项可显示文件已设定的 "
-"一或多个扩展属性的特徵."
+msgstr "此选项可显示文件已设定的 一或多个扩展属性的特徵."
 
 #: tips:71
 msgid "Icon View"
@@ -3617,7 +3616,7 @@ msgstr "自动小图标化："
 
 #: tips:84
 msgid "Change at:"
-msgstr "改变於："
+msgstr "改变于："
 
 #: tips:86
 msgid ""
@@ -3625,7 +3624,7 @@ msgid ""
 "items then it will be shown using Small Icons, otherwise Large Icons will be "
 "used."
 msgstr ""
-"当目录中有太多项目时，会自行以小型图标来显示；反之，则以大型图标来开启."
+"当目录中有太多项目时，会自行以小型图标来显示；反之，则以大型图标来显示."
 
 #: tips:87
 msgid "Max width (Large icons):"
@@ -3640,8 +3639,8 @@ msgid ""
 "Text wider than this is broken onto two lines in Large Icons mode. In Huge "
 "Icons mode, text is wrapped when 50% wider than this."
 msgstr ""
-"在大图标模式下，讯息文字如比此宽度为长，则自动换行。在巨图标模式下，则会比宽"
-"度多长百份之五十."
+"在大图标模式下，文本文字如比此宽度长，则自动换行。在巨图标模式下，则会比宽度"
+"长百分之五十."
 
 #: tips:90
 msgid "(Small Icons):"
@@ -3649,7 +3648,7 @@ msgstr "(小图标)："
 
 #: tips:92
 msgid "Maximum width for the text beside a Small Icon."
-msgstr "小图标最大的讯息宽度"
+msgstr "小图标最大的文本宽度"
 
 #: tips:93
 msgid "Order small icons vertically"
@@ -3658,7 +3657,7 @@ msgstr "小图标垂直排列"
 #: tips:94
 msgid ""
 "If this option is on, then small icons are arranged in columns, not rows."
-msgstr "打开选项，小型图标会以垂直方式排列"
+msgstr "开启选项，小型图标会以垂直方式排列"
 
 #: tips:95
 msgid "Order large icons vertically"
@@ -3667,7 +3666,7 @@ msgstr "大图标垂直排列"
 #: tips:96
 msgid ""
 "If this option is on, then large icons are arranged in columns, not rows."
-msgstr "打开选项，大型图标会以垂直方式排列"
+msgstr "开启选项，大型图标会以垂直方式排列"
 
 #: tips:98
 msgid "Show column headings"
@@ -3709,11 +3708,11 @@ msgstr "只显示图标"
 
 #: tips:107
 msgid "Text under icons"
-msgstr "图标讯息在下"
+msgstr "图标文字在下"
 
 #: tips:108
 msgid "Text beside icons"
-msgstr "图标讯息在侧"
+msgstr "图标文字在侧"
 
 #: tips:109
 msgid "Show totals of items"
@@ -3734,7 +3733,7 @@ msgstr "选择要加入的按钮："
 
 #: tips:112
 msgid "Width of toolbar sets minimum width of window"
-msgstr "工具栏宽度决定窗口的最少宽度"
+msgstr "工具栏宽度决定窗口的最小宽度"
 
 #: tips:113
 msgid ""
@@ -3759,39 +3758,39 @@ msgstr "当启用`输入路径'小型命令框，在按下 Tab 键时没有作�
 
 #: tips:117
 msgid "Beep if there are several matches"
-msgstr "哔声 当找到匹配的数目太多"
+msgstr "当找到数个匹配项时发出哔的报警声"
 
 #: tips:118
 msgid ""
 "When using the `Enter Path...' minibuffer and Tab is pressed, beep if there "
 "is more than one matching file, even though some more letters were added."
 msgstr ""
-"当启用`输入路径'小型命令框，在按下 Tab 键时，找到匹配的数目太多则会发出哔的响"
-"声"
+"当启用`输入路径'小型命令框，在按下 Tab 键时，找到匹配的数目不止一个时则会发出"
+"哔的报警声声"
 
 #: tips:121
 msgid ""
 "When thumbnails are turned on, each image file in a directory is loaded and "
 "a small thumbnail of it is shown."
-msgstr "当目录内有影像或图片时，会以缩图来预览."
+msgstr "当目录内有影像或图片时，会以缩略图来预览."
 
 #: tips:122
 msgid "Show image thumbnails"
-msgstr "显示影像档的缩图"
+msgstr "显示影像档的缩略图"
 
 #: tips:123
 msgid ""
 "This is the default setting for new windows. Use the Display menu to turn "
 "thumbnails on and off for individual windows."
-msgstr "这是新窗口的缺省值，可在菜单的显示内自行开启或关闭缩图."
+msgstr "这是新窗口的缺省值，可在菜单的显示内自行打开或关闭缩略图."
 
 #: tips:124
 msgid "Video thumbnails"
-msgstr "影片缩图"
+msgstr "影片缩略图"
 
 #: tips:125
 msgid "Thumbnails cache"
-msgstr "缩图缓存区"
+msgstr "缩略图缓存区"
 
 #: tips:126
 msgid ""
@@ -3804,7 +3803,7 @@ msgstr ""
 
 #: tips:127
 msgid "Manage thumbnails"
-msgstr "管理缩图"
+msgstr "管理缩略图"
 
 #: tips:128 tips:205
 msgid "Pinboard"
@@ -3814,7 +3813,7 @@ msgstr "桌面"
 msgid ""
 "When using a pinboard, you can drag files and applications onto the desktop "
 "background to create shortcuts to them."
-msgstr "当启用桌面时，您可拖放文件或程式到桌面上它们会以捷径型式出现. "
+msgstr "当启用桌面时，您可拖放文件或程序到桌面上它们会以捷径型式出现. "
 
 #: tips:130 tips:258
 msgid "Appearance"
@@ -3868,7 +3867,7 @@ msgstr "桌面行为"
 
 #: tips:142
 msgid "Single-click to open"
-msgstr "单击予开启"
+msgstr "单击以打开"
 
 #: tips:144
 msgid "Keep icons within screen limits"
@@ -3940,11 +3939,11 @@ msgstr "只显示当前工作区"
 msgid ""
 "If this option is on, the filer will only show iconified windows associated "
 "with the current workspace."
-msgstr "打开此选项，ROX-Filer 只会显示当前工作区内的已图标化(或最小化)窗口"
+msgstr "开启此选项，ROX-Filer 只会显示当前工作区内的已图标化(或最小化)窗口"
 
 #: tips:160
 msgid "Iconify to the"
-msgstr "图标化后置於"
+msgstr "图标化后置于"
 
 #: tips:161
 msgid "top-left"
@@ -3981,8 +3980,8 @@ msgid ""
 "or bottom margin to avoid placing the icons there. The filer already knows "
 "about its own panel."
 msgstr ""
-"ROX-Filer 可能会忽略您的桌面环境布局，而将 图标化窗口放到(例如)Gnome面板上，"
-"您可定义一个最顶或最底的边沿设置，以防止图标被放到这处"
+"ROX-Filer 可能会忽略您的桌面环境布局，而将图标化窗口放到(例如)Gnome面板上，您"
+"可定义一个最顶或最底的边沿设置，以防止图标被放到这处"
 
 #: tips:169
 msgid "Top margin"
@@ -4042,12 +4041,12 @@ msgstr "面板上显示图像及文字"
 
 #: tips:182
 msgid "Image only for applications"
-msgstr "程式档只显示图像"
+msgstr "程序档只显示图像"
 
 #: tips:183
 msgid ""
 "Applications have just an image, everything else has both an image and text."
-msgstr "程式档只以图标表达，其他的文件则有图标及文字叙述."
+msgstr "程序档只以图标表达，其他的文件则有图标及文字叙述."
 
 #: tips:184
 msgid "Image only"
@@ -4096,7 +4095,7 @@ msgid ""
 "If you have an Xinerama multi-monitor setup, use this option to confine the "
 "panels to one monitor instead of spanning them."
 msgstr ""
-"假如您有多个显示器连接，并在 Xorg 设定了 Xinerama(多屏幕功能)，便可在此区限面"
+"假如您有多个显示器链接，并在 Xorg 设定了 Xinerama(多屏幕功能)，便可在此区限面"
 "板被放到某个显示器上."
 
 #: tips:194
@@ -4161,7 +4160,7 @@ msgid ""
 "The session manager activates these options by using the -S or --rox-session "
 "argument to rox."
 msgstr ""
-"Session 管理器，可在启动 rox 时加入 -S 或 --rox-session 这些参数来开启此功"
+"Session 管理器，可在启动 rox 时加入 -S 或 --rox-session 这些参数来打开此功"
 "能。"
 
 #: tips:209
@@ -4176,7 +4175,7 @@ msgstr "程序诊断窗口会在你执行一些程序，如复制或删除文件
 
 #: tips:211
 msgid "Auto-start (Quiet) these actions"
-msgstr "自动开启 (关闭) 诊断这些程序"
+msgstr "自动打开 (关闭) 诊断这些程序"
 
 #: tips:213
 msgid "Copy files without confirming first."
@@ -4188,7 +4187,7 @@ msgstr "移动文件而无须先被确认"
 
 #: tips:217
 msgid "Create links to files without confirming first."
-msgstr "连接文件而无须先被确认"
+msgstr "链接文件而无须先被确认"
 
 #: tips:219
 msgid "Delete files without confirming first."
@@ -4208,11 +4207,11 @@ msgstr "默认设定"
 
 #: tips:224
 msgid "Don't confirm deletion of non-writeable items."
-msgstr "不确认删除唯读项目"
+msgstr "不确认删除只读项目"
 
 #: tips:226
 msgid "Don't display so much information in the message area."
-msgstr "简化讯息框内资料"
+msgstr "简化消息框内资料"
 
 #: tips:228
 msgid "Also change contents of subdirectories."
@@ -4246,7 +4245,7 @@ msgstr "褪出光碟指令"
 
 #: tips:237
 msgid "The command used to eject removable media. If unsure, use \"eject\"."
-msgstr "用以褪出可移除媒体的指令。一般为 \"eject\". "
+msgstr "用以弹出可移动媒体的指令。一般为 \"eject\". "
 
 #: tips:238
 msgid "Drag and Drop"
@@ -4266,12 +4265,12 @@ msgid ""
 "filer window. The item will highlight when you do this and dropping the file "
 "will put it into that directory, or load it into the program."
 msgstr ""
-"选项开启后你可将文件在子目录或程式上拖放，该项目会被加亮并拖放进你指定的目录"
-"内，或在你拖进的程式内执行."
+"选项开启后你可将文件在子目录或程序上拖放，该项目会被加亮并拖放进你指定的目录"
+"内，或在你拖进的程序内执行."
 
 #: tips:242
 msgid "Directories spring open"
-msgstr "目录弹出并开启"
+msgstr "目录弹出并打开"
 
 #: tips:243
 msgid ""
@@ -4279,8 +4278,8 @@ msgid ""
 "highlighted directory to 'spring open' after the file is held over it for a "
 "short while."
 msgstr ""
-"此选项必须连带上一个选项同时开启，在指向加亮的目录时，使它在按著鼠标一段短时"
-"间内自动开启."
+"此选项必须连带上一个选项同时开启，在指向加亮的目录时，使它在按着鼠标一段短时"
+"间内自动打开."
 
 #: tips:244
 msgid "Spring delay:"
@@ -4296,7 +4295,7 @@ msgid ""
 "before it will spring open. The above option must be turned on for this to "
 "have any effect."
 msgstr ""
-"此选项是用作是设定：你在加亮的目录上按著鼠标而引发该目录被自动开启的延迟时"
+"此选项是用作是设定：你在加亮的目录上按着鼠标而引发该目录被自动打开的延迟时"
 "间，并会以 ms 微秒来计算"
 
 #: tips:247
@@ -4315,7 +4314,7 @@ msgstr "复制文件"
 msgid ""
 "Note that you can still get the menu to appear, by dragging with Alt held "
 "down."
-msgstr "注意，如想菜单再出现，可按著左键并同时按下键盘上的 Alt 键"
+msgstr "注意，如想菜单再出现，可按着左键并同时按下键盘上的 Alt 键"
 
 #: tips:251
 msgid "When dragging files with the middle mouse button"
@@ -4329,7 +4328,7 @@ msgstr "移动文件"
 msgid ""
 "Note that you can still get the menu to appear, by dragging with the left "
 "button and holding down the Alt key."
-msgstr "注意，如想菜单再出现，可按著左键并同时按下键盘上的 Alt 键"
+msgstr "注意，如想菜单再出现，可按着左键并同时按下键盘上的 Alt 键"
 
 #: tips:255
 msgid "Download handler"
@@ -4343,7 +4342,7 @@ msgid ""
 "xterm -e wget $1"
 msgstr ""
 "当从浏览器或远端来源中拖放文件至本机时，此功能可自动将文件下载到相对目的地，"
-"设置方式用以下指令进行：其中 $1 是被拖进文件的位址；wget 是用以下载的程式，例"
+"设置方式用以下指令进行：其中 $1 是被拖进文件的位址；wget 是用以下载的程序，例"
 "如:\n"
 "xterm -e wget $1"
 
@@ -4383,11 +4382,11 @@ msgstr "当右击时以文件菜单代替主菜单显示，(如想显示主菜�
 
 #: tips:268
 msgid "Terminal emulator program"
-msgstr "“终端机”程式"
+msgstr "“终端机”程序"
 
 #: tips:269
 msgid "The program to launch when you choose `Terminal Here' from the menu."
-msgstr "当你从菜单选择“终端机”这程式将被启动"
+msgstr "当你从菜单选择“终端机”这程序将被启动"
 
 #: tips:270
 msgid "Keyboard shortcuts"
@@ -4439,7 +4438,7 @@ msgstr "文件类型颜色"
 
 #: tips:281
 msgid "Colour files based on their types"
-msgstr "基於文件类型配色"
+msgstr "基于文件类型配色"
 
 #: tips:282
 msgid "Filenames (and details) are coloured according to the file's type."
@@ -4483,7 +4482,7 @@ msgstr "入口："
 msgid ""
 "Door files are a bit like sockets or pipes, and have only been seen on "
 "Solaris."
-msgstr "类似套节或管导的单元文件，只会用於 Solaris."
+msgstr "类似套节或管导的单元文件，只会用于 Solaris."
 
 #: tips:293
 msgid "Executable file:"
@@ -4491,7 +4490,7 @@ msgstr "可执行档："
 
 #: tips:294
 msgid "Application directory:"
-msgstr "应用程式目录："
+msgstr "应用程序目录："
 
 #: tips:295
 msgid "Unknown type:"
@@ -4499,7 +4498,7 @@ msgstr "不明类型："
 
 #: tips:296
 msgid "Compatibility"
-msgstr "相容性"
+msgstr "兼容性"
 
 #: tips:297
 msgid "Window manager problems"
@@ -4516,7 +4515,7 @@ msgid ""
 "on to fix problems such as the pinboard coming to the front when you click "
 "on it, titlebars and other decorations appearing around windows, or having "
 "them appear in window-select lists."
-msgstr "某些窗口管理员不支援伸延提示功能，此选项可解决相应问题"
+msgstr "某些窗口管理员不支持伸延提示功能，此选项可解决相应问题"
 
 #: tips:300
 msgid "Pass all backdrop mouse clicks to window manager"
@@ -4542,7 +4541,7 @@ msgid ""
 "managers are expected to change their behaviour in new versions so that this "
 "isn't necessary."
 msgstr ""
-"Blackbox, Fluxbox 及某些窗口管理员不支援 ROX-Filer 桌面功能，点选此处可文件这"
+"Blackbox, Fluxbox 及某些窗口管理员不支持 ROX-Filer 桌面功能，点选此处可文件这"
 "些问题；但新版本的窗口管理员，已无须这个选项."
 
 #: tips:304
@@ -4569,8 +4568,8 @@ msgid ""
 "option turned on. Use this if dragging files to an application shows a + "
 "sign on the pointer but the drop doesn't work."
 msgstr ""
-"某些旧的应用程式不完全支援拖放来执行的功能，此选项便须要开启，以达致将文件拖"
-"到当鼠标出现 a + 符号的应用程式上."
+"某些旧的应用程序不完全支持拖放来执行的功能，此选项便须要开启，以达致将文件拖"
+"到当鼠标出现 a + 符号的应用程序上."
 
 #: tips:309
 msgid "Extended attributes"
@@ -4587,6 +4586,6 @@ msgid ""
 "disabled, the MIME type of the file is only derived from the file name and "
 "the properties window does not report extended attributes."
 msgstr ""
-"如打开选项，在较新的操作系统和文件系统中的扩展属性功能会被关闭；而菜单中的 "
-"'另定类型' 选项亦会解除；MIME 的类别会由文件名或副档名决定；讯息窗口亦不会报"
+"如开启选项，在较新的操作系统和文件系统中的扩展属性功能会被关闭；而菜单中的 "
+"'另定类型' 选项亦会解除；MIME 的类别会由文件名或副档名决定；属性窗口亦不会报"
 "告文件的扩展属性."

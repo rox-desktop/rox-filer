@@ -30,7 +30,6 @@
 #endif
 
 #include <assert.h>
-#include <glib.h>
 #include "xdgmimemagic.h"
 #include "xdgmimeint.h"
 #include <stdio.h>
@@ -48,7 +47,9 @@
 #define	TRUE	(!FALSE)
 #endif
 
-extern int errno;
+#if !defined getc_unlocked && !defined HAVE_GETC_UNLOCKED
+#define getc_unlocked(fp) getc (fp)
+#endif
 
 typedef struct XdgMimeMagicMatch XdgMimeMagicMatch;
 typedef struct XdgMimeMagicMatchlet XdgMimeMagicMatchlet;
@@ -475,7 +476,9 @@ _xdg_mime_magic_parse_magic_line (FILE              *magic_file,
       /* We clean up the matchlet, byte swapping if needed */
       if (matchlet->word_size > 1)
 	{
+#if LITTLE_ENDIAN
 	  int i;
+#endif
 	  if (matchlet->value_length % matchlet->word_size != 0)
 	    {
 	      _xdg_mime_magic_matchlet_free (matchlet);
@@ -651,104 +654,59 @@ _xdg_mime_magic_get_buffer_extents (XdgMimeMagic *mime_magic)
   return mime_magic->max_extent;
 }
 
-static gboolean buffer_looks_like_text (const void  *data, const size_t len)
-{
-	gchar *end;
-
-	if (g_utf8_validate (data, len, (const gchar**)&end))
-	{
-		/* g_utf8_validate allows control characters */
-		int i;
-		for (i = 0; i < len; i++)
-		{
-			unsigned char c = ((const guchar *) data)[i];
-			if (c < 32 && c != '\r' && c != '\n' && c != '\t')
-				return FALSE;
-		}
-		return TRUE;
-	} else {
-		/* Check whether the string was truncated in the middle of
-		 * a valid UTF8 char, or if we really have an invalid
-		 * UTF8 string
-    		 */
-		gint remaining_bytes = len;
-
-		remaining_bytes -= (end-((gchar*)data));
-	
- 		if (g_utf8_get_char_validated(end, remaining_bytes) == -2)
-			return TRUE;
-#if defined(HAVE_WCTYPE_H) && defined (HAVE_MBRTOWC)
-		else {
-			size_t wlen;
-			wchar_t wc;
-			gchar *src, *end;
-			mbstate_t state;
-
-			src = data;
-			end = data+len;
-			
-			memset (&state, 0, sizeof (state));
-			while (src < end) {
-				/* Don't allow embedded zeros in textfiles */
-				if (*src == 0)
-					return FALSE;
-				
-				wlen = mbrtowc(&wc, src, end - src, &state);
-
-				if (wlen == (size_t)(-1)) {
-					/* Illegal mb sequence */
-					return FALSE;
-				}
-				
-				if (wlen == (size_t)(-2)) {
-					/* No complete mb char before end
-					 * Probably a cut off char which is ok */
-					return TRUE;
-				}
-
-				if (wlen == 0) {
-					/* Don't allow embedded zeros in textfiles */
-					return FALSE;
-				}
-				
-				if (!iswspace (wc)  && !iswprint(wc)) {
-					/* Not a printable or whitspace
-					 * Probably not a text file */
-					return FALSE;
-				}
-
-				src += wlen;
-			}
-			return TRUE;
-		}
-#endif /* defined(HAVE_WCTYPE_H) && defined (HAVE_MBRTOWC) */
-	}
-	return FALSE;
-}
-
-
 const char *
 _xdg_mime_magic_lookup_data (XdgMimeMagic *mime_magic,
 			     const void   *data,
-			     size_t        len)
+			     size_t        len,
+                             const char   *mime_types[],
+                             int           n_mime_types)
 {
   XdgMimeMagicMatch *match;
   const char *mime_type;
+  int n;
+  int priority;
+  int had_match;
 
   mime_type = NULL;
+  priority = 0;
+  had_match = 0;
   for (match = mime_magic->match_list; match; match = match->next)
     {
       if (_xdg_mime_magic_match_compare_to_data (match, data, len))
 	{
-	  if ((mime_type == NULL) || (xdg_mime_mime_type_subclass (match->mime_type, mime_type))) {
-	    mime_type = match->mime_type;
-	  }
+	  if (!had_match || match->priority > priority ||
+	      (mime_type != NULL && _xdg_mime_mime_type_subclass (match->mime_type, mime_type)))
+	    {
+	      mime_type = match->mime_type;
+	      priority = match->priority;
+	    }
+	  else if (had_match && match->priority == priority && mime_type &&
+		   !_xdg_mime_mime_type_subclass (mime_type, match->mime_type))
+	    /* multiple unrelated patterns with the same priority matched,
+	     * so we can't tell what type this is. */
+	    mime_type = NULL;
+
+	  had_match = 1;
+	}
+      else 
+	{
+	  for (n = 0; n < n_mime_types; n++)
+	    {
+	      if (mime_types[n] && 
+		  _xdg_mime_mime_type_equal (mime_types[n], match->mime_type))
+		mime_types[n] = NULL;
+	    }
 	}
     }
 
   if (mime_type == NULL)
-  	if (buffer_looks_like_text(data, len))
-		mime_type = XDG_MIME_TYPE_UNKNOWN_TEXT;
+    {
+      for (n = 0; n < n_mime_types; n++)
+	{
+	  if (mime_types[n])
+	    mime_type = mime_types[n];
+	}
+    }
 
   return mime_type;
 }

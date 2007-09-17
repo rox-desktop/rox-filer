@@ -711,8 +711,7 @@ static MaskedPixmap *image_from_desktop_file(const char *path)
 		/* SVG reader is very noisy, so redirect stderr to stdout */
 		tmp_fd = dup(2);
 		dup2(1, 2);
-		pixbuf = gtk_icon_theme_load_icon(icon_theme, icon, HUGE_WIDTH,
-							0, NULL);
+		pixbuf = theme_load_icon(icon, HUGE_WIDTH, 0, NULL);
 		dup2(tmp_fd, 2);
 		close(tmp_fd);
 

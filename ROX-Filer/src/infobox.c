@@ -789,6 +789,7 @@ static GtkWidget *make_file_says(const guchar *path)
 	w_file_label = gtk_label_new(_("<nothing yet>"));
 	l_file_label = GTK_LABEL(w_file_label);
 	gtk_label_set_line_wrap(l_file_label, TRUE);
+	gtk_label_set_selectable(l_file_label, TRUE);
 	
 	if (pipe(file_data))
 	{

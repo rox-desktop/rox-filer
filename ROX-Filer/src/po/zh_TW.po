@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 1.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-06-17 12:07+0800\n"
+"POT-Creation-Date: 2007-09-08 00:38+0800\n"
 "PO-Revision-Date: 2007-06-17 00:00+0100\n"
 "Last-Translator: Babyfai Cheung<babyfai1@yahoo.com.hk>\n"
 "Language-Team: none\n"
@@ -21,15 +21,15 @@ msgstr "<目錄>"
 
 #: abox.c:218
 msgid "_Quiet"
-msgstr "離開(_Q)"
+msgstr "默許(_Q)"
 
 #: abox.c:227
 msgid "Quiet"
-msgstr "離開"
+msgstr "默許"
 
 #: abox.c:227
 msgid "Don't confirm every operation"
-msgstr "不確認操作"
+msgstr "不用對每次操作進行確認"
 
 #: abox.c:454 infobox.c:771 tips:63
 msgid "Name"
@@ -673,50 +673,50 @@ msgstr "自定選單..."
 msgid "Help"
 msgstr "說明"
 
-#: bookmarks.c:145
+#: bookmarks.c:148
 msgid "Path"
 msgstr "路徑"
 
-#: bookmarks.c:153
+#: bookmarks.c:156
 msgid "Title"
 msgstr "標題"
 
-#: bookmarks.c:302
+#: bookmarks.c:305
 #, c-format
 msgid "Can't bookmark non-local resource '%s'\n"
 msgstr "不能書簽化非本機的資源 '%s'\n"
 
-#: bookmarks.c:310 bookmarks.c:628
+#: bookmarks.c:313 bookmarks.c:631
 #, c-format
 msgid "'%s' isn't a directory"
 msgstr "'%s'並非一個目錄"
 
-#: bookmarks.c:516
+#: bookmarks.c:519
 msgid "You should first select some rows to delete"
 msgstr "請先選擇行數以刪除"
 
-#: bookmarks.c:540
+#: bookmarks.c:543
 msgid "Put the cursor on an entry in the list to move it"
 msgstr "將鼠標指向想要移動的項目上"
 
-#: bookmarks.c:560
+#: bookmarks.c:563
 msgid "This item is already at the end"
 msgstr "此項目已排在最後"
 
-#: bookmarks.c:634
+#: bookmarks.c:637
 #, c-format
 msgid "Can't bookmark non-local directories like '%s'"
 msgstr "不能書簽化非本機目錄如 '%s'"
 
-#: bookmarks.c:776
+#: bookmarks.c:779
 msgid "Add New Bookmark"
 msgstr "加入新書簽"
 
-#: bookmarks.c:783
+#: bookmarks.c:786
 msgid "Edit Bookmarks"
 msgstr "編輯書簽"
 
-#: bookmarks.c:788
+#: bookmarks.c:791
 msgid "Recently Visited"
 msgstr "最近存取的"
 
@@ -1003,7 +1003,7 @@ msgstr "抱歉，您每次只可拖放一個檔案."
 msgid "Sorry, I can't use '%s' because it's not a local file."
 msgstr "抱歉，未能運用 '%s' 因其並非本機檔案."
 
-#: dropbox.c:278 pinboard.c:858
+#: dropbox.c:278 pinboard.c:932
 #, c-format
 msgid ""
 "Can't access '%s':\n"
@@ -1715,74 +1715,74 @@ msgstr "執行檔案"
 msgid "<nothing yet>"
 msgstr "<還是空的>"
 
-#: infobox.c:859
+#: infobox.c:860
 #, c-format
 msgid "file(1) says... %s"
 msgstr "檔案(1) 顯示...%s"
 
-#: infobox.c:916
+#: infobox.c:917
 #, c-format
 msgid "Could not change permissions: %s"
 msgstr "不能改變 '%s' 的權限"
 
-#: infobox.c:934
+#: infobox.c:935
 msgid "Owner"
 msgstr "用戶"
 
-#: infobox.c:936
+#: infobox.c:937
 msgid "Group"
 msgstr "組別"
 
-#: infobox.c:938
+#: infobox.c:939
 msgid "World"
 msgstr "其他"
 
-#: infobox.c:941
+#: infobox.c:942
 msgid "Read"
 msgstr "可讀"
 
-#: infobox.c:943
+#: infobox.c:944
 msgid "Write"
 msgstr "可寫"
 
-#: infobox.c:945
+#: infobox.c:946
 msgid "Exec"
 msgstr "可執行"
 
-#: infobox.c:962
+#: infobox.c:963
 msgid "SUID"
 msgstr "SUID"
 
-#: infobox.c:969
+#: infobox.c:970
 msgid "SGID"
 msgstr "SGID"
 
-#: infobox.c:976
+#: infobox.c:977
 msgid "Sticky"
 msgstr "Sticky"
 
-#: infobox.c:998
+#: infobox.c:999
 msgid "Symbolic link"
 msgstr "是一符號連結"
 
-#: infobox.c:1001
+#: infobox.c:1002
 msgid "ROX application"
 msgstr "ROX 應用程式"
 
-#: infobox.c:1009
+#: infobox.c:1010
 msgid "mounted"
 msgstr "已掛載"
 
-#: infobox.c:1009
+#: infobox.c:1010
 msgid "unmounted"
 msgstr "已解除掛載"
 
-#: infobox.c:1013
+#: infobox.c:1014
 #, c-format
 msgid "Mount point for %s (%s)"
 msgstr "掛載點為 %s (%s)"
 
-#: infobox.c:1016
+#: infobox.c:1017
 #, c-format
 msgid "Mount point (%s)"
 msgstr "掛載點 (%s)"
@@ -2588,14 +2588,14 @@ msgstr "右部邊沿"
 msgid "Your old pinboard file has been converted to the new XML format."
 msgstr "你的舊桌面資源檔案已轉為新的XML格式."
 
-#: pinboard.c:637
+#: pinboard.c:711
 msgid ""
 "The backdrop handler must be an application directory. Drag an application "
 "directory into the Set Backdrop dialog box, or (for programmers) pass it to "
 "the SOAP SetBackdropApp method."
 msgstr "桌面處理工具是一個程式目錄，請於設定對話框內，拖進要加入的程序."
 
-#: pinboard.c:656
+#: pinboard.c:730
 msgid ""
 "You can only set the backdrop to an image or to a program which knows how to "
 "manage ROX-Filer's backdrop.\n"
@@ -2608,91 +2608,91 @@ msgstr ""
 "程式員注意: 程式內的 AppInfo.xml 必須包含 CanSetBackdrop 這元素，可參閱 ROX-"
 "Filer 的指南."
 
-#: pinboard.c:676
+#: pinboard.c:750
 msgid "Set backdrop"
 msgstr "設定背景"
 
-#: pinboard.c:687
+#: pinboard.c:761
 msgid "Choose a style and drag an image in:"
 msgstr "選取一風格並將影像拖進 :"
 
-#: pinboard.c:700
+#: pinboard.c:774
 msgid "Centre the image without scaling it"
 msgstr "影像置中及不作調整"
 
-#: pinboard.c:701
+#: pinboard.c:775
 msgid "Centre"
 msgstr "置中"
 
-#: pinboard.c:702
+#: pinboard.c:776
 msgid "Scale the image to fit the backdrop area, without distorting it"
 msgstr "調整影像致全螢幕"
 
-#: pinboard.c:704
+#: pinboard.c:778
 msgid "Scale"
 msgstr "調整"
 
-#: pinboard.c:705
+#: pinboard.c:779
 msgid ""
 "Scale the image to fit the backdrop area, regardless of image dimensions - "
 "overscale"
 msgstr "調整影像致匹配全個背景區，不管影像的任何大小"
 
-#: pinboard.c:707
+#: pinboard.c:781
 msgid "Fit"
 msgstr "適配"
 
-#: pinboard.c:708
+#: pinboard.c:782
 msgid "Stretch the image to fill the backdrop area"
 msgstr "伸延影像致全螢幕"
 
-#: pinboard.c:709
+#: pinboard.c:783
 msgid "Stretch"
 msgstr "伸延"
 
-#: pinboard.c:710
+#: pinboard.c:784
 msgid "Tile the image over the backdrop area"
 msgstr "平鋪影像致全螢幕"
 
-#: pinboard.c:711
+#: pinboard.c:785
 msgid "Tile"
 msgstr "平鋪"
 
-#: pinboard.c:716
+#: pinboard.c:790
 msgid "Drop an image here"
 msgstr "拖放圖像到此處"
 
-#: pinboard.c:777
+#: pinboard.c:851
 msgid ""
 "No pinboard was in use... the 'Default' pinboard has been selected. Use 'rox "
 "-p=Default' to turn it on in future."
 msgstr ""
 "沒有設定所用桌面，桌面將會選用預設值，亦可用指令 'rox -p=Default' 來啟動."
 
-#: pinboard.c:871
+#: pinboard.c:945
 msgid ""
 "Only files (and certain applications) can be used to set the background "
 "image."
 msgstr "只有檔案(及某些應用程式)才可用作設定背景"
 
-#: pinboard.c:1496
+#: pinboard.c:1570
 msgid "Missing '>' in icon label"
 msgstr "沒有 '>' 在圖示標簽內"
 
-#: pinboard.c:1505
+#: pinboard.c:1579
 msgid "Missing ',' after icon label"
 msgstr "沒有 ',' 在圖示標簽後"
 
-#: pinboard.c:1593
+#: pinboard.c:1667
 #, c-format
 msgid "Error saving pinboard %s: %s"
 msgstr "錯誤儲存桌面 %s: %s"
 
-#: pinboard.c:2137
+#: pinboard.c:2211
 msgid "Backdrop..."
 msgstr "背景..."
 
-#: pinboard.c:2230
+#: pinboard.c:2304
 #, c-format
 msgid ""
 "Error loading backdrop image:\n"
@@ -2703,7 +2703,7 @@ msgstr ""
 "%s\n"
 "背景被移除."
 
-#: pixmaps.c:975
+#: pixmaps.c:977
 #, c-format
 msgid ""
 "Can't delete thumbnails in %s:\n"
@@ -2712,11 +2712,11 @@ msgstr ""
 "不能刪除縮圖於 %s:\n"
 "%s"
 
-#: pixmaps.c:996
+#: pixmaps.c:998
 msgid "There are no thumbnails to delete"
 msgstr "沒有縮圖可供移除"
 
-#: pixmaps.c:1009
+#: pixmaps.c:1011
 msgid "Purge thumbnails disk cache"
 msgstr "清除緩存區內的縮圖"
 
@@ -2735,7 +2735,7 @@ msgstr "不明詳細類型 '%s'"
 msgid "Unknown sorting type '%s'"
 msgstr "不明排列類型 '%s'"
 
-#: remote.c:1245
+#: remote.c:1247
 #, c-format
 msgid "Attempt to invoke unknown SOAP method '%s'"
 msgstr "嘗試呼叫不明的 SOAP 方式 '%s'"
@@ -2980,35 +2980,35 @@ msgstr "沒有項目%s"
 msgid "%u selected (%s)"
 msgstr "%u 已選擇 (%s)"
 
-#: toolbar.c:423
+#: toolbar.c:445
 msgid "Sort by name"
 msgstr "以名稱排序"
 
-#: toolbar.c:423
+#: toolbar.c:445
 msgid "Sort by type"
 msgstr "以類型排序"
 
-#: toolbar.c:423
+#: toolbar.c:445
 msgid "Sort by date"
 msgstr "以日期排序"
 
-#: toolbar.c:424
+#: toolbar.c:446
 msgid "Sort by size"
 msgstr "以大小排序"
 
-#: toolbar.c:424
+#: toolbar.c:446
 msgid "Sort by owner"
 msgstr "以用戶排序"
 
-#: toolbar.c:424
+#: toolbar.c:446
 msgid "Sort by group"
 msgstr "以組別排序"
 
-#: toolbar.c:458
+#: toolbar.c:480
 msgid "ascending"
 msgstr "提升"
 
-#: toolbar.c:458
+#: toolbar.c:480
 msgid "descending"
 msgstr "下降"
 
