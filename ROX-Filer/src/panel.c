@@ -298,6 +298,30 @@ static void panel_load_options_from_xml(Panel *panel, xmlDocPtr doc)
 	get_int_prop(options, "monitor", &panel->monitor);
 }
 
+static void save_panels(void)
+{
+	char *filename = choices_find_xdg_path_save("panels",
+				"ROX-Filer", "rox.sourceforge.net", TRUE);
+	FILE *fp = fopen(filename, "w");
+
+	if (fp)
+	{
+		PanelSide n;
+
+		for (n = 0; n < PANEL_NUMBER_OF_SIDES; ++n)
+		{
+			if (current_panel[n])
+				fprintf(fp, "%s\n", current_panel[n]->name);
+		}
+		fclose(fp);
+	}
+	else
+	{
+		g_critical(_("Unable to save '%s'"), filename);
+	}
+	g_free(filename);
+}
+
 /* 'name' may be NULL or "" to remove the panel */
 Panel *panel_new(const gchar *name, PanelSide side)
 {
@@ -366,7 +390,10 @@ Panel *panel_new(const gchar *name, PanelSide side)
 	}
 
 	if (name == NULL || *name == '\0')
+	{
+		save_panels();
 		return NULL;
+	}
 
 	panel = g_new(Panel, 1);
 	panel->name = g_strdup(name);
@@ -534,6 +561,8 @@ Panel *panel_new(const gchar *name, PanelSide side)
 		/* (if pinboard is NULL, will go right to the back) */
 		window_put_just_above(panel->window->window, pinboard);
 	}
+
+	save_panels();
 
 	return panel;
 }

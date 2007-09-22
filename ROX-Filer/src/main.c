@@ -175,7 +175,7 @@ enum {
 	SESSION_BOTH,
 };
 Option o_session_panel_or_pin;
-Option o_session_panel_name;
+Option o_session_panel_name;	/* Now a comma-separated list */
 Option o_session_pinboard_name;
 
 /* Always start a new filer, even if one seems to be already running */
@@ -828,7 +828,7 @@ static void xrandr_size_change(GdkScreen *screen, gpointer user_data)
 
 static void add_default_panel_and_pinboard(xmlNodePtr body)
 {
-	char *name;
+	const char *name;
 
 	if (o_session_panel_or_pin.int_value != SESSION_PANEL_ONLY)
 	{
@@ -840,11 +840,41 @@ static void add_default_panel_and_pinboard(xmlNodePtr body)
 					
 	if (o_session_panel_or_pin.int_value != SESSION_PINBOARD_ONLY)
 	{
-		name = o_session_panel_name.value;
-		if (!name[0])
-			name="Default";
-		
-		soap_add(body, "Panel", "Name", name, NULL, NULL);
+		gboolean use_old_option = TRUE;
+		GIOChannel *fp = NULL;
+		GError *err = NULL;
+		char *line = NULL;
+		gsize term;
+		char *filename = choices_find_xdg_path_load("panels",
+				"ROX-Filer", "rox.sourceforge.net");
+
+		if (filename)
+			fp = g_io_channel_new_file(filename, "r", &err);
+		while (fp && g_io_channel_read_line(fp, &line, NULL, &term, &err) ==
+				G_IO_STATUS_NORMAL)
+		{
+			if (line && (line[term] = 0, line[0]))
+			{
+				soap_add(body, "Panel", "Name", line, NULL, NULL);
+				use_old_option = FALSE;
+			}
+		}
+		if (err)
+		{
+			g_critical(_("Unable to read '%s': %s"),
+					filename, err->message);
+			g_error_free(err);
+		}
+		if (fp)
+			g_io_channel_shutdown(fp, FALSE, NULL);
+		if (use_old_option)
+		{
+			name = o_session_panel_name.value;
+			if (!name[0])
+				name="Default";
+			soap_add(body, "Panel", "Name", name, NULL, NULL);
+		}
+		g_free(filename);
 	}
 }
 

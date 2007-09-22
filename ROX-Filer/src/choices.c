@@ -295,7 +295,7 @@ gchar *choices_find_xdg_path_save(const char *leaf, const char *dir,
 	}
 
 	if(site)
-        {
+	{
 		path = g_build_filename(xdg_dir_list[0], site, NULL);
 		if (create && !exists(path))
 		{
