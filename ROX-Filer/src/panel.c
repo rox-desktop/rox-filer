@@ -2615,9 +2615,23 @@ static void panel_position_menu(GtkMenu *menu, gint *x, gint *y,
 	*push_in = FALSE;
 }
 
+static void panel_remove_callback(PanelSide side)
+{
+	GtkWidget *dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL,
+			GTK_MESSAGE_QUESTION, GTK_BUTTONS_OK_CANCEL,
+			_("Are you sure you want to remove this panel from the desktop?"));
+
+	gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
+	gtk_window_set_title(GTK_WINDOW(dialog), _("Remove Panel"));
+	if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK)
+		panel_new(NULL, side);
+	gtk_widget_destroy(dialog);
+}
+
 static void panel_show_menu(GdkEventButton *event, PanelIcon *pi, Panel *panel)
 {
 	GtkWidget	*option_item;
+	GtkWidget	*del_item;
 	PanelSide	side = panel->side;
 	int		pos[4];
 
@@ -2634,7 +2648,12 @@ static void panel_show_menu(GdkEventButton *event, PanelIcon *pi, Panel *panel)
 	g_signal_connect_swapped(option_item, "activate",
 			 G_CALLBACK(panel_show_options), panel);
 
-	icon_prepare_menu((Icon *) pi, option_item, NULL);
+	del_item = gtk_image_menu_item_new_with_label(_("Remove Panel"));
+	g_signal_connect_swapped(del_item, "activate",
+			 G_CALLBACK(panel_remove_callback), GINT_TO_POINTER(side));
+
+	icon_prepare_menu((Icon *) pi, option_item,
+			del_item, GTK_STOCK_REMOVE, NULL);
 
 	if (side == PANEL_LEFT)
 		pos[0] = -2;
