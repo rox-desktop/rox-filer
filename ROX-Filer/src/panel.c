@@ -1564,11 +1564,7 @@ void panel_save(Panel *panel)
 
 	root = xmlDocGetRootElement(doc);
 
-	xmlSetProp(root, "side",
-			panel->side == PANEL_TOP ? "Top" :
-			panel->side == PANEL_BOTTOM ? "Bottom" :
-			panel->side == PANEL_LEFT ? "Left" :
-			"Right");
+	xmlSetProp(root, "side", panel_side_to_name(panel->side));
 
 	options = xmlNewChild(root, NULL, "options", NULL);
 	set_int_prop(options, "style", panel->style);
@@ -1974,10 +1970,7 @@ static void run_applet(PanelIcon *pi)
 
 		/* Set a hint to let applets position their menus correctly */
 		pos = g_strdup_printf("%s,%d",
-				side == PANEL_TOP ? "Top" :
-				side == PANEL_BOTTOM ? "Bottom" :
-				side == PANEL_LEFT ? "Left" :
-				"Right", MENU_MARGIN(side));
+				panel_side_to_name(side), MENU_MARGIN(side));
 		gdk_property_change(pi->socket->window,
 				gdk_atom_intern("_ROX_PANEL_MENU_POS", FALSE),
 				gdk_atom_intern("STRING", FALSE),
@@ -2641,7 +2634,7 @@ static void panel_show_menu(GdkEventButton *event, PanelIcon *pi, Panel *panel)
 	g_signal_connect_swapped(option_item, "activate",
 			 G_CALLBACK(panel_show_options), panel);
 
-	icon_prepare_menu((Icon *) pi, option_item);
+	icon_prepare_menu((Icon *) pi, option_item, NULL);
 
 	if (side == PANEL_LEFT)
 		pos[0] = -2;
@@ -2743,6 +2736,46 @@ static GList *build_monitor_number(Option *option, xmlNode *node, guchar *label)
 	return build_numentry_base(option, node, label, GTK_ADJUSTMENT(adj));
 }
 
+static const char *panel_side_to_translated_name(PanelSide side)
+{
+	switch (side)
+	{
+		case PANEL_TOP:
+			return _("Top");
+		case PANEL_BOTTOM:
+			return _("Bottom");
+		case PANEL_LEFT:
+			return _("Left");
+		case PANEL_RIGHT:
+			return _("Right");
+		case PANEL_DEFAULT_SIDE:
+			return _("Default");
+		default:
+			break;
+	}
+	return _("Unknown side");
+}
+
+const char *panel_side_to_name(PanelSide side)
+{
+	switch (side)
+	{
+		case PANEL_TOP:
+			return "Top";
+		case PANEL_BOTTOM:
+			return "Bottom";
+		case PANEL_LEFT:
+			return "Left";
+		case PANEL_RIGHT:
+			return "Right";
+		case PANEL_DEFAULT_SIDE:
+			return "Default";
+		default:
+			break;
+	}
+	return "UnknownSide";
+}
+
 /* Returns PANEL_NUMBER_OF_SIDES if name is invalid */
 PanelSide panel_name_to_side(gchar *side)
 {
@@ -2759,3 +2792,19 @@ PanelSide panel_name_to_side(gchar *side)
 	return PANEL_NUMBER_OF_SIDES;
 }
 
+GtkWidget *panel_new_panel_submenu(void)
+{
+	GtkWidget *menu = gtk_menu_new();
+	PanelSide side;
+
+	for (side = 0; side < PANEL_NUMBER_OF_SIDES; ++side)
+	{
+		GtkWidget *item = gtk_menu_item_new_with_label(
+				panel_side_to_translated_name(side));
+
+		gtk_widget_set_sensitive(item, current_panel[side] == NULL);
+		gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+		gtk_widget_show(item);
+	}
+	return menu;
+}

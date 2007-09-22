@@ -55,6 +55,11 @@ gboolean panel_remove_item(PanelSide side, const gchar *path,
 			   const gchar *label);
 void panel_mark_used(GdkRegion *used);
 void panel_update_size(void);
+
+/* Side names here are English for implementation */
 PanelSide panel_name_to_side(gchar *side);
+const char *panel_side_to_name(PanelSide side);
+
+GtkWidget *panel_new_panel_submenu(void);
 
 #endif /* _PANEL_H */
