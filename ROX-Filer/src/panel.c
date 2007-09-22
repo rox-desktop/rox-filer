@@ -2652,6 +2652,7 @@ static void panel_remove_callback(PanelSide side)
 
 	gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
 	gtk_window_set_title(GTK_WINDOW(dialog), _("Remove Panel"));
+	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_MOUSE);
 	if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK)
 		panel_new(NULL, side);
 	gtk_widget_destroy(dialog);
