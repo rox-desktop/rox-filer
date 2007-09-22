@@ -2792,6 +2792,12 @@ PanelSide panel_name_to_side(gchar *side)
 	return PANEL_NUMBER_OF_SIDES;
 }
 
+static void panel_add_callback(PanelSide side)
+{
+	g_return_if_fail(current_panel[side] == NULL);
+	panel_new(panel_side_to_name(side), side);
+}
+
 GtkWidget *panel_new_panel_submenu(void)
 {
 	GtkWidget *menu = gtk_menu_new();
@@ -2802,6 +2808,8 @@ GtkWidget *panel_new_panel_submenu(void)
 		GtkWidget *item = gtk_menu_item_new_with_label(
 				panel_side_to_translated_name(side));
 
+		g_signal_connect_swapped(item, "activate",
+				G_CALLBACK(panel_add_callback), GINT_TO_POINTER(side));
 		gtk_widget_set_sensitive(item, current_panel[side] == NULL);
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
 		gtk_widget_show(item);
