@@ -302,7 +302,8 @@ static void save_panels(void)
 {
 	char *filename = choices_find_xdg_path_save("panels",
 				"ROX-Filer", "rox.sourceforge.net", TRUE);
-	FILE *fp = fopen(filename, "w");
+	char *tmp = g_strconcat(filename, ".new", NULL);
+	FILE *fp = fopen(tmp, "w");
 
 	if (fp)
 	{
@@ -314,11 +315,14 @@ static void save_panels(void)
 				fprintf(fp, "%s\n", current_panel[n]->name);
 		}
 		fclose(fp);
+		if (rename(tmp, filename))
+			g_critical(_("Unable to replace '%s'"), filename);
 	}
 	else
 	{
-		g_critical(_("Unable to save '%s'"), filename);
+		g_critical(_("Unable to save '%s'"), tmp);
 	}
+	g_free(tmp);
 	g_free(filename);
 }
 
