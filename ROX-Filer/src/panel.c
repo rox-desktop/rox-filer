@@ -2683,11 +2683,11 @@ static void panel_show_menu(GdkEventButton *event, PanelIcon *pi, Panel *panel)
 			 G_CALLBACK(panel_show_options), panel);
 
 	del_item = gtk_image_menu_item_new_with_label(_("Remove Panel"));
+	add_stock_to_menu_item(del_item, GTK_STOCK_REMOVE);
 	g_signal_connect_swapped(del_item, "activate",
 			 G_CALLBACK(panel_remove_callback), GINT_TO_POINTER(side));
 
-	icon_prepare_menu((Icon *) pi, option_item,
-			del_item, GTK_STOCK_REMOVE, NULL);
+	icon_prepare_menu((Icon *) pi, option_item, del_item, NULL);
 
 	if (side == PANEL_LEFT)
 		pos[0] = -2;

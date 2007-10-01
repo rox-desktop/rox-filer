@@ -52,8 +52,8 @@ gboolean icons_require(const gchar *path);
 void icon_may_update(Icon *icon);
 void icons_may_update(const gchar *path);
 
-/* After options_item you may pass pairs of widget (MenuItem) and
- * stock icon name (NULL for no icon), followed by NULL to terminate list */
+/* After options_item you may pass further MenuItems followed by NULL to
+ * terminate list */
 void icon_prepare_menu(Icon *icon, GtkWidget *options_item, ...);
 
 void icon_set_selected(Icon *icon, gboolean selected);
