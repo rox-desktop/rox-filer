@@ -2202,6 +2202,7 @@ static void pin_icon_set_tip(PinIcon *pi)
 static void pinboard_show_menu(GdkEventButton *event, PinIcon *pi)
 {
 	GtkWidget	*option_item;
+	GtkWidget	*new_panel_item;
 	int		pos[3];
 	GList		*list;
 
@@ -2211,7 +2212,11 @@ static void pinboard_show_menu(GdkEventButton *event, PinIcon *pi)
 	option_item = gtk_image_menu_item_new_with_label(_("Backdrop..."));
 	g_signal_connect(option_item, "activate",
 			 G_CALLBACK(pinboard_set_backdrop_box), NULL);
-	icon_prepare_menu((Icon *) pi, option_item);
+	new_panel_item = gtk_image_menu_item_new_with_label(_("Add Panel"));
+	gtk_menu_item_set_submenu(GTK_MENU_ITEM(new_panel_item),
+			panel_new_panel_submenu());
+	icon_prepare_menu((Icon *) pi, option_item,
+			new_panel_item, GTK_STOCK_ADD, NULL);
 
 	list = gtk_container_get_children(GTK_CONTAINER(icon_menu));
 	pos[2] = g_list_length(list) - 6;

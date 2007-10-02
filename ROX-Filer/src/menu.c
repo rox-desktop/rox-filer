@@ -19,6 +19,10 @@
 
 /* menu.c - code for handling the popup menus */
 
+#ifndef GTK_STOCK_INFO
+# define GTK_STOCK_INFO "gtk-info"
+#endif
+
 #include "config.h"
 
 #include <stdio.h>

@@ -298,6 +298,30 @@ static void panel_load_options_from_xml(Panel *panel, xmlDocPtr doc)
 	get_int_prop(options, "monitor", &panel->monitor);
 }
 
+static void save_panels(void)
+{
+	char *filename = choices_find_xdg_path_save("panels",
+				"ROX-Filer", "rox.sourceforge.net", TRUE);
+	FILE *fp = fopen(filename, "w");
+
+	if (fp)
+	{
+		PanelSide n;
+
+		for (n = 0; n < PANEL_NUMBER_OF_SIDES; ++n)
+		{
+			if (current_panel[n])
+				fprintf(fp, "%s\n", current_panel[n]->name);
+		}
+		fclose(fp);
+	}
+	else
+	{
+		g_critical(_("Unable to save '%s'"), filename);
+	}
+	g_free(filename);
+}
+
 /* 'name' may be NULL or "" to remove the panel */
 Panel *panel_new(const gchar *name, PanelSide side)
 {
@@ -366,7 +390,10 @@ Panel *panel_new(const gchar *name, PanelSide side)
 	}
 
 	if (name == NULL || *name == '\0')
+	{
+		save_panels();
 		return NULL;
+	}
 
 	panel = g_new(Panel, 1);
 	panel->name = g_strdup(name);
@@ -534,6 +561,8 @@ Panel *panel_new(const gchar *name, PanelSide side)
 		/* (if pinboard is NULL, will go right to the back) */
 		window_put_just_above(panel->window->window, pinboard);
 	}
+
+	save_panels();
 
 	return panel;
 }
@@ -1564,11 +1593,7 @@ void panel_save(Panel *panel)
 
 	root = xmlDocGetRootElement(doc);
 
-	xmlSetProp(root, "side",
-			panel->side == PANEL_TOP ? "Top" :
-			panel->side == PANEL_BOTTOM ? "Bottom" :
-			panel->side == PANEL_LEFT ? "Left" :
-			"Right");
+	xmlSetProp(root, "side", panel_side_to_name(panel->side));
 
 	options = xmlNewChild(root, NULL, "options", NULL);
 	set_int_prop(options, "style", panel->style);
@@ -1974,10 +1999,7 @@ static void run_applet(PanelIcon *pi)
 
 		/* Set a hint to let applets position their menus correctly */
 		pos = g_strdup_printf("%s,%d",
-				side == PANEL_TOP ? "Top" :
-				side == PANEL_BOTTOM ? "Bottom" :
-				side == PANEL_LEFT ? "Left" :
-				"Right", MENU_MARGIN(side));
+				panel_side_to_name(side), MENU_MARGIN(side));
 		gdk_property_change(pi->socket->window,
 				gdk_atom_intern("_ROX_PANEL_MENU_POS", FALSE),
 				gdk_atom_intern("STRING", FALSE),
@@ -2622,9 +2644,24 @@ static void panel_position_menu(GtkMenu *menu, gint *x, gint *y,
 	*push_in = FALSE;
 }
 
+static void panel_remove_callback(PanelSide side)
+{
+	GtkWidget *dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL,
+			GTK_MESSAGE_QUESTION, GTK_BUTTONS_OK_CANCEL,
+			_("Are you sure you want to remove this panel from the desktop?"));
+
+	gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
+	gtk_window_set_title(GTK_WINDOW(dialog), _("Remove Panel"));
+	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_MOUSE);
+	if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK)
+		panel_new(NULL, side);
+	gtk_widget_destroy(dialog);
+}
+
 static void panel_show_menu(GdkEventButton *event, PanelIcon *pi, Panel *panel)
 {
 	GtkWidget	*option_item;
+	GtkWidget	*del_item;
 	PanelSide	side = panel->side;
 	int		pos[4];
 
@@ -2641,7 +2678,12 @@ static void panel_show_menu(GdkEventButton *event, PanelIcon *pi, Panel *panel)
 	g_signal_connect_swapped(option_item, "activate",
 			 G_CALLBACK(panel_show_options), panel);
 
-	icon_prepare_menu((Icon *) pi, option_item);
+	del_item = gtk_image_menu_item_new_with_label(_("Remove Panel"));
+	g_signal_connect_swapped(del_item, "activate",
+			 G_CALLBACK(panel_remove_callback), GINT_TO_POINTER(side));
+
+	icon_prepare_menu((Icon *) pi, option_item,
+			del_item, GTK_STOCK_REMOVE, NULL);
 
 	if (side == PANEL_LEFT)
 		pos[0] = -2;
@@ -2743,6 +2785,46 @@ static GList *build_monitor_number(Option *option, xmlNode *node, guchar *label)
 	return build_numentry_base(option, node, label, GTK_ADJUSTMENT(adj));
 }
 
+static const char *panel_side_to_translated_name(PanelSide side)
+{
+	switch (side)
+	{
+		case PANEL_TOP:
+			return _("Top");
+		case PANEL_BOTTOM:
+			return _("Bottom");
+		case PANEL_LEFT:
+			return _("Left");
+		case PANEL_RIGHT:
+			return _("Right");
+		case PANEL_DEFAULT_SIDE:
+			return _("Default");
+		default:
+			break;
+	}
+	return _("Unknown side");
+}
+
+const char *panel_side_to_name(PanelSide side)
+{
+	switch (side)
+	{
+		case PANEL_TOP:
+			return "Top";
+		case PANEL_BOTTOM:
+			return "Bottom";
+		case PANEL_LEFT:
+			return "Left";
+		case PANEL_RIGHT:
+			return "Right";
+		case PANEL_DEFAULT_SIDE:
+			return "Default";
+		default:
+			break;
+	}
+	return "UnknownSide";
+}
+
 /* Returns PANEL_NUMBER_OF_SIDES if name is invalid */
 PanelSide panel_name_to_side(gchar *side)
 {
@@ -2759,3 +2841,27 @@ PanelSide panel_name_to_side(gchar *side)
 	return PANEL_NUMBER_OF_SIDES;
 }
 
+static void panel_add_callback(PanelSide side)
+{
+	g_return_if_fail(current_panel[side] == NULL);
+	panel_new(panel_side_to_name(side), side);
+}
+
+GtkWidget *panel_new_panel_submenu(void)
+{
+	GtkWidget *menu = gtk_menu_new();
+	PanelSide side;
+
+	for (side = 0; side < PANEL_NUMBER_OF_SIDES; ++side)
+	{
+		GtkWidget *item = gtk_menu_item_new_with_label(
+				panel_side_to_translated_name(side));
+
+		g_signal_connect_swapped(item, "activate",
+				G_CALLBACK(panel_add_callback), GINT_TO_POINTER(side));
+		gtk_widget_set_sensitive(item, current_panel[side] == NULL);
+		gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+		gtk_widget_show(item);
+	}
+	return menu;
+}
