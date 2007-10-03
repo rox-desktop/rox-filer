@@ -23,6 +23,9 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+#ifdef HAVE_LIBINTL_H
+#include <libintl.h>
+#endif
 
 #include "global.h"
 
@@ -207,6 +210,12 @@ static void set_trans(const guchar *lang)
 		lang2 = g_strdup(lang);
 
 	current_lang = lang2;
+
+#ifdef HAVE_LIBINTL_H
+	path = g_strdup_printf("%s/Messages", app_dir);
+	bindtextdomain("ROX-Filer", path);
+	g_free(path);
+#endif
 
 	path = g_strdup_printf("%s/Messages/%s.gmo", app_dir, current_lang);
 	if (!file_exists(path) && strchr(current_lang, '_'))
