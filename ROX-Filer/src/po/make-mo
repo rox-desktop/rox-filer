@@ -26,5 +26,5 @@ if [ -f "$OUT" ]; then
 	mkdir -p "$LOCALE_DIR"
 	ln -sf "../../$1.gmo" "$LOCALE_DIR/ROX-Filer.mo"
 else
-	rm -rf "$LOCALE_DIR/ROX-Filer.mo"
+	rm -f "$LOCALE_DIR/ROX-Filer.mo"
 fi
