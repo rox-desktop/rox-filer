@@ -60,6 +60,11 @@ static GList *build_i18n_message(Option *option, xmlNode *node, guchar *label);
 /* Set things up for internationalisation */
 void i18n_init(void)
 {
+#ifdef HAVE_LIBINTL_H
+	gchar *path = g_strdup_printf("%s/Messages", app_dir);
+	bindtextdomain("ROX-Filer", path);
+	g_free(path);
+#endif
 	gtk_set_locale();
 
 	option_add_string(&o_translation, "i18n_translation", "From LANG");
@@ -210,12 +215,6 @@ static void set_trans(const guchar *lang)
 		lang2 = g_strdup(lang);
 
 	current_lang = lang2;
-
-#ifdef HAVE_LIBINTL_H
-	path = g_strdup_printf("%s/Messages", app_dir);
-	bindtextdomain("ROX-Filer", path);
-	g_free(path);
-#endif
 
 	path = g_strdup_printf("%s/Messages/%s.gmo", app_dir, current_lang);
 	if (!file_exists(path) && strchr(current_lang, '_'))
