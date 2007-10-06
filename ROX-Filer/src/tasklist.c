@@ -948,14 +948,12 @@ static void show_icon(IconWindow *win)
 
 	gtk_box_pack_start(GTK_BOX(vbox), win->label, FALSE, TRUE, 0);
 
-	gtk_widget_add_events(win->widget, GDK_BUTTON1_MOTION_MASK);
+	gtk_widget_add_events(win->widget,
+			GDK_BUTTON1_MOTION_MASK | GDK_BUTTON_RELEASE_MASK);
 	g_signal_connect(win->widget, "button-press-event",
 			G_CALLBACK(icon_button_press), win);
 	g_signal_connect(win->widget, "motion-notify-event",
 			G_CALLBACK(icon_motion_notify), win);
-	gdk_window_set_events(win->widget->window,
-			gdk_window_get_events(win->widget->window) |
-			GDK_BUTTON_RELEASE_MASK);
 	g_signal_connect(win->widget, "button-release-event",
 			G_CALLBACK(button_released), win);
 	
