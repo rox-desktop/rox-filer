@@ -3351,8 +3351,8 @@ static void settings_response(GtkWidget *window, gint response,
 void filer_save_settings(FilerWindow *fwin)
 {
 	SettingsWindow *set_win;
-	GtkWidget *vbox;
-	GtkWidget *path;
+	GtkWidget *vbox, *frame;
+	GtkWidget *path, *lbl;
 	gint x, y;
 	
 	Settings *set=settings_new(fwin->sym_path);
@@ -3412,8 +3412,19 @@ void filer_save_settings(FilerWindow *fwin)
 
 	vbox=GTK_DIALOG(set_win->window)->vbox;
 
+	lbl=gtk_label_new(_("<b>Save display settings for directory</b>"));
+	gtk_label_set_use_markup(GTK_LABEL(lbl), TRUE);
+	gtk_box_pack_start(GTK_BOX(vbox), lbl, FALSE, FALSE, 2);
+
 	path=gtk_label_new(set->path);
 	gtk_box_pack_start(GTK_BOX(vbox), path, FALSE, FALSE, 2);
+
+	frame=gtk_frame_new(_("Selete settings to save"));
+	gtk_box_pack_start(GTK_BOX(vbox), frame, TRUE, TRUE, 2);
+
+	/*Make new vbox to go in the frame */
+	vbox=gtk_vbox_new(FALSE, 2);
+	gtk_container_add(GTK_CONTAINER(frame), vbox);
 
 	set_win->pos=gtk_check_button_new_with_label(_("Position"));
 	gtk_box_pack_start(GTK_BOX(vbox), set_win->pos, FALSE, FALSE, 2);
