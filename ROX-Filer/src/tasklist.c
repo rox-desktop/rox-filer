@@ -605,6 +605,7 @@ static void uniconify(IconWindow *win, guint32 timestamp)
 			gdk_atom_intern("_NET_ACTIVE_WINDOW", FALSE));
 	sev.data.l[0] = 2;
 	sev.data.l[1] = timestamp;
+	sev.data.l[2] = 0;
 
 	gdk_error_trap_push();
 
