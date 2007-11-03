@@ -90,8 +90,15 @@ void mount_init(void)
 					    g_free, NULL);
 
 #ifdef DO_MOUNT_POINTS
-	fstab_time = read_time(THE_FSTAB);
-	read_table();
+	if(file_exists(THE_FSTAB))
+	{
+		fstab_time = read_time(THE_FSTAB);
+		read_table();
+
+	} else {
+		fstab_time = 0;
+		g_warning(_("File system table \"%s\" not found, cannot monitor system mounts"), THE_FSTAB);
+	}
 #endif
 }
 
