@@ -22,6 +22,7 @@
 #include "config.h"
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
@@ -208,7 +209,7 @@ static void clear_table(void)
 	g_hash_table_foreach_remove(fstab_mounts, free_mp, NULL);
 }
 
-/* Return the mtime of a file */
+/* Return the mtime of a file - only used for the fstab file */
 static time_t read_time(char *path)
 {
 	struct stat info;
@@ -216,6 +217,10 @@ static time_t read_time(char *path)
 
 	err = stat(path, &info);
 
+	/* Don't print an error if the file is missing, just return the
+	 * epoch (change if used for more than the fstab?) */
+	if(err && errno==ENOENT)
+		return 0;
 	g_return_val_if_fail(err == 0, 0);
 
 	return info.st_mtime;
@@ -232,6 +237,8 @@ static void read_table(void)
 #  endif
 
 	clear_table();
+	if(!file_exists(THE_FSTAB))
+		return;
 
 	tab = setmntent(THE_FSTAB, "r");
 	g_return_if_fail(tab != NULL);
@@ -270,6 +277,8 @@ static void read_table(void)
 #  endif
 
 	clear_table();
+	if(!file_exists(THE_FSTAB))
+		return;
 
 	tab = fopen(THE_FSTAB, "r");
 	g_return_if_fail(tab != NULL);
@@ -306,6 +315,8 @@ static void read_table(void)
 	MountPoint	*mp;
 
 	clear_table();
+	if(!file_exists(THE_FSTAB))
+		return;
 
 	tab = setfsent();
 	g_return_if_fail(tab != 0);
