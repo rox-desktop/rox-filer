@@ -93,12 +93,17 @@ void mount_init(void)
 	if(file_exists(THE_FSTAB))
 	{
 		fstab_time = read_time(THE_FSTAB);
-		read_table();
 
 	} else {
 		fstab_time = 0;
+		
+#if defined(HAVE_MNTENT_H) || defined(HAVE_SYS_MNTENT_H)
+		/* We need THE_FSTAB for these implementations, but
+		 * it is missing */
 		g_warning(_("File system table \"%s\" not found, cannot monitor system mounts"), THE_FSTAB);
+#endif
 	}
+	read_table();
 #endif
 }
 
@@ -322,8 +327,6 @@ static void read_table(void)
 	MountPoint	*mp;
 
 	clear_table();
-	if(!file_exists(THE_FSTAB))
-		return;
 
 	tab = setfsent();
 	g_return_if_fail(tab != 0);
