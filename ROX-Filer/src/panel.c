@@ -302,7 +302,8 @@ static void save_panels(void)
 {
 	char *filename = choices_find_xdg_path_save("panels",
 				"ROX-Filer", "rox.sourceforge.net", TRUE);
-	FILE *fp = fopen(filename, "w");
+	char *tmp = g_strconcat(filename, ".new", NULL);
+	FILE *fp = fopen(tmp, "w");
 
 	if (fp)
 	{
@@ -314,11 +315,14 @@ static void save_panels(void)
 				fprintf(fp, "%s\n", current_panel[n]->name);
 		}
 		fclose(fp);
+		if (rename(tmp, filename))
+			g_critical(_("Unable to replace '%s'"), filename);
 	}
 	else
 	{
-		g_critical(_("Unable to save '%s'"), filename);
+		g_critical(_("Unable to save '%s'"), tmp);
 	}
+	g_free(tmp);
 	g_free(filename);
 }
 
@@ -2679,11 +2683,11 @@ static void panel_show_menu(GdkEventButton *event, PanelIcon *pi, Panel *panel)
 			 G_CALLBACK(panel_show_options), panel);
 
 	del_item = gtk_image_menu_item_new_with_label(_("Remove Panel"));
+	add_stock_to_menu_item(del_item, GTK_STOCK_REMOVE);
 	g_signal_connect_swapped(del_item, "activate",
 			 G_CALLBACK(panel_remove_callback), GINT_TO_POINTER(side));
 
-	icon_prepare_menu((Icon *) pi, option_item,
-			del_item, GTK_STOCK_REMOVE, NULL);
+	icon_prepare_menu((Icon *) pi, option_item, del_item, NULL);
 
 	if (side == PANEL_LEFT)
 		pos[0] = -2;

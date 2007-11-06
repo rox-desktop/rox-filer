@@ -247,7 +247,6 @@ static gboolean any_selected_item_is_locked()
  */
 void icon_prepare_menu(Icon *icon, GtkWidget *options_item, ...)
 {
-	GtkWidget *image;
 	gboolean shaded;
 	GSList *link;
 	va_list ap;
@@ -278,9 +277,7 @@ void icon_prepare_menu(Icon *icon, GtkWidget *options_item, ...)
 		create_menu();
 
 	current_options_item = options_item;
-	image = gtk_image_new_from_stock(GTK_STOCK_PREFERENCES,
-						GTK_ICON_SIZE_MENU);
-	gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(options_item), image);
+	add_stock_to_menu_item(options_item, GTK_STOCK_PREFERENCES);
 
 	gtk_menu_shell_append(GTK_MENU_SHELL(icon_menu), options_item);
 	gtk_widget_show_all(options_item);
@@ -288,14 +285,6 @@ void icon_prepare_menu(Icon *icon, GtkWidget *options_item, ...)
 	va_start(ap, options_item);
 	while ((trailing = va_arg(ap, GtkWidget *)) != NULL)
 	{
-		const char *stock = va_arg(ap, const char *);
-
-		if (stock)
-		{
-			image = gtk_image_new_from_stock(stock, GTK_ICON_SIZE_MENU);
-			gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(trailing),
-					image);
-		}
 		current_trailing_items = g_slist_prepend(current_trailing_items,
 				trailing);
 		gtk_menu_shell_append(GTK_MENU_SHELL(icon_menu), trailing);

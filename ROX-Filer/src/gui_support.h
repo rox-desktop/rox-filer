@@ -90,5 +90,6 @@ void allow_right_click(GtkWidget *button);
 gint current_event_button(void);
 GdkPixbuf *create_spotlight_pixbuf(GdkPixbuf *src, GdkColor *color);
 GladeXML *get_glade_xml(const char *component);
+void add_stock_to_menu_item(GtkWidget *item, const char *stock);
 
 #endif /* _GUI_SUPPORT_H */

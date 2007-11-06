@@ -40,6 +40,8 @@ static GtkTreeStore *log;
 #define MESSAGE 2
 
 /* Static prototypes */
+static void log_dialog_response(GtkDialog *dialog, gint resp_id,
+				gpointer udata);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -158,8 +160,18 @@ void log_show_window()
 							   "text", DIRECTORY,
 							   NULL);
 	gtk_tree_view_append_column(tv, column);
+
+	g_signal_connect(G_OBJECT(glade_xml_get_widget(glade, "Log viewer")),
+			 "response", log_dialog_response, NULL);
 }
 	
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
+static void log_dialog_response(GtkDialog *dialog, gint resp_id,
+				gpointer udata)
+{
+	/* Only response we should get is CLOSE */
+	gtk_widget_hide(GTK_WIDGET(dialog));
+	gtk_widget_destroy(GTK_WIDGET(dialog));
+}

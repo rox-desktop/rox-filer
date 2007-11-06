@@ -593,7 +593,7 @@ static void tasklist_update(gboolean to_empty)
 }
 
 /* Called when the user clicks on the button */
-static void uniconify(IconWindow *win)
+static void uniconify(IconWindow *win, guint32 timestamp)
 {
 	XClientMessageEvent sev;
 
@@ -603,7 +603,9 @@ static void uniconify(IconWindow *win)
 	sev.window = win->xwindow;
 	sev.message_type = gdk_x11_atom_to_xatom(
 			gdk_atom_intern("_NET_ACTIVE_WINDOW", FALSE));
-	sev.data.l[0] = 0;
+	sev.data.l[0] = 2;
+	sev.data.l[1] = timestamp;
+	sev.data.l[2] = 0;
 
 	gdk_error_trap_push();
 
@@ -665,10 +667,11 @@ static gboolean icon_motion_notify(GtkWidget *widget,
 	return FALSE;
 }
 
-static void button_released(GtkWidget *widget, IconWindow *win)
+static void button_released(GtkWidget *widget, GdkEventButton *event,
+		IconWindow *win)
 {
-	if (!drag_started)
-		uniconify(win);
+	if (!drag_started && event->button == 1)
+		uniconify(win, event->time);
 }
 
 static GdkColormap* get_cmap(GdkPixmap *pixmap)
@@ -946,12 +949,13 @@ static void show_icon(IconWindow *win)
 
 	gtk_box_pack_start(GTK_BOX(vbox), win->label, FALSE, TRUE, 0);
 
-	gtk_widget_add_events(win->widget, GDK_BUTTON1_MOTION_MASK);
+	gtk_widget_add_events(win->widget,
+			GDK_BUTTON1_MOTION_MASK | GDK_BUTTON_RELEASE_MASK);
 	g_signal_connect(win->widget, "button-press-event",
 			G_CALLBACK(icon_button_press), win);
 	g_signal_connect(win->widget, "motion-notify-event",
 			G_CALLBACK(icon_motion_notify), win);
-	g_signal_connect(win->widget, "released",
+	g_signal_connect(win->widget, "button-release-event",
 			G_CALLBACK(button_released), win);
 	
 	gtk_widget_show_all(vbox);	/* So the size comes out right */
