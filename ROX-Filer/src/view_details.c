@@ -633,9 +633,24 @@ static gint view_details_key_press(GtkWidget *widget, GdkEventKey *event)
 {
 	if (event->keyval == GDK_Up || event->keyval == GDK_Down ||
 	    event->keyval == GDK_Prior || event->keyval == GDK_Next ||
-	    event->keyval == GDK_Home || event->keyval == GDK_End)
-		return GTK_WIDGET_CLASS(parent_class)->key_press_event(widget,
-									event);
+	    event->keyval == GDK_Home || event->keyval == GDK_End) {
+		/* Work around a strange GTK bug that prevents you from moving the cursor
+		 * if nothing is selected.
+		 */
+		if (event->state & GDK_CONTROL_MASK)
+		{
+			return GTK_WIDGET_CLASS(parent_class)->key_press_event(widget, event);
+		}
+		else
+		{
+			/* GTK hard-codes the test for CTRL, and won't move the cursor
+			 * if it isn't set.
+			 */
+			event->state |= GDK_CONTROL_MASK;
+			gtk_propagate_event(widget, (GdkEvent *) event);
+			return TRUE;
+		}
+	}
 	return FALSE;
 }
 
