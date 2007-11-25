@@ -46,8 +46,12 @@
 
 #include "my_vfs.h"
 
-#include "rox_gettext.h"
-#define _(String) rox_gettext(String)
+#ifdef HAVE_LIBINTL_H
+# include <libintl.h>
+# define _(String) dgettext("ROX-Filer", String)
+#else
+# define _(String) (String)
+#endif
 /* Short for gettext_noop() - marks a string as translatable without
  * actually translating it at that point. Used by xgettext.
  */
