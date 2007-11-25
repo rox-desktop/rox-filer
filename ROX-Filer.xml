@@ -8,6 +8,14 @@
     ROX-Filer is a fast and powerful graphical file manager. It has full drag-and-drop support and background file operations, and is highly configurable. It can also act as a pinboard, allowing you to pin frequently used files to the desktop background.
   </description>
   <feed-for interface='http://rox.sourceforge.net/2005/interfaces/ROX-Filer'/>
+
+  <release:management xmlns:release="http://zero-install.sourceforge.net/2007/namespaces/0release">
+    <release:action phase="generate-archive">cd ROX-Filer/src/Docs/ &amp;&amp; make</release:action>
+    <release:action phase="generate-archive">cd ROX-Filer/src/po/ &amp;&amp; ./dist</release:action>
+    <release:action phase="generate-archive">cd ROX-Filer/src/ &amp;&amp; autoconf</release:action>
+    <release:action phase="generate-archive">cd ROX-Filer/src/ &amp;&amp; autoconf &amp;&amp; rm -fr autom4te.cache</release:action>
+  </release:management>
+
   <group>
     <implementation version="2.6.1" version-modifier='-post' released='Snapshot' id="."/>
   </group>
