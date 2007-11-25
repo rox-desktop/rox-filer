@@ -446,6 +446,9 @@ static GtkIconInfo *mime_type_lookup_icon_info(GtkIconTheme *theme,
  * 3. Icon theme 'mime-base'
  * 4. Unknown type icon.
  *
+ * Special case: If an icon cannot be found for inode/mount-point, the icon for
+ * inode/directory will be returned (if possible).
+ *
  * Note: You must g_object_unref() the image afterwards.
  */
 MaskedPixmap *type_to_icon(MIME_type *type)
@@ -474,6 +477,7 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 		type->image = NULL;
 	}
 
+again:
 	type_name = g_strconcat(type->media_type, "_", type->subtype,
 				".png", NULL);
 	path = choices_find_xdg_path_load(type_name, "MIME-icons", SITE);
@@ -497,6 +501,12 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 	{
 		init_gnome_theme();
 		full = mime_type_lookup_icon_info(gnome_theme, type);
+	}
+	if (!full && type == inode_mountpoint)
+	{
+		/* Try to use the inode/directory icon for inode/mount-point */
+		type = inode_directory;
+		goto again;
 	}
 	if (full)
 	{

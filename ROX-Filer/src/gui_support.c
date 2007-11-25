@@ -1581,7 +1581,7 @@ GladeXML *get_glade_xml(const char *component)
 	char *path;
 
 	path = g_build_filename(app_dir, "Templates.glade", NULL);
-	widgets = glade_xml_new(path, component, NULL);
+	widgets = glade_xml_new(path, component, "ROX-Filer");
 
 	if (widgets == NULL)
 		g_warning("Failed to load widget '%s' from '%s'",

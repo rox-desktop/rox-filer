@@ -336,7 +336,7 @@ static void draw_item(GtkWidget *widget,
 	else
 		selection_state = GTK_STATE_NORMAL;
 
-	color = &widget->style->bg[selection_state];
+	color = &widget->style->base[selection_state];
 	
 	fill_template(area, colitem, view_collection, &template);
 		
@@ -345,7 +345,7 @@ static void draw_item(GtkWidget *widget,
 		type_gc = gdk_gc_new(widget->window);
 
 	gdk_gc_set_foreground(type_gc, type_get_colour(item,
-					&widget->style->fg[GTK_STATE_NORMAL]));
+					&widget->style->text[GTK_STATE_NORMAL]));
 
 	if (template.icon.width <= SMALL_WIDTH &&
 			template.icon.height <= SMALL_HEIGHT)
@@ -638,7 +638,7 @@ static void draw_string(GtkWidget *widget,
 {
 	GdkGC	*gc = selection_state == GTK_STATE_NORMAL
 			? type_gc
-			: widget->style->fg_gc[selection_state];
+			: widget->style->text_gc[selection_state];
 	
 	if (selection_state != GTK_STATE_NORMAL && box)
 		gtk_paint_flat_box(widget->style, widget->window, 

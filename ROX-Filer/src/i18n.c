@@ -23,6 +23,9 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+#ifdef HAVE_LIBINTL_H
+#include <libintl.h>
+#endif
 
 #include "global.h"
 
@@ -57,6 +60,11 @@ static GList *build_i18n_message(Option *option, xmlNode *node, guchar *label);
 /* Set things up for internationalisation */
 void i18n_init(void)
 {
+#ifdef HAVE_LIBINTL_H
+	gchar *path = g_strdup_printf("%s/Messages", app_dir);
+	bindtextdomain("ROX-Filer", path);
+	g_free(path);
+#endif
 	gtk_set_locale();
 
 	option_add_string(&o_translation, "i18n_translation", "From LANG");
