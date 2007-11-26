@@ -544,10 +544,13 @@ static gint collection_expose(GtkWidget *widget, GdkEventExpose *event)
 	/* Note about 'detail' argument:
 	 * - If set to "base", lighthouse theme will crash
 	 * - If set to NULL, cleanice theme will crash
+	 *
+	 * Clear the background only if we have a background pixmap.
 	 */
-	gtk_paint_flat_box(widget->style, widget->window, GTK_STATE_NORMAL, 
-		      GTK_SHADOW_NONE, &event->area,
-		      widget, "collection", 0, 0, -1, -1);
+	if (widget->style->bg_pixmap[GTK_STATE_NORMAL])
+		gtk_paint_flat_box(widget->style, widget->window, GTK_STATE_NORMAL, 
+				   GTK_SHADOW_NONE, &event->area,
+				   widget, "collection", 0, 0, -1, -1);
 
 	collection = COLLECTION(widget);
 
