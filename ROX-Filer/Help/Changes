@@ -2,9 +2,149 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
-* Note: you don't need to update file this when committing a change.
-* Just add a log message with the commit (with your name in brackets at
-* the end) and I'll update this file only when making a new release.
+* Note: you don't need to update file this when committing a change. Just add a
+* log message with the commit and I'll update this file only when making a new
+* release.
+
+Release 2.7 (2007-11-29)
+
+
+NEW FEATURES
+
+- New panel configuration GUI (Tony Houghton):
+  - Created new Panel Options dialog in Templates.glade.
+  - Changing panel side is now in the dialog.
+  - Created new panel menu item.
+  - Implemented Remove Panel menu item.
+  - Pinboard menu has "Add panel" submenu.
+  - Added panel_side_to_{translated_}name.
+  - Options are stored with each panel.
+
+  Use new panels config file to decide which panels to create with -S (Tony
+  Houghton) .
+
+  Fixed some problems and cleaned up some things in my new Panel Options
+  code spotted by Thomas Leonard (Tony Houghton).
+
+  Got rid of panel options from main Options dialog (Tony Houghton).
+  No longer warn about options without widgets.
+
+- Added a log viewer (Thomas Leonard).
+  On the Window menu there is now a "Show Log" item which opens a window
+  displaying a log of recent actions. Currently, only actions involving
+  an action window are logged. The action is logged when you request the
+  action (so it might not have actually been performed). The log window
+  was created using Glade, and this therefore adds a Glade dependency
+  on ROX-Filer, along with some support code to use it.
+
+  Make the log window close when the Close button is clicked (Stephen Watson) 
+
+- Added automatic placement and updating to PinboardAdd RPC (Dennis
+  Tomas).
+
+- Try to find icons in ROX and gnome themes if not in configured
+  theme (Tony Houghton).
+
+
+CHANGES
+
+- Use text/base theme colours for the Collection widget,
+  not fg/bg. (Andras Mohari) This provides a good default for the
+  Collection widget, and is consistent with other widgets (GtkEntry,
+  GtkTreeView...).
+
+  Setting the colours in .gtkrc-2.0 is unnecessary now (unless someone
+  wants to override theme colours, of course).
+
+- Updated xdgmime* files from CVS source (retrieved 2007-08-18)
+  (Stephen Watson).
+
+- Making new ROX-Filer releases is now handled by 0release (Thomas
+  Leonard).
+
+
+TRANSLATIONS
+
+- Switched completely to standard gettext (Thomas Leonard).
+  We used to use our own implementation of the gettext functions so that
+  the user could switch langauges on the fly. However, that doesn't work
+  with Glade and it wasn't very useful anyway, so it has all been
+  removed.
+
+  One visible change is that e.g. "LANG=fr rox -n" no longer works. You
+  have to use the full string (e.g. "LANG=fr_FR.utf8 rox -n").
+
+- Added preliminary support for Glade translations (Andras Mohari, as
+  suggested by Lennon Cook). We check for the presence of libintl.h
+  and use the bindtextdomain() call to tell Glade where to find its
+  catalogs.
+
+  Build failed on Solaris, because libintl wasn't linked in (Stephen
+  Watson).
+
+- Updated Hungarian translation (Andras Mohari).
+
+- Updated Chinese translation (Babyfai Cheung).
+
+
+BUG FIXES
+
+- In the Properties box, the text in the "Contents Indicate" part of the
+  box can now be selected and pasted (Thomas Leonard).
+
+- Made uniconify from pinboard work properly with metacity (Tony
+  Houghton): _NET_ACTIVE_WINDOW message now has timestamp and source
+  field is set to 2 (pretend we're a pager).
+
+  When uniconifying, set "requestor's currently active window"
+  to zero to be on the safe side (Thomas Leonard).
+
+- Arrow keys didn't work in details view (Thomas Leonard; reported by
+  Dennis Nezic and others).
+  GTK likes to select rows as you move over them. Since we don't want
+  that, ROX-Filer marks the rows as unselectable. However, newer GTK
+  versions refuse to move the cursor at all if the selection behaviour
+  is disabled.
+
+- Don't print CRITICAL message if there is no fstab available,
+  for Mac OS X (Stephen Watson, suggested by Anders F Björklund).
+
+- Make it clearer what the "Save Display Settings" does (Stephen
+  Watson).
+
+- Combined adding of release event with motion event for pinboard icons
+  (Tony Houghton). Doesn't seem necessary to add release event
+  explicitly, but best be on safe side.
+
+- Fixed build problem on GTK 2.6: GTK_STOCK_INFO doesn't exist
+  (Thomas Leonard; reported by Stephen Watson).
+
+- Escape special characters when opening the shell minibuffer (Thomas Leonard).
+  If you click on files while the shell minibuffer is open then the names are
+  escaped, but if you open it with a file under the cursor then the name wasn't
+  escaped (reported by Nils-Erik Svangård).
+
+- Fix occasional core dump with multiple magic matches (Stephen
+  Watson).
+
+- Use the directory icon for mount points if the icon theme has no icon
+  for mount points (Andras Mohari).
+
+- Use pathdup() in diritem_restart(), not readlink_dup(), to ensure that
+  we get the full pathname and not a path relative to the filer's
+  working directory (Stephen Watson).
+
+- Fixed crash when running a .desktop file in terminal (Dennis Tomas).
+
+- Strip .xpm or .svg extensions from Icon entry in .desktop files
+  (Dennis Tomas).
+
+- When clicking on toolbar buttons, don't crash if gtk_get_current_event
+  returns NULL (Thomas Leonard). This is the case when ATK is used.
+
+- Need to use unsigned char when reading the header of an Exif file to
+  avoid problems on some hardware (Stephen Watson, reported by Musus
+  Umbra).
 
 
 Release 2.6.1 (2007-06-10)
