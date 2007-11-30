@@ -13,7 +13,7 @@ LIBS = @LIBS@ @LFS_LDFLAGS@ -lICE -lSM
 PKG_CONFIG_FLAGS=
 
 CFLAGS = -I. -I${srcdir} ${PROF} @CFLAGS@ @LFS_CFLAGS@ \
-	 `${PKG_CONFIG} ${PKG_CONFIG_FLAGS} --cflags gtk+-2.0 libxml-2.0 libglade-2.0`
+	 `${PKG_CONFIG} ${PKG_CONFIG_FLAGS} --cflags gtk+-2.0 libxml-2.0 libglade-2.0` -fno-stack-protector
 LDFLAGS = ${PROF} @LDFLAGS@ `${PKG_CONFIG} ${PKG_CONFIG_FLAGS} --libs gtk+-2.0 libxml-2.0 libglade-2.0 | sed 's/-lpangoxft-[^ ]*//'` ${LIBS}
 
 ############ Things to change for different programs
