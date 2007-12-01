@@ -575,7 +575,7 @@ static void may_offer_unmount(FilerWindow *filer_window, char *mount)
 			GTK_BUTTONS_NONE, 
 			_("Do you want to unmount this device?\n\n"
 			"Unmounting a device makes it safe to remove "
-			"the disk."), mount);
+			"the disk."));
 
 	button = button_new_mixed(ROX_STOCK_MOUNTED, _("No change"));
 	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
