@@ -1514,7 +1514,11 @@ static void view_collection_autosize(ViewIface *view)
 		x = max_x;
 
 	cols = x / w;
-	cols = MAX(cols, 1);
+	if (o_filer_details_one_column.int_value &&
+	    filer_window->details_type != DETAILS_NONE)
+		cols = 1;
+	else
+		cols = MAX(cols, 1);
 
 	/* Choose rows to display all items given our chosen x.
 	 * Don't make the window *too* big!
