@@ -3419,7 +3419,7 @@ void filer_save_settings(FilerWindow *fwin)
 	path=gtk_label_new(set->path);
 	gtk_box_pack_start(GTK_BOX(vbox), path, FALSE, FALSE, 2);
 
-	frame=gtk_frame_new(_("Selete settings to save"));
+	frame=gtk_frame_new(_("Select settings to save"));
 	gtk_box_pack_start(GTK_BOX(vbox), frame, TRUE, TRUE, 2);
 
 	/*Make new vbox to go in the frame */
