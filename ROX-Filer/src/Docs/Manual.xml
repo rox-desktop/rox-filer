@@ -2901,6 +2901,11 @@ generated.
     </para></listitem>
 
     <listitem><para>
+      Glade 2.0.0 or later (libraries and headers) &mdash; get the latest version
+      from <citation>Glade</citation>,
+    </para></listitem>
+
+    <listitem><para>
       LibXML 2.0.0 or later (libraries and headers) &mdash; get the latest
       version from <citation>libxml</citation>,
     </para></listitem>
@@ -2920,7 +2925,37 @@ generated.
 2.6.8</screen>
   </para>
 
-  <procedure><title>To compile:</title>
+  <procedure><title>To compile (using Zero Install):</title>
+
+   <step><para>
+     Go to the Zero Install launcher dialog for ROX-Filer. For example, from the shell you can do:
+
+     <screen>$ 0launch --gui http://rox.sourceforge.net/2005/interfaces/ROX-Filer</screen>
+   </para></step>
+
+   <step><para>
+     Right-click on the ROX-Filer line in the window and choose <guimenuitem>Compile...</guimenuitem>
+     from the menu.
+   </para></step>
+     
+   <step><para>
+     It will prompt you to choose a version of ROX-Filer to compile and of some
+     required header files. You should be able to just accept the defaults and let
+     it download them.
+   </para></step>
+     
+   <step><para>
+     Choose a directory in which to store the compiled code when prompted
+     and then click on the <guibutton>Build</guibutton> button to compile it.
+   </para></step>
+
+   <step><para>
+     Once the build is complete, click on <guibutton>Register</guibutton> to add this
+     version to the available versions.
+   </para></step>
+  </procedure>
+
+  <procedure><title>To compile (manually):</title>
 
    <step><para>
      The filer now uses the Shared MIME Database<citation>SharedMIME</citation>
@@ -2934,53 +2969,25 @@ generated.
    </para></step>
 
    <step><para>
-     Run the <command>install.sh</command> script, like this:
+     Run the AppRun script, like this:
 
-     <screen>$ ./install.sh</screen>
+     <screen>$ ./ROX-Filer/AppRun --compile</screen>
 
    </para></step>
 
    <step><para>
      <application>ROX-Filer</application> will perform various checks to find
      out what kind of system it is being run on and will then compile. If it
-     doesn't work then please e-mail me and complain! Tell me what kind of
+     doesn't work then please e-mail us and complain! Tell us what kind of
      system you have and what errors were reported. If you manage to fix the
-     problem yourself then please e-mail me the fix.
+     problem yourself then please e-mail us the fix.
    </para></step>
 
    <step><para>
-     Once the filer has compiled you will be asked where you want to install
-     it. If you want to do a system-wide installation as root, you may
-     want to stop here, <command>su</command> to root and rerun the install
-     script.
-
-     If you don't have the root password then don't worry &mdash; just follow
-     the instructions for installing into your home directory.
+     Once the filer has compiled it will run automatically. You can run it
+     again later by running the AppRun script with no arguments.
    </para></step>
   </procedure>
-
-  <para>
-   You can now run the filer by running the <command>rox</command> script
-   without any options, like this:
-
-   <screen>$ rox</screen>
-
-   A window should appear and display the contents of the current directory.
-
-   If you installed the script into your home directory then you may
-   need to set your <envar>PATH</envar> environment variable so that the shell can
-   find it. For example, if you installed it into a directory called
-   <filename>bin</filename> in your home directory, use this:
-
-   <screen>$ PATH=$HOME/bin:$PATH; export PATH</screen>
-
-   or (if you are using the <citerefentry><refentrytitle>csh</refentrytitle>
-    <manvolnum>1</manvolnum></citerefentry> shell):
-
-   <screen>$ setenv PATH $HOME/bin:$PATH
-$ rehash</screen>
-
-  </para>
 
  </appendix>
 
@@ -3462,6 +3469,11 @@ then this must match the label of the item.  If more than one item matches, only
   <bibliomixed>
    <abbrev>GTK+</abbrev><citetitle>GTK+ Toolkit,
     <ulink url="http://www.gtk.org"/></citetitle>
+  </bibliomixed>
+
+  <bibliomixed>
+   <abbrev>Glade</abbrev><citetitle>Glade - a User Interface Designer for GTK+ and GNOME,
+    <ulink url="http://glade.gnome.org/"/></citetitle>
   </bibliomixed>
 
   <bibliomixed>

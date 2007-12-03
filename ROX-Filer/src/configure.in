@@ -12,9 +12,10 @@ AC_PROG_CC
 
 dnl Use -Wall, etc if possible
 dnl Note: GTK uses func(), so can't use -Wstrict-prototypes 
+dnl -fno-stack-protector must be used to avoid GLIBC2.4 dependency
 [
 if test "x$GCC" = "xyes"; then
-  CFLAGS="$CFLAGS -Wall -Wmissing-prototypes"
+  CFLAGS="$CFLAGS -Wall -Wmissing-prototypes -fno-stack-protector"
 ]
   AC_MSG_CHECKING(for GCC version 4)
 [ if $CC --version | grep "(GCC) 4" > /dev/null; then ]

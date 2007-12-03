@@ -6,78 +6,23 @@
 
 Quick start
 ~~~~~~~~~~~
-Type this ($ is the shell prompt):
+If you downloaded a source or binary tarball directly, type this ($ is the
+shell prompt):
 
-	$ ./install.sh
+	$ ./ROX-Filer/AppRun
 
-and follow the on-screen instructions. If you want to compile as a normal
-user and install as root then you should do this instead:
+This will compile the filer (if necessary) and then run it.
 
-	$ ROX-Filer/AppRun --compile
-	$ su
-	[ enter root password ]
-	$ ./install.sh
+However, it is more common to use Zero Install or a distribution package. To
+get the filer using Zero Install, do:
 
-
-CVS notes
-~~~~~~~~~
-If you got this from CVS then you'll need to have 'autoconf' installed
-before you can compile (the snapshots on the FTP site don't require this).
-
-You will also need to run 'make' in the 'ROX-Filer/src/Docs' directory
-to get the manual created in 'ROX-Filer/Help', and also run 'dist' in
-'ROX-Filer/src/po' to get the translations.
-
-Instructions on getting rox via CVS can be found at:
-
-	http://sourceforge.net/cvs/?group_id=7023
-
-Once you have a version of rox from CVS you can update it by simply doing
-
-	$ cvs -z3 update
-
-from inside the 'rox' directory.
-
-Finally, remember that the CVS version is the very latest developer code. It
-has not been well tested. It may have bugs. It may not even compile. You
-have been warned! (but please report any bugs you find)
+$ 0alias rox http://rox.sourceforge.net/2005/interfaces/ROX-Filer
+$ rox
 
 
 ROX-Filer
 ~~~~~~~~~
-Help for ROX-Filer can be found in the directory ROX-Filer/Help.
-
-
-Files
-~~~~~
-
-Two places are used for MIME-handling configuration files:
-
-<Choices>/MIME-info/*
-	Contains the rules for guessing a file's type from its name.
-	Many programs come with files called '<prog>.mime' which contain
-	additional rules. Put these files in the MIME-info directory too.
-
-<Choices>/MIME-types/*
-	Contains programs or symlinks which will be run.
-	For example:
-
-	$ rox picture.gif
-	is like doing
-	$ <Choices>/MIME-types/image_gif picture.gif
-	or, if that isn't found,
-	$ <Choices>/MIME-types/image picture.gif
-
-In both cases, <Choices> is all the directories in your CHOICESPATH
-environment variable, which defaults to:
-
-	~/Choices:/usr/local/share/Choices:/usr/share/Choices
-
-The leftmost directory listed is searched first, followed by the others in
-order. If the string starts with a `:' then saving is disabled and no program
-will attempt to save any configuration into it. For more details, see:
-
-	<http://rox.sourceforge.net/choices.php3>
+Documentation for ROX-Filer can be found in the directory ROX-Filer/Help.
 
 
 Conditions
@@ -99,4 +44,4 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 Please report any bugs to the mailing list:
 
-	http://rox.sourceforge.net/contact.php3
+	http://roscidus.com/desktop/lists
