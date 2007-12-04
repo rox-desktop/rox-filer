@@ -18,32 +18,40 @@ dnl but is only available from 4.1 onwards
 if test "x$GCC" = "xyes"; then
   CFLAGS="$CFLAGS -Wall -Wmissing-prototypes"
 ]
-  AC_MSG_CHECKING(for GCC version 4)
-[ if $CC --version | grep "(GCC) 4" > /dev/null; then ]
-    AC_MSG_RESULT(yes)
-    [ CFLAGS="$CFLAGS -Wno-pointer-sign" ]
-  else
-    AC_MSG_RESULT(no)
-  fi
-  AC_MSG_CHECKING(for GCC version 4.1 or greater)
-  ver=`$CC --version | head -1 | cut -d" " -f 3`
-  major=`echo $ver | cut -d"." -f 1`
-  minor=`echo $ver | cut -d"." -f 2`
-  case $major in
-    [1-4]) 
-      a=no;;
-    4)
-      if test "$minor" = 1 ; then a=yes; else a=no; fi ;;
-    [5-9])
-      a=yes;;
-    *)
-      a=no;;
-  esac
-  if test "$a" = yes ; then
-     AC_MSG_RESULT(yes)
-     CFLAGS="$CFLAGS -fno-stack-protector"
-  else
-    AC_MSG_RESULT(no)
+  AC_MSG_CHECKING(for GCC version)
+  if $CC --version | grep "(GCC) 4" > /dev/null; then 
+    ver=`$CC --version | head -1 | cut -d" " -f 3`
+    major=`echo $ver | cut -d"." -f 1`
+    minor=`echo $ver | cut -d"." -f 2`
+    AC_MSG_RESULT($ver)
+    case $major in
+      [1-3]) 
+        gcc_pointer=no
+        gcc_stack=no;;
+      4)
+        gcc_pointer=yes
+        if test "$minor" -ge 1 ; then gcc_stack=yes; else gcc_stack=no; fi ;;
+      [5-9])
+        gcc_pointer=yes
+        gcc_stack=yes;;
+      *)
+        gcc_pointer=no
+        gcc_stack=no;;
+    esac
+    AC_MSG_CHECKING(whether to disable pointer sign warning)
+    if test "$gcc_pointer" = yes ; then
+      AC_MSG_RESULT(yes)
+      CFLAGS="$CFLAGS -Wno-pointer-sign"
+    else
+      AC_MSG_RESULT(no)
+    fi
+    AC_MSG_CHECKING(whether to disable stack protector)
+    if test "$gcc_stack" = yes ; then
+      AC_MSG_RESULT(yes)
+      CFLAGS="$CFLAGS -fno-stack-protector"
+    else
+      AC_MSG_RESULT(no)
+    fi
   fi
 fi
 
