@@ -20,7 +20,7 @@ fi
 "$GTK24_HOME/gtk-2.4" make "PLATFORM_DIR=$DISTDIR/ROX-Filer"|| exit 1
 
 (cd "$SRCDIR" && cp -ru Choices install.sh README README-es ROX-Filer.xml rox.xml rox.1 "$DISTDIR") || exit 1
-(cd "$SRCDIR/ROX-Filer" && cp -ru .DirIcon Help images Messages ROX AppInfo.xml AppRun Options.xml style.css subclasses "$DISTDIR/ROX-Filer") || exit 1
+(cd "$SRCDIR/ROX-Filer" && cp -ru .DirIcon Help images Messages ROX AppInfo.xml AppRun Options.xml style.css subclasses Templates.glade "$DISTDIR/ROX-Filer") || exit 1
 find "$DISTDIR" -name '.svn' -type d |xargs rm -rf
 
 # Remove debugging symbols, if any
