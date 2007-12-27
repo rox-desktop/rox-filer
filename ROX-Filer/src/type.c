@@ -1259,8 +1259,9 @@ static void unref_icon_theme(void)
 
 static void set_icon_theme(void)
 {
-	GtkIconInfo *info;
+	struct stat info;
 	char *icon_home;
+	const char *theme_dir;
 	const char *theme_name = o_icon_theme.value;
 
 	if (!theme_name || !*theme_name)
@@ -1285,31 +1286,29 @@ static void set_icon_theme(void)
 		gtk_icon_theme_set_custom_theme(icon_theme, theme_name);
 	}
 
-	info = theme_lookup_icon("mime-application:postscript",
-			ICON_HEIGHT, 0);
-	if (!info)
-	{
-		info = theme_lookup_icon("gnome-mime-application-postscript",
-				ICON_HEIGHT, 0);
-	}
-	if (info)
-	{
-		gtk_icon_info_free(info);
-		return;
-	}
-
-	icon_home = g_build_filename(home_dir, ".icons", NULL);
-	if (!file_exists(icon_home))
-		mkdir(icon_home, 0755);
-	g_free(icon_home);	
+	/* Ensure the ROX theme exists. */
 
 	icon_home = g_build_filename(home_dir, ".icons", "ROX", NULL);
+	if (stat(icon_home, &info) == 0)
+		return;	/* Already exists */
+
+	/* First, create the .icons directory */
+	theme_dir = make_path(home_dir, ".icons");
+	if (!file_exists(theme_dir))
+		mkdir(theme_dir, 0755);
+
+	if (lstat(icon_home, &info) == 0)
+	{
+		/* Probably a broken symlink, then. Remove it. */
+		if (unlink(icon_home))
+			g_warning("Error removing broken symlink %s: %s", icon_home, g_strerror(errno));
+		else
+			g_warning("Removed broken symlink %s", icon_home);
+	}
+
 	if (symlink(make_path(app_dir, "ROX"), icon_home))
 	{
-		delayed_error(_("Failed to create symlink '%s':\n%s\n\n"
-		"(this may mean that %s already exists as a link to an invalid "
-		"directory; try deleting it)"),
-		icon_home, g_strerror(errno), icon_home);
+		delayed_error(_("Failed to create symlink '%s':\n%s"), icon_home, g_strerror(errno));
 		open_to_show(icon_home);
 	}
 	g_free(icon_home);
