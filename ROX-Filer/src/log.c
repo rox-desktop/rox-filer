@@ -23,6 +23,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <gtk/gtk.h>
 #include <glade/glade.h>
 
@@ -162,7 +163,7 @@ void log_show_window()
 	gtk_tree_view_append_column(tv, column);
 
 	g_signal_connect(G_OBJECT(glade_xml_get_widget(glade, "Log viewer")),
-			 "response", log_dialog_response, NULL);
+			 "response", (GCallback) log_dialog_response, NULL);
 }
 	
 /****************************************************************
