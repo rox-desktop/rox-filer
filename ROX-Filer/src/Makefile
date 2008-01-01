@@ -5,7 +5,8 @@
 BUILDDIR = ../build
 
 all:
-	cd ${BUILDDIR} && ${MAKE}
+	0launch --source --main=/ROX-Filer/build --wrapper='make -C' ../ROX-Filer-src.xml
+	#cd ${BUILDDIR} && ${MAKE}
 
 clean:
 	cd ${BUILDDIR} && ${MAKE} clean
