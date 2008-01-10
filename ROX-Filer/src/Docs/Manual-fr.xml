@@ -7,7 +7,7 @@
 <book lang="fr">
  <bookinfo>
   <title>
-   ROX-Filer 2.6.1 - Manuel de l'utilisateur
+   ROX-Filer 2.7.1 - Manuel de l'utilisateur
    <ulink url="http://rox.sourceforge.net/Manual/Manual/Manual-fr.html"/>
   </title>
 
@@ -3281,14 +3281,21 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filena
        </para>
       </listitem>
 
-	  <listitem>
+      <listitem>
+       <para>
+        Glade 2.0.0 ou postérieure (bibliothèques et en-têtes) &mdash; dernière 
+                version téléchargeable depuis <citation>Glade</citation>,
+       </para>
+      </listitem>
+
+      <listitem>
        <para>
         LibXML 2.0.0 ou postérieure (bibliothèques et en-têtes)  &mdash; dernière 
 		version téléchargeable depuis <citation>libxml</citation>,
        </para>
       </listitem>
 
-	  <listitem>
+      <listitem>
        <para>
         Un compilateur C, comme 'gcc' (standard sur la plupart des systèmes).
        </para>
@@ -3305,7 +3312,39 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filena
 
     </para>
 
-	<procedure>
+    <procedure>
+     <title>Pour compiler (en utilisant Zero Install) :</title>
+     <step>
+      <para>
+      Démarrez l'interface Zero Install pour ROX-Filer. Par exemple, depuis un terminal :
+      <screen>
+      $ 0launch --gui http://rox.sourceforge.net/2005/interfaces/ROX-Filer
+      </screen>
+      </para>
+     </step>
+     <step>
+      <para>
+      Faites un clic droit sur la ligne ROX-Filer et choisissez <guimenuitem>Compiler...</guimenuitem> dans le menu.
+      </para>
+     </step>
+     <step>
+      <para>
+      Zero Install va vous demander de choisir une version de ROX-Filer à compiler et de certains fichiers d'en-têtes requis. Vous pouvez normalement accepter les choix par défaut et les télécharger.
+      </para>
+     </step>
+     <step>
+      <para>
+      Choisissez un dossier dans lequel le code compilé sera enregistré et cliquez sur <guibutton>Build</guibutton> pour procéder.
+      </para>
+     </step>
+     <step>
+      <para>
+      Une fois compilé, cliquez sur <guibutton>Register</guibutton> pour ajouter cette version à la liste des versions disponibles.
+      </para>
+     </step>
+    </procedure>
+
+    <procedure>
      <title>Pour compiler :</title>
 
 	 <step>
@@ -3325,10 +3364,10 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filena
 
      <step>
       <para>
-       Exécutez le script d'installation <command>install.sh</command>, comme ceci :
+       Exécutez le script AppRun, comme ceci :
 
-	   <screen>
-        $ ./install.sh
+       <screen>
+        <screen>$ ./ROX-Filer/AppRun --compile</screen>
        </screen>
 
       </para>
@@ -3336,52 +3375,17 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filena
 
      <step>
       <para>
-       <application>ROX-Filer</application> va effectuer quelques tests pour trouver 
-	   sur quel type de système vous travaillez, puis va commencer la compilation. 
-	   Si ça ne fonctionne pas, envoyez-moi un courriel et plaignez-vous ! (ndt : plaignez-vous 
-	   -en anglais- à l'auteur de ce manuel, pas à moi ;-)
-	   Dites-moi quel type de système vous avez et quels sont les messages d'erreur affichés. 
-	   Si vous réussissez à régler le problème vous-même, envoyez-moi SVP un courriel avec le correctif.
+       <application>ROX-Filer</application> va effectuer quelques tests pour trouver sur quel type de système vous travaillez, puis va commencer la compilation. Si ça ne fonctionne pas, envoyez-nous un courriel et plaignez-vous ! Dites-nous quel type de système vous avez et quels sont les messages d'erreur affichés. Si vous réussissez à régler le problème vous-même, envoyez-nous SVP un courriel avec le correctif.
       </para>
      </step>
 
      <step>
       <para>
-       Une fois que le <foreignphrase lang="en">filer</foreignphrase> est compilé, vous allez devoir préciser où vous voulez l'installer. 
-	   Si vous voulez effectuer une installation standard en root, vous devriez arrêter ici, 
-	   passer en root (un <command>su</command> suffit), et relancer le script d'installation. 
-
-       Si vous n'avez pas le mot de passe root, ne vous inquiétez pas &mdash; suivez simplement 
-	   les instructions, pour installer le <foreignphrase lang="en">filer</foreignphrase> dans votre dossier personnel (home).
+       Une fois que le <foreignphrase lang="en">filer</foreignphrase> est compilé, il démarre automatiquement. Pour le démarrer à nouveau plus tard, exécutez le script AppRun sans argument.
       </para>
      </step>
 
     </procedure>
-
-    <para>
-     Vous pouvez maintenant lancer le <foreignphrase lang="en">filer</foreignphrase> en exécutant la commande <command>rox</command> 
-	 sans aucune option, comme ceci :
-
-	 <screen>
-      $ rox
-     </screen>
-
-     Une fenêtre devrait apparaître et afficher le contenu du dossier courant. 
-	 Si vous avez installé le script dans votre home, vous devrez sûrement mettre 
-	 à jour votre variable d'environnement <envar>PATH</envar> pour que le shell 
-	 puisse le trouver.
-     Par exemple, si vous l'avez installé dans un dossier nommé <filename>bin</filename> 
-	 dans votre home, tapez ceci :
-
-     <screen>$ PATH=$HOME/bin:$PATH; export PATH</screen>
-
-     ou (si vous utilisez le shell <citerefentry><refentrytitle>csh</refentrytitle>
-     <manvolnum>1</manvolnum></citerefentry>) :
-
-     <screen>$ setenv PATH $HOME/bin:$PATH
-      $ rehash</screen>
-
-    </para>
 
 </appendix>
 
@@ -3760,13 +3764,11 @@ pour n'afficher que les fichiers se terminant par .c.
  <listitem>
   <para>
    <function>PinboardAdd</function>(<parameter>Path</parameter>, 
-	<parameter>X</parameter>, <parameter>Y</parameter>, 
-	[<parameter>Label</parameter>, <parameter>Shortcut</parameter>, <parameter>Args</parameter>])
-	Ajoute <parameter>Path</parameter> au punaiseur à la position 
-	(<parameter>X</parameter>, <parameter>Y</parameter>), en le nommant <parameter>Label</parameter> (facultatif).
-	Si <parameter>Shortcut</parameter> est précisé, il s'agit du raccourci-clavier 
-	à utiliser pour ouvrir cet objet. Les arguements <parameter>Args</parameter>, 
-	s'ils sont fournis, seront passés à l'objet lors de son démarrage, s'il s'agit d'un programme.
+	[<parameter>X</parameter>, <parameter>Y</parameter>, 
+<parameter>Label</parameter>, <parameter>Shortcut</parameter>, <parameter>Args</parameter>, <parameter>Update</parameter>])
+	Ajoute <parameter>Path</parameter> au punaiseur en le nommant <parameter>Label</parameter> (facultatif). Si X et Y ne sont pas mentionnés ou s'ils sont négatifs, l'icône est positionnée automatiquement. Les paramètres négatifs X et Y indiquent la position de l'icône ajoutée (X=-1 : gauche, X=-2 : droite, Y=-1 : haut, Y=-2 : bas). Si X et Y sont précisés et positifs, la position de l'icône est (<parameter>X</parameter>, <parameter>Y</parameter>). 
+        Si <parameter>Shortcut</parameter> est précisé, il s'agit du raccourci-clavier à utiliser pour ouvrir cet objet. 
+        Les arguements <parameter>Args</parameter>, s'ils sont fournis, seront passés à l'objet lors de son démarrage, s'il s'agit d'un programme. Si le paramètre <parameter>Update</parameter> est fixé à "true" et qu'une icône existe déjà sur le punaiseur avec le chemin indiqué, les valeurs seront remplacées au lieu d'ajouter une nouvelle icône.
   </para>
  </listitem>
 
@@ -3936,6 +3938,11 @@ pour n'afficher que les fichiers se terminant par .c.
 <bibliomixed>
   <abbrev>GTK+</abbrev><citetitle>GTK+ Toolkit,
   <ulink url="http://www.gtk.org"/></citetitle>
+</bibliomixed>
+
+<bibliomixed>
+  <abbrev>Glade</abbrev><citetitle>Glade - a User Interface Designer for GTK+ and GNOME,
+  <ulink url="http://glade.gnome.org/"/></citetitle>
 </bibliomixed>
 
 <bibliomixed>
