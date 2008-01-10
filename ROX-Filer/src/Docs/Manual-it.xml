@@ -754,6 +754,10 @@
        Quando è attivato, la barra del titolo mostra <guilabel>(Glob (modello))</guilabel>.
        </entry></row>
 
+       <row><entry><guimenuitem>Filtra le directory con i file</guimenuitem></entry><entry>
+       Applica il filtro <guimenuitem>Filtra i file...</guimenuitem> anche alle directory.
+       </entry></row>
+
        <row><entry><guimenuitem>Mostra miniature</guimenuitem></entry><entry>
        Se attivato, per ogni immagine il filer tenta di caricare come
        icona del file l'immagine stessa. È utile nelle directory piene di foto.
@@ -3029,7 +3033,9 @@ $ rehash</screen>
       </para></listitem></varlistentry>
 
       <varlistentry><term><option>-S</option></term><term><option>--rox-session</option></term>
-       <listitem><para>eseguito da ROX-Session, apre il pannello e la bacheca predefinita (implica --new).
+       <listitem><para>eseguito da un manager di sessione, apre il pannello e la bacheca predefinita (implica --new).
+       Se un manager di sessione XSM è in esecuzione e questa opzione viene usata, allora ROX-Filer chiederà di essere
+       automaticamente riavviato in caso di crash.
       </para></listitem></varlistentry>
 
       <varlistentry><term><option>-t</option></term><term><option>--top=PAN</option></term>
@@ -3038,6 +3044,13 @@ $ rehash</screen>
 
       <varlistentry><term><option>-u</option></term><term><option>--user</option></term>
        <listitem><para>mostra il nome utente in ogni finestra.
+      </para></listitem></varlistentry>
+
+      <varlistentry><term><option>-U</option></term><term><option>--url=URI</option></term>
+       <listitem><para>esegue URI come un file o una directory. Se URI è un file: l'url 
+	si riferisce a un file sulla macchina locale e viene convertito in un nome di file locale:  «rox -U file:///tmp» 
+	è equilvalente a «rox /tmp».  Se URI è un altro schema, per eseguirlo viene consultata la configurazione 
+	condivisa dell'handler URI.
       </para></listitem></varlistentry>
 
       <varlistentry><term><option>-v</option></term><term><option>--version</option></term>
@@ -3257,13 +3270,15 @@ EOF</screen>
 
    <listitem><para><function>PinboardAdd</function>(<parameter>Path</parameter>,
      <parameter>X</parameter>, <parameter>Y</parameter>, 
-     [<parameter>Label</parameter>, <parameter>Shortcut</parameter>, <parameter>Args</parameter>])
-     Aggiunge <parameter>Path</parameter> nella bacheca alla posizione
-     (<parameter>X</parameter>, <parameter>Y</parameter>), assegnandole l'etichetta
-     <parameter>Label</parameter>. Se viene specificato <parameter>Shortcut</parameter>,
-     allora questa è la scorciatoia da tastiera che lo attiva. Se viene specificato 
-     <parameter>Args</parameter>, questo è l'argomento che aggiunge quando viene eseguito 
-     come programma.
+     [<parameter>Label</parameter>, <parameter>Shortcut</parameter>, <parameter>Args</parameter>, <parameter>Update</parameter>])
+     Aggiunge <parameter>Path</parameter> alla bacheca con l'etichetta (opzionale) <parameter>Label</parameter>.
+     Se X o Y sono negativi o non assegnati, l'icona è messa automaticamente. I parametri X e Y allora indicano
+     dove l'icona dovrebbe andare (X=-1: a sinistra, X=-2: a destra, Y=-1: in alto, Y=-2: in basso). 
+     Se X e Y sono assegnati, la loro posizione è (<parameter>X</parameter>, <parameter>Y</parameter>). 
+     Se <parameter>Shortcut</parameter> è assegnato, è la scorciatoia da tastiera che attiva questo oggetto.
+     Se <parameter>Args</parameter> è assegnato, è l'argomento stringa da attaccare all'oggetto quando eseguito
+     (se è un programma). Se <parameter>Update</parameter> è <userinput>true</userinput> e se c'è già un'icona sulla
+     bacheca per il percorso dato, allora verrà aggiornata con i nuovi valori invece che aggiungere una nuova icona.
    </para></listitem>
 
    <listitem><para><function>PinboardRemove</function>(<parameter>Path</parameter>, [<parameter>Label</parameter>])
@@ -3298,6 +3313,12 @@ EOF</screen>
 
    <listitem><para><function>Run</function>(<parameter>NomeFile</parameter>)
      Esegue <parameter>NomeFile</parameter> come se si facesse clic nel filer.
+   </para></listitem>
+
+   <listitem><para><function>RunURI</function>(<parameter>URI</parameter>)
+     Esegue <parameter>URI</parameter> come se si facesse clic nel filer.
+     <parameter>URI</parameter> viene interpretato come un URI, nella forma
+     file://localhost/path.
    </para></listitem>
 
    <listitem><para><function>Show</function>(<parameter>Directory</parameter>,
