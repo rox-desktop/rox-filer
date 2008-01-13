@@ -5,10 +5,10 @@
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: ROX-Filer 2.7.0\n"
+"Project-Id-Version: ROX-Filer 2.7.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-12-24 15:56+0100\n"
-"PO-Revision-Date: 2007-12-24 15:56+0100\n"
+"POT-Creation-Date: 2008-01-12 12:17+0100\n"
+"PO-Revision-Date: 2008-01-12 15:56+0100\n"
 "Last-Translator: Yuri Bongiorno http://yuri.webhop.org <>\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
 "MIME-Version: 1.0\n"
@@ -1234,7 +1234,7 @@ msgid "<b>Save display settings for directory</b>"
 msgstr "<b>Salva le impostazioni di visualizzazione per la directory</b>"
 
 #: filer.c:3422
-msgid "Selete settings to save"
+msgid "Select settings to save"
 msgstr "Seleziona le impostazioni da salvare"
 
 #: filer.c:3429
@@ -1637,9 +1637,9 @@ msgstr "Mostra posizione"
 
 #: icon.c:145
 msgid "Remove Item(s)"
-msgstr "Rimuovi oggetto/i"
+msgstr "Rimuovi oggetti"
 
-#: icon.c:318 log.c:109 menu.c:774
+#: icon.c:318 log.c:110 menu.c:774
 #, c-format
 msgid "%s '%s'"
 msgstr "%s «%s»"
@@ -1911,16 +1911,16 @@ msgstr "Punto di montaggio per %s (%s)"
 msgid "Mount point (%s)"
 msgstr "Punto di montaggio (%s)"
 
-#: log.c:54
+#: log.c:55
 msgid "ROX-Filer started"
 msgstr "ROX-Filer avviato"
 
-#: log.c:111
+#: log.c:112
 #, c-format
 msgid "%s on %d items"
 msgstr "%s su %d oggetti"
 
-#: log.c:124
+#: log.c:125
 msgid "Item"
 msgstr "Oggetto"
 
@@ -2655,7 +2655,9 @@ msgstr "Condizione di ricerca non valida"
 #: mount.c:103
 #, c-format
 msgid "File system table \"%s\" not found, cannot monitor system mounts"
-msgstr "Tabella dei file system «%s» non trovata. Impossibile monitorare i mount di sistema."
+msgstr ""
+"Tabella dei file system «%s» non trovata. Impossibile monitorare i mount di "
+"sistema."
 
 #: mount.c:393
 #, c-format
@@ -3368,20 +3370,14 @@ msgid "Choices saving is disabled by CHOICESPATH variable"
 msgstr ""
 "Il salvataggio delle preferenze è disabilitato dalla variabile CHOICESPATH"
 
-#: type.c:1309
+#: type.c:1311
 #, c-format
 msgid ""
 "Failed to create symlink '%s':\n"
-"%s\n"
-"\n"
-"(this may mean that %s already exists as a link to an invalid directory; try "
-"deleting it)"
+"%s"
 msgstr ""
-"Fallita la creazione del collegamento simbolico «%s»:\n"
-"%s\n"
-"\n"
-"(significa che %s esiste già come collegamento a una directory non valida: "
-"provare a cancellare tale collegamento)"
+"Creazione del collegamento simbolico «%s» fallita:\n"
+"%s"
 
 #: usericons.c:179
 msgid "The pathname you gave does not exist. The icon has not been changed."
@@ -4250,8 +4246,8 @@ msgid ""
 "Enter the name of the panel to show here. This option is now only used when "
 "upgrading from an old version."
 msgstr ""
-"Inserire il nome del pannello da mostrare. Questa opzione è ora usata "
-"solo durante l'aggiornamento da una versione precendente."
+"Inserire il nome del pannello da mostrare. Questa opzione è ora usata solo "
+"durante l'aggiornamento da una versione precendente."
 
 #: tips:162
 msgid "Changes here take effect the next time the filer is run."
@@ -4749,7 +4745,8 @@ msgstr "Opzioni pannello"
 
 #: ../Templates.glade:169
 msgid "Every icon on this panel is shown with an image and some text."
-msgstr "Ogni icona di questo pannello è visualizzata con un'immagine e del testo."
+msgstr ""
+"Ogni icona di questo pannello è visualizzata con un'immagine e del testo."
 
 #: ../Templates.glade:170
 msgid "Image and Text"
@@ -4759,8 +4756,9 @@ msgstr "Immagine e testo"
 msgid ""
 "Applications in this panel have just an image, everything else has both an "
 "image and text."
-msgstr "Le applicazioni in questo pannello hanno solo un'immagine, tutto il resto "
-"ha sia l'immagine che il testo."
+msgstr ""
+"Le applicazioni in questo pannello hanno solo un'immagine, tutto il resto ha "
+"sia l'immagine che il testo."
 
 #: ../Templates.glade:187
 msgid "Image only for applications"
@@ -4792,10 +4790,11 @@ msgid ""
 "otherwise leave just 2 pixels at the edge of the screen to allow auto-"
 "raising. Some window managers may not honour this setting."
 msgstr ""
-"Chiede al window manager di non coprire questo pannello quando le finestre sono "
-"massimizzate. Se disattivato, il filer chiede di lasciare scoperti un paio di pixel dal bordo "
-"dello schermo, in modo da permettere il sollevamento automatico. Alcuni window manager potrebbero non "
-"rispettare questa impostazione."
+"Chiede al window manager di non coprire questo pannello quando le finestre "
+"sono massimizzate. Se disattivato, il filer chiede di lasciare scoperti un "
+"paio di pixel dal bordo dello schermo, in modo da permettere il sollevamento "
+"automatico. Alcuni window manager potrebbero non rispettare questa "
+"impostazione."
 
 #: ../Templates.glade:279
 msgid "Do not cover panel"
@@ -4821,7 +4820,8 @@ msgstr "Limitare il monitor di Xinerama"
 msgid ""
 "The monitor this panel is confined to when using Xinerama. The numbering "
 "starts from zero."
-msgstr "Questo pannello è limitato nella modalità Xinerama. Il conteggio inizia da 0."
+msgstr ""
+"Questo pannello è limitato nella modalità Xinerama. Il conteggio inizia da 0."
 
 #: ../Templates.glade:372
 msgid "<b>Xinerama</b>"
@@ -4846,4 +4846,5 @@ msgstr "In alto"
 #: ../Templates.glade:496
 msgid "<b>Position</b>"
 msgstr "<b>Posizione</b>"
+
 
