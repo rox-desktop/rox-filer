@@ -65,6 +65,7 @@ XdgMimeCache **_xdg_mime_caches = NULL;
 static int n_caches = 0;
 
 const char xdg_mime_type_unknown[] = "application/octet-stream";
+const char xdg_mime_type_unknown_text[] = "text/plain"; /* ROX: */
 
 
 enum
