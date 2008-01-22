@@ -7,11 +7,11 @@
 Use 0compile to build this program.</description>
   <icon href="http://rox.sourceforge.net/Icons/ROX-Filer.png" type="image/png"/>
 
-  <group arch="*-src" compile:build-main="ROX-Filer/AppRun" compile:command="&quot;$SRCDIR/ROX-Filer/src/build&quot;" main="src/build">
+  <group arch="*-src" compile:binary-main="ROX-Filer/AppRun" compile:command="&quot;$SRCDIR/ROX-Filer/src/build&quot;">
     <requires interface="http://0install.net/2006/interfaces/GTK-2.4.xml">
       <environment insert="" name="GTK24_HOME"/>
     </requires>
 
-    <implementation id=".." released="2008-01-08" version="2.7.1"/>
+    <implementation id=".."  version="2.7.1-post"/>
   </group>
 </interface>
