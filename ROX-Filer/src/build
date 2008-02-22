@@ -3,21 +3,13 @@
 # This script is called by ROX-Filer-src.xml. It builds the filer
 # against the GTK 2.4 headers, using the gtk-2.4 compatibility environment.
 
-if [ "x$GTK24_HOME" = "x" ]; then
-  echo 'Run me like this:'
-  echo '0compile setup ../../ROX-Filer-src.xml build-dir'
-  echo 'cd build-dir'
-  echo '0compile build'
-  exit 1
-fi
-
 if [ ! -f Makefile ]; then
-  "$GTK24_HOME/gtk-2.4" "$SRCDIR/ROX-Filer/src/configure" "$@" || exit 1
+  "$SRCDIR/ROX-Filer/src/configure" "$@" || exit 1
 fi
 
 [ -d "$DISTDIR/ROX-Filer" ] || mkdir "$DISTDIR/ROX-Filer" || exit 1
 
-"$GTK24_HOME/gtk-2.4" make "PLATFORM_DIR=$DISTDIR/ROX-Filer"|| exit 1
+make "PLATFORM_DIR=$DISTDIR/ROX-Filer"|| exit 1
 
 (cd "$SRCDIR" && cp -ru Choices README README-es ROX-Filer.xml rox.xml rox.1 "$DISTDIR") || exit 1
 (cd "$SRCDIR/ROX-Filer" && cp -ru .DirIcon Help images Messages ROX AppInfo.xml AppRun Options.xml style.css subclasses Templates.glade "$DISTDIR/ROX-Filer") || exit 1
