@@ -564,9 +564,16 @@ void set_blocking(int fd, gboolean blocking)
 char *pretty_time(const time_t *time)
 {
         char time_buf[32];
+	struct tm *tms;
 
-        if (strftime(time_buf, sizeof(time_buf),
-			TIME_FORMAT, localtime(time)) == 0)
+	if (time == NULL)
+		return g_strdup("(null)");
+
+	tms = localtime(time);
+	if (tms == NULL)
+		return g_strdup("(invalid time)");
+
+        if (strftime(time_buf, sizeof(time_buf), TIME_FORMAT, tms) == 0)
 		time_buf[0]= 0;
 
 	return to_utf8(time_buf);
