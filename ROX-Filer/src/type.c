@@ -402,10 +402,8 @@ inline static void init_gnome_theme(void)
 static GtkIconInfo *mime_type_lookup_icon_info(GtkIconTheme *theme,
 		MIME_type *type)
 {
-	char *type_name = g_strconcat("mime-", type->media_type, ":",
-				type->subtype, NULL);
-	GtkIconInfo *full = gtk_icon_theme_lookup_icon(theme, type_name,
-			HUGE_HEIGHT, 0);
+	char *type_name = g_strconcat(type->media_type, "-", type->subtype, NULL);
+	GtkIconInfo *full = gtk_icon_theme_lookup_icon(theme, type_name, HUGE_HEIGHT, 0);
 
 	g_free(type_name);
 	if (!full)
@@ -422,7 +420,7 @@ static GtkIconInfo *mime_type_lookup_icon_info(GtkIconTheme *theme,
 	if (!full)
 	{
 		/* Try for a media type */
-		type_name = g_strconcat("mime-", type->media_type, NULL);
+		type_name = g_strconcat(type->media_type, "-x-generic", NULL);
 		full = gtk_icon_theme_lookup_icon(theme, type_name, HUGE_HEIGHT, 0);
 		g_free(type_name);
 	}
