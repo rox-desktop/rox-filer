@@ -3,9 +3,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: ROX-Filer 2.5\n"
+"Project-Id-Version: ROX-Filer 2.7.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-07-20 15:57+0700\n"
+"POT-Creation-Date: 2008-04-09 22:11+0700\n"
 "Last-Translator: anhtuan, xomhau\n"
 "Language-Team: vi_VN <out of team>\n"
 "MIME-Version: 1.0\n"
@@ -28,11 +28,11 @@ msgstr "Im lặng"
 msgid "Don't confirm every operation"
 msgstr "Không xác nhận cho mỗi thao tác"
 
-#: abox.c:454 infobox.c:771 tips:63
+#: abox.c:454 infobox.c:771 tips:36
 msgid "Name"
 msgstr "Tên"
 
-#: abox.c:460 menu.c:228
+#: abox.c:460 menu.c:237
 msgid "Directory"
 msgstr "Thư mục"
 
@@ -40,23 +40,23 @@ msgstr "Thư mục"
 msgid "Expression:"
 msgstr "Từ cần tìm:"
 
-#: action.c:56
+#: action.c:57
 msgid "See the attr(5) man page for full details."
 msgstr "Xem hướng dẫn trong trang man của attr(5)."
 
-#: action.c:58
+#: action.c:59
 msgid "See the fsattr(5) man page for full details."
 msgstr "Xem hướng dẫn trong trang man của fsattr(5)."
 
-#: action.c:60
+#: action.c:61
 msgid "You do not appear to have OS support."
 msgstr "Có vẻ bạn không có OS được hỗ trợ"
 
-#: action.c:189
+#: action.c:191
 msgid "Find expression reference"
 msgstr "Hướng dẫn tìm kiếm"
 
-#: action.c:200
+#: action.c:202
 msgid ""
 "<u>Quick Start</u>\n"
 "Just put the name of the file you're looking for in single quotes:\n"
@@ -129,11 +129,11 @@ msgstr ""
 "a % in 'command' được thay thế bằng đường dẫn của tập tin hiện tại)\n"
 "<b>prune</b> (nếu false, ngăn không tìm kiếm bên trong thư mục)."
 
-#: action.c:247
+#: action.c:249
 msgid "Change permissions reference"
 msgstr "Hướng dẫn thay đổi quyền hạn"
 
-#: action.c:258
+#: action.c:260
 msgid ""
 "Normally, you can just select a command from the menu (click \n"
 "on the arrow beside the command box). Sometimes, you need more...\n"
@@ -191,11 +191,11 @@ msgstr ""
 "\n"
 "Xem hướng dẫn chi tiết trong trang man của chmod(1)."
 
-#: action.c:299
+#: action.c:301
 msgid "Set type reference"
 msgstr "Hướng dẫn thiết đặt loại tập tin"
 
-#: action.c:310
+#: action.c:312
 msgid ""
 "Normally ROX-Filer determines the type of a regular file\n"
 "by matching it's name against a pattern. To change the\n"
@@ -218,7 +218,7 @@ msgstr ""
 "thư mục, thiết bị, pipe hay socket và chỉ trên các tập tin hệ\n"
 "thống (file system) được OS hỗ trợ\n"
 
-#: action.c:417
+#: action.c:419
 msgid ""
 "\n"
 "Process terminated.\n"
@@ -226,20 +226,20 @@ msgstr ""
 "\n"
 "Qúa trình kết thúc.\n"
 
-#: action.c:433
+#: action.c:435
 msgid "There was one error.\n"
 msgstr "Có lỗi xảy ra\n"
 
-#: action.c:435
+#: action.c:437
 #, c-format
 msgid "There were %d errors.\n"
 msgstr "Có %d lỗi xảy ra.\n"
 
-#: action.c:459
+#: action.c:461
 msgid "ERROR reading"
 msgstr "LỖI khi đọc"
 
-#: action.c:502
+#: action.c:504
 msgid ""
 "'\n"
 "Done\n"
@@ -247,19 +247,19 @@ msgstr ""
 "'\n"
 "Hoàn tất\n"
 
-#: action.c:558 support.c:395
+#: action.c:560 support.c:395
 msgid "ERROR"
 msgstr "LỖI"
 
-#: action.c:712 main.c:684 main.c:691 main.c:705
+#: action.c:714 main.c:693 main.c:700 main.c:714
 msgid "Yes"
 msgstr "Đồng ý"
 
-#: action.c:715 main.c:686 main.c:693 main.c:705
+#: action.c:717 main.c:695 main.c:702 main.c:714
 msgid "No"
 msgstr "Không đồng ý"
 
-#: action.c:733
+#: action.c:735
 msgid ""
 "\n"
 "Asking child process to terminate...\n"
@@ -267,7 +267,7 @@ msgstr ""
 "\n"
 "Yêu cầu quá trình con kết thúc...\n"
 
-#: action.c:740
+#: action.c:742
 msgid ""
 "\n"
 "Trying to KILL run-away process...\n"
@@ -275,42 +275,42 @@ msgstr ""
 "\n"
 "KILL quá trình đang chạy...\n"
 
-#: action.c:893
+#: action.c:895
 #, c-format
 msgid "?Count contents of %s?"
 msgstr "?Kiểm kê nội dung của %s?"
 
-#: action.c:929
+#: action.c:931
 #, c-format
 msgid "?Delete %s'%s'?"
 msgstr "?Xoá %s'%s'?"
 
-#: action.c:930
 # Dịch thế nào cho xuôi tai?
+#: action.c:932
 msgid "WRITE-PROTECTED "
 msgstr "CHỐNG-GHI"
 
-#: action.c:937
+#: action.c:939
 #, c-format
 msgid "'Deleting '%s'\n"
 msgstr "'Xoá '%s'\n"
 
-#: action.c:950
+#: action.c:952
 #, c-format
 msgid "'Directory '%s' deleted\n"
 msgstr "'Thư mục '%s' đã bị xoá\n"
 
-#: action.c:983
+#: action.c:985
 #, c-format
 msgid "?Eject '%s'?"
 msgstr "?Eject '%s'?"
 
-#: action.c:990
+#: action.c:992
 #, c-format
 msgid "'Eject '%s'\n"
 msgstr "'Eject '%s'\n"
 
-#: action.c:1009
+#: action.c:1011
 #, c-format
 msgid ""
 "!%s\n"
@@ -319,80 +319,95 @@ msgstr ""
 "!%s\n"
 "eject đã lỗi\n"
 
-#: action.c:1028 action.c:1047
+#: action.c:1030 action.c:1049
 #, c-format
 msgid "?Check '%s'?"
 msgstr "?Kiểm tra '%s'?"
 
-#: action.c:1044
+#: action.c:1046
 msgid "!Invalid find condition - change it and try again\n"
 msgstr "!Điều kiện tìm kiếm không đúng - hãy thay đổi chúng và thử lại\n"
 
-#: action.c:1054
+#: action.c:1056
 #, c-format
 msgid "'(while checking '%s')\n"
 msgstr "'(kiểm kê '%s')\n"
 
-#: action.c:1128 action.c:1153
+#: action.c:1130 action.c:1155
 #, c-format
 msgid "?Change permissions of '%s'?"
 msgstr "?Thay đổi quyền hạn của '%s'?"
 
-#: action.c:1134
+#: action.c:1136
 #, c-format
 msgid "'Changing permissions of '%s'\n"
 msgstr "'Thay đổi quyền hạn của '%s'\n"
 
-#: action.c:1151
+#: action.c:1153
 msgid "!Invalid mode command - change it and try again\n"
 msgstr "!Lệnh không đúng - hãy thay đổi và thử lại\n"
 
-#: action.c:1208 action.c:1228
+#: action.c:1211
+#, c-format
+msgid "?Change contents of '%s'?"
+msgstr "?Thay đổi nội dung của '%s'?"
+
+#: action.c:1214 action.c:1234
 #, c-format
 msgid "?Change type of '%s'?"
 msgstr "?Thay đổi loại của '%s'?"
 
-#: action.c:1225
+#: action.c:1231
 msgid "!Invalid type - change it and try again\n"
 msgstr "!Loại không đúng - hãy thay đổi và thử lại\n"
 
-#: action.c:1247
+#: action.c:1253
 #, c-format
 msgid "'Changing type of '%s' to '%s'\n"
 msgstr "'Thay đổi loại của '%s' đến '%s'\n"
 
-#: action.c:1326
+#: action.c:1276
+#, c-format
+msgid "'Not changing type of directory '%s'\n"
+msgstr "'Không thay đổi kiểu của thư mục '%s'\n"
+
+#: action.c:1282
+#, c-format
+msgid "'Non-regular file '%s' not changed\n"
+msgstr "Tập tin không-chuẩn '%s' không thay đổi\n"
+
+#: action.c:1342
 #, c-format
 msgid "?'%s' already exists - %s?"
 msgstr "?'%s' đã tồn tại - %s?"
 
-#: action.c:1328
+#: action.c:1344
 msgid "merge contents"
 msgstr "kết hợp nội dung"
 
-#: action.c:1329
+#: action.c:1345
 msgid "overwrite"
 msgstr "ghi đè lên"
 
-#: action.c:1345
+#: action.c:1361
 msgid "'Trying copy anyway...\n"
 msgstr "'Thử sao chép bằng mọi cách...\n"
 
-#: action.c:1354
+#: action.c:1370
 #, c-format
 msgid "?Copy %s as %s?"
 msgstr "?Sao chép %s như %s?"
 
-#: action.c:1358
+#: action.c:1374
 #, c-format
 msgid "'Copying %s as %s\n"
 msgstr "'Sao chép %s như %s\n"
 
-#: action.c:1373
+#: action.c:1389
 msgid "!ERROR: Destination already exists, but is not a directory\n"
 msgstr "!LỖI: Đích đã tồn tại, nhưng đó không phải là một thư mục\n"
 
-#: action.c:1445
+#: action.c:1461
 #, c-format
 msgid ""
 "!%s\n"
@@ -401,26 +416,26 @@ msgstr ""
 "!%s\n"
 "Quá trình sao chép '%s' bị lỗi\n"
 
-#: action.c:1489
+#: action.c:1505
 #, c-format
 msgid "?'%s' already exists - overwrite?"
 msgstr "?'%s' đã tồn tại - ghi đè lên?"
 
-#: action.c:1504
+#: action.c:1520
 msgid "'Trying move anyway...\n"
 msgstr "'Thử di chuyển bằng mọi cách...\n"
 
-#: action.c:1512
+#: action.c:1528
 #, c-format
 msgid "?Move %s as %s?"
 msgstr "?Chuyển %s như %s?"
 
-#: action.c:1516
+#: action.c:1532
 #, c-format
 msgid "'Moving %s as %s\n"
 msgstr "'Đang chuyển %s như %s\n"
 
-#: action.c:1524
+#: action.c:1540
 #, c-format
 msgid ""
 "!%s\n"
@@ -429,45 +444,45 @@ msgstr ""
 "!%s\n"
 "Lỗi khi di chuyển %s như %s\n"
 
-#: action.c:1545
+#: action.c:1561
 msgid "!ERROR: Can't copy object into itself\n"
 msgstr "!LỖI: Không thể sao chép đối tượng lên chính nó\n"
 
-#: action.c:1560
+#: action.c:1576
 msgid "!ERROR: Can't move/rename object into itself\n"
 msgstr "!LỖI: Không thể di chuyển hoặc đổi tên đối tượng vào/như chính nó\n"
 
-#: action.c:1572
+#: action.c:1588
 #, c-format
 msgid "'Linking %s as %s\n"
 msgstr "'Tạo liên kết cho %s như %s\n"
 
-#: action.c:1577
+#: action.c:1593
 #, c-format
 msgid "?Link %s as %s?"
 msgstr "?Tạo liên kết cho %s như %s?"
 
-#: action.c:1620
+#: action.c:1636
 #, c-format
 msgid "'Mounting %s\n"
 msgstr "'Đang gắn kết %s\n"
 
-#: action.c:1621
+#: action.c:1637
 #, c-format
 msgid "'Unmounting %s\n"
 msgstr "'Hủy gắn kết %s\n"
 
-#: action.c:1624
+#: action.c:1640
 #, c-format
 msgid "?Mount %s?"
 msgstr "?Gắn kết %s?"
 
-#: action.c:1625
+#: action.c:1641
 #, c-format
 msgid "?Unmount %s?"
 msgstr "?Hủy gắn kết %s?"
 
-#: action.c:1645
+#: action.c:1662
 #, c-format
 msgid ""
 "!%s\n"
@@ -476,7 +491,7 @@ msgstr ""
 "!%s\n"
 "Gắn kết đã lỗi\n"
 
-#: action.c:1646
+#: action.c:1663
 #, c-format
 msgid ""
 "!%s\n"
@@ -485,11 +500,11 @@ msgstr ""
 "!%s\n"
 "Hủy gắn kết đã lỗi\n"
 
-#: action.c:1654
+#: action.c:1671
 msgid "'(seems to be mounted now anyway)\n"
 msgstr "'(dường như đã được gắn kết ở đâu đó)'\n"
 
-#: action.c:1700
+#: action.c:1717
 #, c-format
 msgid ""
 "'\n"
@@ -498,198 +513,198 @@ msgstr ""
 "'\n"
 "Tổng cộng: %s ("
 
-#: action.c:1706
+#: action.c:1723
 msgid "file"
 msgstr "tập tin"
 
-#: action.c:1706
+#: action.c:1723
 msgid "files"
 msgstr "tập tin"
 
-#: action.c:1710
+#: action.c:1727
 msgid "no directories)\n"
 msgstr "không có thư mục)\n"
 
-#: action.c:1714
+#: action.c:1731
 msgid "directory"
 msgstr "thư mục"
 
-#: action.c:1715
+#: action.c:1732
 msgid "directories"
 msgstr "thư mục"
 
-#: action.c:1756
+#: action.c:1773
 msgid "!No mount points selected!\n"
 msgstr "!Chưa chọn điểm gắn kết\n"
 
-#: action.c:1841
+#: action.c:1858
 msgid "?Another search?"
 msgstr "?Tìm kiếm lại?"
 
-#: action.c:1871 action.c:1902
+#: action.c:1888 action.c:1919
 #, c-format
 msgid "!'%s' is a symbolic link\n"
 msgstr "!'%s' đây là liên kết tượng trưng\n"
 
-#: action.c:1942
+#: action.c:1959
 msgid "You need to select some items to search through"
 msgstr "Bạn cần chọn vài mục để tìm kiếm"
 
-#: action.c:1952 menu.c:219
+#: action.c:1969 menu.c:228
 msgid "Find"
 msgstr "Tìm kiếm"
 
-#: action.c:1985
+#: action.c:2002
 msgid "You need to select some items to count"
 msgstr "Bạn cần chọn vài mục để kiểm kê"
 
-#: action.c:1989
+#: action.c:2006
 msgid "Disk Usage"
 msgstr "Sử dụng đĩa"
 
-#: action.c:2025
+#: action.c:2042
 msgid "Mount / Unmount"
 msgstr "Gắn kết / Hủy gắn kết"
 
-#: action.c:2040
+#: action.c:2059
 msgid "ROX-Filer does not yet support mount points on your system. Sorry."
 msgstr "ROX-Filer chưa hỗ trợ điểm gắn kết trên hệ thống của bạn. Xin lỗi."
 
-#: action.c:2054 menu.c:207 tips:216
+#: action.c:2073 menu.c:216 tips:173
 msgid "Delete"
 msgstr "Xoá"
 
-#: action.c:2066 tips:221
+#: action.c:2085 tips:178
 msgid "Force"
 msgstr "Bắt buộc"
 
-#: action.c:2066
+#: action.c:2085
 msgid "Don't confirm deletion of non-writeable items"
 msgstr "Không xác nhận việc xoá của những mục chỉ đọc"
 
-#: action.c:2069 action.c:2126 action.c:2187 action.c:2242 action.c:2280
-#: tips:223
+#: action.c:2088 action.c:2147 action.c:2210 action.c:2283 action.c:2323
+#: tips:180
 msgid "Brief"
 msgstr "Ngắn gọn"
 
-#: action.c:2069
+#: action.c:2088
 msgid "Only log directories being deleted"
 msgstr "Chỉ ghi nhận các thư mục đã xoá"
 
-#: action.c:2086
+#: action.c:2107
 msgid "You need to select the items whose permissions you want to change"
 msgstr "Bạn cần chọn các mục mà bạn muốn thay đổi quyền hạn"
 
-#: action.c:2094
+#: action.c:2115
 msgid "a+x (Make executable/searchable)"
 msgstr "a+x (Thực thi/Tìm kiếm được)"
 
-#: action.c:2096
+#: action.c:2117
 msgid "a-x (Make non-executable/non-searchable)"
 msgstr "a-x (Không thực thi/Không tìm kiếm được)"
 
-#: action.c:2098
+#: action.c:2119
 msgid "u+rw (Give owner read+write)"
 msgstr "u+rw (Cho phép chủ nhân đọc và ghi)"
 
-#: action.c:2100
+#: action.c:2121
 msgid "go-rwx (Private - owner access only)"
 msgstr "go-rwx (Riêng tư - chỉ chủ nhân truy nhập)"
 
-#: action.c:2102
+#: action.c:2123
 msgid "go=u-w (Public access, not write)"
 msgstr "go=u-w (Tất cả đều truy nhập được, không ghi được)"
 
-#: action.c:2113 menu.c:181 menu.c:217 tips:78
+#: action.c:2134 menu.c:189 menu.c:226 tips:53
 msgid "Permissions"
 msgstr "Quyền hạn"
 
-#: action.c:2126 action.c:2187
+#: action.c:2147 action.c:2210
 msgid "Don't list processed files"
 msgstr "Không liệt kê các tập tin đã tiến hành"
 
-#: action.c:2129 action.c:2190 tips:225
-#, fuzzy, c-format
+#: action.c:2150 action.c:2213 tips:182
+#, fuzzy
 msgid "Recurse"
 msgstr "Recurse"
 
-#: action.c:2129
+#: action.c:2150
 msgid "Also change contents of subdirectories"
 msgstr "Thay đổi cả nội dung các thư mục con"
 
-#: action.c:2133
+#: action.c:2154
 msgid "Command:"
 msgstr "Lệnh:"
 
-#: action.c:2161
+#: action.c:2184
 msgid "You need to select the items whose type you want to change"
 msgstr "Bạn cần chọn các mục mà bạn muốn thay đổi quyền hạn"
 
-#: action.c:2174
+#: action.c:2197
 msgid "Set type"
 msgstr "Thiết đặt Loại"
 
-#: action.c:2190
+#: action.c:2213
 msgid "Change contents of subdirectories"
 msgstr "Thay đổi cả nội dung các thư mục con"
 
-#: action.c:2197 infobox.c:627
+#: action.c:2220 infobox.c:627
 msgid "Type:"
 msgstr "Loại:"
 
-#: action.c:2226 dnd.c:122 menu.c:1986 tips:210
+#: action.c:2267 dnd.c:122 menu.c:2018 tips:167
 msgid "Copy"
 msgstr "Sao chép"
 
-#: action.c:2238 action.c:2276 tips:227
+#: action.c:2279 action.c:2319 tips:184
 msgid "Newer"
 msgstr "Mới hơn"
 
-#: action.c:2239 action.c:2277 tips:228
+#: action.c:2280 action.c:2320 tips:185
 msgid "Only over-write if source is newer than destination."
 msgstr "Ghi đè lên nếu nguồn mới hơn đích"
 
-#: action.c:2242
+#: action.c:2283
 msgid "Only log directories as they are copied"
 msgstr "Chỉ ghi nhận các thư mục đã được sao chép"
 
-#: action.c:2264 dnd.c:123 tips:212
+#: action.c:2307 dnd.c:123 tips:169
 msgid "Move"
 msgstr "Di chuyển"
 
-#: action.c:2280
+#: action.c:2323
 msgid "Don't log each file as it is moved"
 msgstr "Không ghi nhận tập tin khi nó được di chuyển"
 
-#: action.c:2300 tips:214
+#: action.c:2346 tips:171
 msgid "Link"
 msgstr "Liên kết"
 
-#: action.c:2321 appmenu.c:111
+#: action.c:2369 appmenu.c:111 filer.c:593
 msgid "Eject"
 msgstr "Eject"
 
-#: action.c:2385
+#: action.c:2437
 msgid "Deleting items such as "
 msgstr "Xoá các mục này như "
 
-#: action.c:2389
+#: action.c:2441
 msgid "Deleting the item "
 msgstr "Đang xoá mục "
 
-#: action.c:2391
+#: action.c:2443
 msgid "Deleting the items "
 msgstr "Đang xoá các mục "
 
-#: action.c:2410
+#: action.c:2462
 msgid " and "
 msgstr " và "
 
-#: action.c:2419
+#: action.c:2471
 msgid " will affect some items on the pinboard or panel - really delete it?"
 msgstr " sẽ ảnh hưởng vài mục trên pinboard và panel - xóa nó?"
 
-#: action.c:2426
+#: action.c:2478
 msgid " will affect some items on the pinboard or panel - really delete them?"
 msgstr " sẽ ảnh hưởng vài mục trên pinboard và panel - xóa chúng?"
 
@@ -697,67 +712,67 @@ msgstr " sẽ ảnh hưởng vài mục trên pinboard và panel - xóa chúng?"
 msgid "<missing label>"
 msgstr "<không có nhãn>"
 
-#: appmenu.c:320
+#: appmenu.c:319
 #, c-format
 msgid ""
 "Symlink any programs you want into this directory. They will appear in the "
 "menu for all items of this type (%s/%s)."
 msgstr ""
-"Tạo liên kết bất kì chương trình nào bạn muốn vào thư mục này. Chúng sẽ "
-"xuất hiện trong menu của mọi mục loại này (%s/%s)."
+"Tạo liên kết bất kì chương trình nào bạn muốn vào thư mục này. Chúng sẽ xuất "
+"hiện trong menu của mọi mục loại này (%s/%s)."
 
-#: appmenu.c:364 menu.c:230
+#: appmenu.c:363 menu.c:239
 msgid "Customise Menu..."
 msgstr "Tinh chỉnh Menu..."
 
-#: appmenu.c:421 menu.c:247 toolbar.c:158
+#: appmenu.c:420 menu.c:257 toolbar.c:158
 msgid "Help"
 msgstr "Trợ giúp"
 
-#: bookmarks.c:145
+#: bookmarks.c:148
 msgid "Path"
 msgstr "Đường dẫn"
 
-#: bookmarks.c:153
+#: bookmarks.c:156
 msgid "Title"
 msgstr "Tựa đề"
 
-#: bookmarks.c:302
+#: bookmarks.c:305
 #, c-format
 msgid "Can't bookmark non-local resource '%s'\n"
 msgstr "Không thể bookmark tài nguyên bên ngoài '%s'\n"
 
-#: bookmarks.c:310 bookmarks.c:628
+#: bookmarks.c:313 bookmarks.c:631
 #, c-format
 msgid "'%s' isn't a directory"
 msgstr "'%s' không phải là thư mục"
 
-#: bookmarks.c:516
+#: bookmarks.c:519
 msgid "You should first select some rows to delete"
 msgstr "Trước tiên bạn phải chọn một vài hàng để xoá"
 
-#: bookmarks.c:540
+#: bookmarks.c:543
 msgid "Put the cursor on an entry in the list to move it"
 msgstr "Đặt con trỏ trên một mục trong danh sách để di chuyển nó"
 
-#: bookmarks.c:560
+#: bookmarks.c:563
 msgid "This item is already at the end"
 msgstr "Mục này đã nằm cuối danh sách"
 
-#: bookmarks.c:634
+#: bookmarks.c:637
 #, c-format
 msgid "Can't bookmark non-local directories like '%s'"
 msgstr "Không thể bookmark các thư mục bên ngoài như '%s'"
 
-#: bookmarks.c:776
+#: bookmarks.c:779
 msgid "Add New Bookmark"
 msgstr "Thêm Bookmark"
 
-#: bookmarks.c:783
+#: bookmarks.c:786
 msgid "Edit Bookmarks"
 msgstr "Chỉnh sửa Bookmark"
 
-#: bookmarks.c:788
+#: bookmarks.c:791
 msgid "Recently Visited"
 msgstr "Đã truy nhập gần đây"
 
@@ -905,7 +920,7 @@ msgstr ""
 "%s"
 
 #: dir.c:980
-#, fuzzy, c-format
+#, c-format
 msgid "Can't stat directory: %s"
 msgstr "Không thể thống kê thư mục: %s"
 
@@ -914,7 +929,7 @@ msgstr "Không thể thống kê thư mục: %s"
 msgid "Can't open directory: %s"
 msgstr "Không thể mở thư mục %s"
 
-#: display.c:612
+#: display.c:629
 #, c-format
 msgid "lstat(2) failed: %s"
 msgstr "lstat(2) lỗi: %s"
@@ -936,29 +951,28 @@ msgid "Drag a directory here to bookmark it."
 msgstr "Kéo thư mục vào đây để bookmark nó."
 
 #: dnd.c:578
-#, fuzzy
 msgid "XDS protocol error: leafname may not contain '/'\n"
 msgstr "Lỗi giao thức XDS: kí tự đầu tên không thể là '/'\n"
 
 #: dnd.c:603
-#, fuzzy
 msgid ""
 "XdndDirectSave0 target provided, but the atom XdndDirectSave0 (type text/"
 "plain) did not contain a leafname\n"
 msgstr ""
-"Đích XdndDirectSave0 đã cung cấp, nhưng phần tử XdndDirectSave0 "
-"(kiểu text/plain) không chứa leafname\n"
+"Đích XdndDirectSave0 đã cung cấp, nhưng phần tử XdndDirectSave0 (kiểu text/"
+"plain) không chứa leafname\n"
 
 #: dnd.c:616
 msgid "Sorry - I require a target type of text/uri-list or XdndDirectSave0."
-msgstr "Xin lỗi - Tôi yêu cầu một loại đích cho text/uri-list hay XdndDirectSave0."
+msgstr ""
+"Xin lỗi - Tôi yêu cầu một loại đích cho text/uri-list hay XdndDirectSave0."
 
 #: dnd.c:619
 msgid ""
 "Sorry - I require a target type of text/uri-list or application/octet-stream."
 msgstr ""
-"Xin lỗi - Tôi yêu cầu một loại đích cho text/uri-list hoặc "
-"application/octet-stream."
+"Xin lỗi - Tôi yêu cầu một loại đích cho text/uri-list hoặc application/octet-"
+"stream."
 
 #: dnd.c:689
 #, c-format
@@ -1019,8 +1033,8 @@ msgid ""
 "None of these files are on the local machine - I can't operate on multiple "
 "remote files - sorry."
 msgstr ""
-"Không có tập tin nào trên máy nội bộ - Tôi không thể tiến hành trên các "
-"tập tin ở xa - xin lỗi."
+"Không có tập tin nào trên máy nội bộ - Tôi không thể tiến hành trên các tập "
+"tin ở xa - xin lỗi."
 
 #: dnd.c:1034
 msgid "Unknown action requested"
@@ -1060,7 +1074,7 @@ msgstr "Xin lỗi, bạn cần thả chính xác một tập tin vào trong vùn
 msgid "Sorry, I can't use '%s' because it's not a local file."
 msgstr "Xin lỗi, tôi không thể dùng '%s' vì nó không là tập tin nội bộ."
 
-#: dropbox.c:278 pinboard.c:855
+#: dropbox.c:278 pinboard.c:932
 #, c-format
 msgid ""
 "Can't access '%s':\n"
@@ -1069,7 +1083,7 @@ msgstr ""
 "Không thể truy nhập %s:\n"
 "%s"
 
-#: filer.c:453
+#: filer.c:456
 #, c-format
 msgid ""
 "Error scanning '%s':\n"
@@ -1078,7 +1092,7 @@ msgstr ""
 "Lỗi quét '%s':\n"
 "%s\n"
 
-#: filer.c:457
+#: filer.c:460
 #, c-format
 msgid ""
 "Error scanning '%s':\n"
@@ -1087,7 +1101,7 @@ msgstr ""
 "Lỗi quét '%s':\n"
 "%s"
 
-#: filer.c:562
+#: filer.c:576
 msgid ""
 "Do you want to unmount this device?\n"
 "\n"
@@ -1097,19 +1111,19 @@ msgstr ""
 "\n"
 "Hủy gắn kết một thiết bị giúp an tòan hơn để lấy đĩa ra."
 
-#: filer.c:566
+#: filer.c:580
 msgid "No change"
 msgstr "Không"
 
-#: filer.c:572 menu.c:858
+#: filer.c:586 menu.c:872
 msgid "Unmount"
 msgstr "Huỷ gắn kết"
 
-#: filer.c:669
+#: filer.c:690
 msgid "Directory missing/deleted"
 msgstr "Thư mục bị lỗi hoặc đã xóa"
 
-#: filer.c:1033
+#: filer.c:1054
 #, c-format
 msgid ""
 "Group %s is not set. Select some files and press Ctrl+%s to set the group. "
@@ -1120,98 +1134,106 @@ msgstr ""
 "nhóm. Nhấn %s trên chính nó để chọn lại tập tin sau đó.\n"
 "Hãy chắc Numlock được bật nếu bạn dùng phím số (keypad)."
 
-#: filer.c:1269
+#: filer.c:1290
 #, c-format
 msgid "Directory '%s' is not accessible"
 msgstr "Thư mục '%s' không thể truy nhập"
 
-#: filer.c:1421
+#: filer.c:1442
 #, c-format
 msgid "Directory '%s' not found."
 msgstr "Thư mục '%s' không tìm thấy."
 
-#: filer.c:1715
+#: filer.c:1742
 msgid "Cancel"
 msgstr "Huỷ"
 
-#: filer.c:1996
+#: filer.c:2023
 msgid "A"
 msgstr "A"
 
-#: filer.c:1998 find.c:923
+#: filer.c:2025 find.c:923
 msgid "G"
 msgstr "G"
 
-#: filer.c:2003
+#: filer.c:2030
 msgid "S"
 msgstr "S"
 
-#: filer.c:2005
+#: filer.c:2032
 msgid "T"
 msgstr "T"
 
-#: filer.c:2015
+#: filer.c:2042
 msgid "All, "
 msgstr "Tất cả, "
 
-#: filer.c:2018
+#: filer.c:2045
 #, c-format
 msgid "Glob (%s), "
 msgstr "Glob (%s), "
 
-#: filer.c:2026
+#: filer.c:2053
 msgid "Scanning, "
 msgstr "Đang quét, "
 
-#: filer.c:2028
+#: filer.c:2055
 msgid "Thumbs, "
 msgstr "Thumbs, "
 
-#: filer.c:2304
+#: filer.c:2331
 msgid "Symbolic link to "
 msgstr "Liên kết đến "
 
-#: filer.c:2346
+#: filer.c:2373
 msgid "This filename is not valid UTF-8. You should rename it.\n"
 msgstr "Tên tập tin này không là UTF-8. Bạn nên đổi tên nó.\n"
 
-#: filer.c:2657 menu.c:1976
+#: filer.c:2684 menu.c:2008
 msgid "Item no longer exists!"
 msgstr "Mục này không tồn tại!"
 
-#: filer.c:3366
+#: filer.c:3411
 msgid "Select display properties to save"
 msgstr "Chọn thuộc tính hiển thị để lưu lại"
 
-#: filer.c:3373
+#: filer.c:3415
+msgid "<b>Save display settings for directory</b>"
+msgstr "Lưu thiết lập hiển thị cho thư mục"
+
+#: filer.c:3422
+msgid "Select settings to save"
+msgstr "Chọn thiết lập để lưu"
+
+#: filer.c:3429
 msgid "Position"
 msgstr "Vị trí"
 
-#: filer.c:3378 toolbar.c:133 toolbar.c:137 tips:66
+#: filer.c:3434 toolbar.c:133 toolbar.c:137 tips:39
 msgid "Size"
 msgstr "Kích cỡ"
 
-#: filer.c:3383
+#: filer.c:3439
 msgid "Show hidden"
 msgstr "Hiện tập tin ẩn"
 
-#: filer.c:3389
+#: filer.c:3445
 msgid "Display style"
 msgstr "Kiểu hiện thị"
 
-#: filer.c:3395
+#: filer.c:3451
 msgid "Sort type and order"
 msgstr "Sằp xếp theo loại và thứ tự"
 
-#: filer.c:3400 toolbar.c:141
+#: filer.c:3456 toolbar.c:141
 msgid "Details"
 msgstr "Chi tiết"
 
-#: filer.c:3405 tips:117 tips:118
+#: filer.c:3461 tips:92 tips:93
 msgid "Thumbnails"
 msgstr "Thumbnail"
 
-#: filer.c:3411
+#: filer.c:3467
 msgid "Filter"
 msgstr "Bộ lọc"
 
@@ -1510,12 +1532,12 @@ msgid ""
 "\n"
 "http://0install.net/injector.html"
 msgstr ""
-"Chương trình (%s) không thể khởi chạy vì lệnh 0launch không có. Nó có "
-"thể được tải về từ đây:\n"
+"Chương trình (%s) không thể khởi chạy vì lệnh 0launch không có. Nó có thể "
+"được tải về từ đây:\n"
 "\n"
 "http://olaunch.net/injector.html"
 
-#: i18n.c:36
+#: i18n.c:39
 msgid ""
 "Note that you must save your choices and restart the filer for the new "
 "language setting to take full effect."
@@ -1531,47 +1553,47 @@ msgstr "(nhấp để thiết đặt)"
 msgid "ROX-Filer"
 msgstr "ROX-Filer"
 
-#: icon.c:132 menu.c:248
+#: icon.c:132 menu.c:258
 msgid "About ROX-Filer..."
 msgstr "Về ROX-Filer..."
 
-#: icon.c:133 menu.c:249
+#: icon.c:133 menu.c:259
 msgid "Show Help Files"
 msgstr "Hiện Tập Tin Trợ Giúp"
 
-#: icon.c:134 menu.c:250
+#: icon.c:134 menu.c:260
 msgid "Manual"
 msgstr "Sổ tay"
 
-#: icon.c:136 menu.c:226
+#: icon.c:136 menu.c:235
 msgid "Options..."
 msgstr "Tuỳ chọn..."
 
-#: icon.c:137 menu.c:235
+#: icon.c:137 menu.c:244
 msgid "Home Directory"
 msgstr "Thư mục cá nhân"
 
-#: icon.c:138 icon.c:1389 menu.c:203 type.c:216
+#: icon.c:138 icon.c:1410 menu.c:212 type.c:223
 msgid "File"
 msgstr "Tập tin"
 
-#: icon.c:139 menu.c:209 menu.c:871
+#: icon.c:139 menu.c:218 menu.c:885
 msgid "Shift Open"
 msgstr "Thay cách Mở"
 
-#: icon.c:140 menu.c:214
+#: icon.c:140 menu.c:223
 msgid "Properties"
 msgstr "Thuộc tính"
 
-#: icon.c:141 menu.c:212
+#: icon.c:141 menu.c:221
 msgid "Set Run Action..."
 msgstr "Hành động thực thi..."
 
-#: icon.c:142 menu.c:213
+#: icon.c:142 menu.c:222
 msgid "Set Icon..."
 msgstr "Thiết đặt Biểu tượng"
 
-#: icon.c:143 icon.c:846
+#: icon.c:143 icon.c:867
 msgid "Edit Item"
 msgstr "Sửa đổi Mục"
 
@@ -1583,69 +1605,69 @@ msgstr "Hiện đường dẫn"
 msgid "Remove Item(s)"
 msgstr "Xoá Mục"
 
-#: icon.c:297 menu.c:760
+#: icon.c:318 log.c:110 menu.c:774
 #, c-format
 msgid "%s '%s'"
 msgstr "%s '%s'"
 
-#: icon.c:310
+#: icon.c:331
 msgid "Nothing"
 msgstr "<không có gì>"
 
-#: icon.c:571
+#: icon.c:592
 msgid "The location must contain at least one character!"
 msgstr "Đường dẫn phải chứa ít nhất một kí tự!"
 
-#: icon.c:636
+#: icon.c:657
 #, c-format
 msgid "You must unlock '%s' before removing it"
 msgstr "Bạn phải unlock '%s' trước khi xóa nó"
 
-#: icon.c:646
+#: icon.c:667
 msgid "You must first select some items to remove"
 msgstr "Bạn phải chọn một vài mục để xóa"
 
-#: icon.c:652
+#: icon.c:673
 msgid "An item must be unlocked before it can be removed."
 msgstr "Một mục phải được unlock trước khi được xóa."
 
-#: icon.c:666
+#: icon.c:687
 msgid "You must open the menu over an item"
 msgstr "Bạn phải mở menu trên một mục"
 
-#: icon.c:691 menu.c:1256
+#: icon.c:712 menu.c:1281
 msgid "You can only set the run action for a regular file"
 msgstr "Bạn chỉ có thể thiết đặt hành động thực thi cho tập tin thường"
 
-#: icon.c:777
+#: icon.c:798
 msgid "Press the desired shortcut (eg, Control+F1)"
 msgstr "Nhấn phím tắt đề nghị (ví dụ, Control+F1)"
 
-#: icon.c:799
+#: icon.c:820
 msgid "Failed to get keyboard grab!"
 msgstr "Lỗi khi nhận lệnh bàn phím!"
 
-#: icon.c:849
+#: icon.c:870
 msgid "Clicking the icon opens:"
 msgstr "Nhấp vào biểu tượng mở:"
 
-#: icon.c:859
+#: icon.c:880
 msgid "Arguments to pass (for executables):"
 msgstr "Tham số bỏ qua (dành cho thực thi được):"
 
-#: icon.c:873
+#: icon.c:894
 msgid "The text displayed under the icon is:"
 msgstr "Text hiển thị dưới biểu tượng là:"
 
-#: icon.c:886
+#: icon.c:907
 msgid "The keyboard shortcut is:"
 msgstr "Phím tắt bàn phím là:"
 
-#: icon.c:906
+#: icon.c:927
 msgid "Locked"
 msgstr "Đã khóa"
 
-#: icon.c:911
+#: icon.c:932
 msgid "Locking an item prevents it from being accidentally removed"
 msgstr "Khóa một mục để ngăn nó không bị xóa vô ý"
 
@@ -1658,7 +1680,7 @@ msgstr "Bạn có chắc muốn mở %d cửa sổ?"
 msgid "Show Info"
 msgstr "Hiện thông tin"
 
-#: infobox.c:134 menu.c:765
+#: infobox.c:134 menu.c:779
 msgid "(bad utf-8)"
 msgstr "(sai utf-8)"
 
@@ -1707,7 +1729,7 @@ msgstr ""
 "%s\n"
 "(liên kết cũ đã được xóa)"
 
-#: infobox.c:547 tips:283
+#: infobox.c:547 tips:242
 msgid "Error:"
 msgstr "Lỗi"
 
@@ -1783,79 +1805,92 @@ msgstr "Thực thi"
 msgid "<nothing yet>"
 msgstr "<chưa có gì>"
 
-#: infobox.c:859
+#: infobox.c:860
 #, c-format
 msgid "file(1) says... %s"
 msgstr "file(1) nói... %s"
 
-#: infobox.c:916
+#: infobox.c:917
 #, c-format
 msgid "Could not change permissions: %s"
 msgstr "Không thể thay đổi quyền truy nhập: %s"
 
-#: infobox.c:934
+#: infobox.c:935
 msgid "Owner"
 msgstr "Sở hữu"
 
-#: infobox.c:936
+#: infobox.c:937
 msgid "Group"
 msgstr "Nhóm"
 
-#: infobox.c:938
+#: infobox.c:939
 msgid "World"
 msgstr "Khác"
 
-#: infobox.c:941
+#: infobox.c:942
 msgid "Read"
 msgstr "Đọc"
 
-#: infobox.c:943
+#: infobox.c:944
 msgid "Write"
 msgstr "Ghi"
 
-#: infobox.c:945
+#: infobox.c:946
 msgid "Exec"
 msgstr "Thực thi"
 
-#: infobox.c:962
+#: infobox.c:963
 msgid "SUID"
 msgstr "SUID"
 
-#: infobox.c:969
+#: infobox.c:970
 msgid "SGID"
 msgstr "SGID"
 
-#: infobox.c:976
+#: infobox.c:977
 msgid "Sticky"
 msgstr "Sticky"
 
-#: infobox.c:998
+#: infobox.c:999
 msgid "Symbolic link"
 msgstr "Liên kết tượng trưng"
 
-#: infobox.c:1001
+#: infobox.c:1002
 msgid "ROX application"
 msgstr "Ứng dụng ROX"
 
-#: infobox.c:1009
+#: infobox.c:1010
 msgid "mounted"
 msgstr "gắn kết"
 
-#: infobox.c:1009
+#: infobox.c:1010
 msgid "unmounted"
 msgstr "huỷ gắn kết"
 
-#: infobox.c:1013
+#: infobox.c:1014
 #, c-format
 msgid "Mount point for %s (%s)"
 msgstr "Điểm gắn kết cho %s (%s) "
 
-#: infobox.c:1016
+#: infobox.c:1017
 #, c-format
 msgid "Mount point (%s)"
 msgstr "Điểm gắn kết (%s)"
 
-#: main.c:93
+#: log.c:55
+msgid "ROX-Filer started"
+msgstr "ROX-Filer đã chạy"
+
+#: log.c:112
+#, c-format
+msgid "%s on %d items"
+msgstr "%s trên %d mục"
+
+#: log.c:125
+msgid "Item"
+msgstr "Mục"
+
+#: main.c:94
 msgid ""
 "Copyright (C) 2005 Thomas Leonard.\n"
 "ROX-Filer comes with ABSOLUTELY NO WARRANTY,\n"
@@ -1871,15 +1906,15 @@ msgstr ""
 "dưới các điều khỏan của giấy phép GNU General Public License.\n"
 "Để biết thêm thông tin hãy xem tập tin có tên COPYING.\n"
 
-#: main.c:102
+#: main.c:103
 msgid "Try `ROX-Filer/AppRun --help' for more information.\n"
 msgstr "Thử `ROX-Filer/AppRun --help' để biết thêm thông tin.\n"
 
-#: main.c:105
+#: main.c:106
 msgid "Try `ROX-Filer/AppRun -h' for more information.\n"
 msgstr "Thử `ROX-Filer/AppRun -h' để biết thêm thông tin.\n"
 
-#: main.c:107
+#: main.c:108
 msgid ""
 "NOTE: Your system does not support long options - \n"
 "you must use the short versions instead.\n"
@@ -1888,7 +1923,7 @@ msgstr ""
 "GHI CHÚ: Hệ thống của bạn không hỗ trợ các tùy chọn dài - \n"
 "bạn phải dùng các phiên bản ngắn thay thế.\n"
 
-#: main.c:113
+#: main.c:114
 #, c-format
 msgid ""
 "Usage: ROX-Filer/AppRun [OPTION]... [FILE]...\n"
@@ -1911,6 +1946,7 @@ msgid ""
 "  -S, --rox-session\tuse default panel and pinboard options, and -n\n"
 "  -t, --top=PANEL\topen PANEL as a top-edge panel\n"
 "  -u, --user\t\tshow user name in each window \n"
+"  -U, --url=URL\t\topen file or directory in URI form\n"
 "  -v, --version\t\tdisplay the version information and exit\n"
 "  -x, --examine=FILE\tFILE has changed - re-examine it\n"
 "\n"
@@ -1937,13 +1973,14 @@ msgstr ""
 "  -S, --rox-session\tdùng các tùy chọn panel và pinboard mặc định, và -n\n"
 "  -t, --top=PANEL\tmở PANEL như một panel cạnh trên\n"
 "  -u, --user\t\thiện tên người dùng trong mỗi cửa sổ \n"
+"  -U, --url=URL\t\tmở tập tin hoặc thư mục theo dạng URI\n"
 "  -v, --version\t\thiện thông tin phiên bản và thoát\n"
 "  -x, --examine=FILE\tFILE đã thay đổi - kiểm tra lại nó\n"
 "\n"
 "Thông báo lỗi đến %s.\n"
 "Trang chủ (bao gồm các phiên bản cập nhật): http://rox.sourceforge.net/\n"
 
-#: main.c:232
+#: main.c:236
 msgid ""
 "We got a BadWindow error from the X server. This might be due to this GTK "
 "bug (during drag-and-drop?):\n"
@@ -1955,57 +1992,62 @@ msgstr ""
 "http://bugzilla.gnome.org/show_bug.cgi?id=152151\n"
 "Đang thử tiếp tục..."
 
-#: main.c:390
+#: main.c:395
 msgid ""
 "The -o argument is no longer used. You can turn on override redirect from "
 "the Options box instead."
 msgstr ""
 "Tham số -o bây giờ không dùng. Bạn có thể bật trực tiếp từ hộp Tùy chọn."
 
-#: main.c:511
+#: main.c:524
 #, c-format
 msgid "Running as user '%s'"
 msgstr "Đang chạy như người dùng '%s'"
 
-#: main.c:676
+#: main.c:685
 #, c-format
 msgid "Compiled with GTK version %s\n"
 msgstr "Đã biên dịch với phiên bản GTK %s\n"
 
-#: main.c:677
+#: main.c:686
 #, c-format
 msgid "Running with GTK version %d.%d.%d\n"
 msgstr "Đang chạy với phiên bản GTK %d.%d.%d\n"
 
-#: main.c:681
+#: main.c:690
 msgid "features set at compile time"
 msgstr "các chức năng thiết đặt tại thời điểm biên dịch"
 
-#: main.c:682
+#: main.c:691
 msgid "Large File Support"
 msgstr "Hỗ trợ Tập tin Lớn"
 
-#: main.c:689
+#: main.c:698
 msgid "Dnotify support"
 msgstr "Hỗ trợ Dnotify"
 
-#: main.c:696
+#: main.c:705
 msgid "Binary compatibility"
 msgstr "Nhị phân tương thích"
 
-#: main.c:698
+#: main.c:707
 msgid "Yes (can run with older glibc versions)"
 msgstr "Có (có thể chạy với phiên bản glibc cũ hơn)"
 
-#: main.c:700
+#: main.c:709
 msgid "No (apsymbols.h not found)"
 msgstr "Không (apsymbols.h không tìm thấy)"
 
-#: main.c:704
+#: main.c:713
 msgid "Extended attribute support"
 msgstr "Hỗ trợ thuộc tính mở rộng"
 
-#: main.c:833
+#: main.c:864
+#, c-format
+msgid "Unable to read '%s': %s"
+msgstr "Không thể đọc '%s': %s"
+
+#: main.c:900
 #, c-format
 msgid ""
 "Left-click to run %s.\n"
@@ -2014,228 +2056,236 @@ msgstr ""
 "Nhấp-trái để chạy %s.\n"
 "Nhấp-phải để hiện một danh sách phiên bản."
 
-#: menu.c:177 tips:55
+#: menu.c:185 tips:28
 msgid "Display"
 msgstr "Hiển thị"
 
-#: menu.c:178 tips:60
+#: menu.c:186 tips:33
 msgid "Icons View"
 msgstr "Xem kiểu biểu tượng"
 
-#: menu.c:179
+#: menu.c:187
 msgid "Icons, With..."
 msgstr "Biểu tượng, Với..."
 
-#: menu.c:180 tips:77
+#: menu.c:188 tips:52
 msgid "Sizes"
 msgstr "Kích cỡ"
 
-#: menu.c:182 tips:267
+#: menu.c:190 tips:226
 msgid "Types"
 msgstr "Loại"
 
-#: menu.c:183 tips:80
+#: menu.c:191 tips:55
 msgid "Times"
 msgstr "Thời gian"
 
-#: menu.c:184 tips:61 tips:95
+#: menu.c:192 tips:34 tips:70
 msgid "List View"
 msgstr "Xem kiểu danh sách"
 
-#: menu.c:186
+#: menu.c:194
 msgid "Bigger Icons"
 msgstr "Biểu tượng lớn hơn"
 
-#: menu.c:187
+#: menu.c:195
 msgid "Smaller Icons"
 msgstr "Biểu tượng nhỏ hơn"
 
-#: menu.c:188 tips:74
+#: menu.c:196 tips:49
 msgid "Automatic"
 msgstr "Tự động"
 
-#: menu.c:190
+#: menu.c:198
 msgid "Sort by Name"
 msgstr "Sắp xếp theo Tên"
 
-#: menu.c:191
+#: menu.c:199
 msgid "Sort by Type"
 msgstr "Sắp xếp theo Loại"
 
-#: menu.c:192
+#: menu.c:200
 msgid "Sort by Date"
 msgstr "Sắp xếp theo Ngày"
 
-#: menu.c:193
+#: menu.c:201
 msgid "Sort by Size"
 msgstr "Sắp xếp theo Kích Cỡ"
 
-#: menu.c:194
+#: menu.c:202
 msgid "Sort by Owner"
 msgstr "Sắp xếp theo Sở Hữu"
 
-#: menu.c:195
+#: menu.c:203
 msgid "Sort by Group"
 msgstr "Sắp xếp theo Nhóm"
 
-#: menu.c:196
+#: menu.c:204
 msgid "Reversed"
 msgstr "Ngược Lại"
 
-#: menu.c:198
+#: menu.c:206
 msgid "Show Hidden"
 msgstr "Hiện tập tin ẩn"
 
-#: menu.c:199
+#: menu.c:207
 msgid "Filter Files..."
 msgstr "Bộ lọc tập tin"
 
-#: menu.c:200
+#: menu.c:208
+msgid "Filter Directories With Files"
+msgstr "Lọc Thư Mục theo Tập tin"
+
+#: menu.c:209
 msgid "Show Thumbnails"
 msgstr "Hiện Thumbnail"
 
-#: menu.c:201
+#: menu.c:210
 msgid "Refresh"
 msgstr "Làm mới"
 
-#: menu.c:202
+#: menu.c:211
 msgid "Save Current Display Settings..."
 msgstr "Lưu Thiết đặt Hiển thị Hiện tại..."
 
-#: menu.c:204
+#: menu.c:213
 msgid "Copy..."
 msgstr "Sao chép..."
 
-#: menu.c:205
+#: menu.c:214
 msgid "Rename..."
 msgstr "Đổi tên..."
 
-#: menu.c:206
+#: menu.c:215
 msgid "Link..."
 msgstr "Liên kết..."
 
-#: menu.c:210
+#: menu.c:219
 msgid "Send To..."
 msgstr "Gửi đến..."
 
-#: menu.c:215
+#: menu.c:224
 msgid "Count"
 msgstr "Kiểm kê"
 
-#: menu.c:216
+#: menu.c:225
 msgid "Set Type..."
 msgstr "Thiết đặt Lọai..."
 
-#: menu.c:220 toolbar.c:154
+#: menu.c:229 toolbar.c:154
 msgid "Select"
 msgstr "Chọn"
 
-#: menu.c:221
+#: menu.c:230
 msgid "Select All"
 msgstr "Chọn tất cả"
 
-#: menu.c:222
+#: menu.c:231
 msgid "Clear Selection"
 msgstr "Bỏ chọn"
 
-#: menu.c:223
+#: menu.c:232
 msgid "Invert Selection"
 msgstr "Đảo ngược việc chọn"
 
-#: menu.c:224
+#: menu.c:233
 msgid "Select by Name..."
 msgstr "Chọn theo Tên..."
 
-#: menu.c:225
+#: menu.c:234
 msgid "Select If..."
 msgstr "Chọn nếu..."
 
-#: menu.c:227
+#: menu.c:236
 msgid "New"
 msgstr "Tạo"
 
-#: menu.c:229
+#: menu.c:238
 msgid "Blank file"
 msgstr "Tập tin trống"
 
-#: menu.c:231 tasklist.c:306
+#: menu.c:240 tasklist.c:306
 msgid "Window"
 msgstr "Cửa sổ"
 
-#: menu.c:232
+#: menu.c:241
 msgid "Parent, New Window"
 msgstr "Lên mức cao hơn, Cửa sổ Mới"
 
-#: menu.c:233
+#: menu.c:242
 msgid "Parent, Same Window"
 msgstr "Lên mức cao hơn , cùng cửa sổ"
 
-#: menu.c:234
+#: menu.c:243
 msgid "New Window"
 msgstr "Cửa sổ mới"
 
-#: menu.c:236
+#: menu.c:245
 msgid "Show Bookmarks"
 msgstr "Hiện Bookmark"
 
-#: menu.c:237
+#: menu.c:246
+msgid "Show Log"
+msgstr "Hiện Bản ghi"
+
+#: menu.c:247
 msgid "Follow Symbolic Links"
 msgstr "Đi theo các Liên kết"
 
-#: menu.c:238
+#: menu.c:248
 msgid "Resize Window"
 msgstr "Đổi kích thước cửa sổ"
 
-#: menu.c:241
+#: menu.c:251
 msgid "Close Window"
 msgstr "Đóng cửa sổ"
 
-#: menu.c:243
+#: menu.c:253
 msgid "Enter Path..."
 msgstr "Nhập đường dẫn..."
 
-#: menu.c:244
+#: menu.c:254
 msgid "Shell Command..."
 msgstr "Lệnh Shell..."
 
-#: menu.c:245
+#: menu.c:255
 msgid "Terminal Here"
 msgstr "Mở Terminal ở đây"
 
-#: menu.c:246
+#: menu.c:256
 msgid "Switch to Terminal"
 msgstr "Chuyển đến Terminal"
 
-#: menu.c:714
+#: menu.c:725
 msgid "You should Shift+Menu click over a file to send it somewhere"
 msgstr "Bạn nên dùng Shift+nhấp phải trên một tập tin để đưa nó vào đâu đó"
 
-#: menu.c:750
+#: menu.c:764
 msgid "Next Click"
 msgstr "Hành động"
 
-#: menu.c:772
+#: menu.c:786
 #, c-format
 msgid "%d items"
 msgstr "%d mục"
 
-#: menu.c:860
+#: menu.c:874
 msgid "Open unmounted"
 msgstr "Mở gắn kết đã hủy"
 
-#: menu.c:863
+#: menu.c:877
 msgid "Show Target"
 msgstr "Hiện đích"
 
-#: menu.c:865
+#: menu.c:879
 msgid "Look Inside"
 msgstr "Xem bên trong"
 
-#: menu.c:867
+#: menu.c:881
 msgid "Open As Text"
 msgstr "Mở như Text"
 
-#: menu.c:1027
+#: menu.c:1052
 msgid ""
 "Extended attributes, used to store types, are not supported for this file or "
 "files.\n"
@@ -2243,21 +2293,21 @@ msgid ""
 "it may simply be that the filesystem needs to be mounted with the right "
 "mount option ('user_xattr' on Linux)."
 msgstr ""
-"Các thuộc tính mở rộng, sử dụng kiểu có sẵn, không hỗ trợ tập tin này hoặc các tập tin "
-"khác.\n"
+"Các thuộc tính mở rộng, sử dụng kiểu có sẵn, không hỗ trợ tập tin này hoặc "
+"các tập tin khác.\n"
 "Điều này có thể thiếu sự hỗ trợ từ tập tin hệ thống hoặc thư viện C , hay nó "
 "đơn giản như các tập tin hệ thống cần thiết để gắn kết với những quyền hạn "
 "tuỳ chọn gắn kết ('user_xattr' trên Linux)."
 
-#: menu.c:1033
+#: menu.c:1058
 msgid "Setting type not supported for some of these files"
 msgstr "Thiết đặt loại không hỗ trợ cho một vài tập tin này"
 
-#: menu.c:1068
+#: menu.c:1093
 msgid "_Relative link"
 msgstr "Liên kết _Tương đối"
 
-#: menu.c:1074
+#: menu.c:1099
 msgid ""
 "If on, the symlink will store the path from the symlink to the target file. "
 "Use this if the symlink and the target will be moved together.\n"
@@ -2269,42 +2319,42 @@ msgstr ""
 "Nếu tắt, đường dẫn từ thư mục gốc (root) sẽ được tích hợp. Dùng chức năng "
 "này nếu liên kếtbị di chuyển nhưng tập tin đích vẫn còn."
 
-#: menu.c:1144
+#: menu.c:1169
 msgid "New pathname is not absolute"
 msgstr "Tên đường dẫn mới không tuyệt đối"
 
-#: menu.c:1210
+#: menu.c:1235
 #, c-format
 msgid "Symlink from '%s' already exists. Replace it with a link to '%s'?"
 msgstr "Liên kết từ '%s' đã có. Thay thế nó với một liên kết đến '%s'?"
 
-#: menu.c:1216
+#: menu.c:1241
 msgid "_Replace"
 msgstr "_Thay thế"
 
-#: menu.c:1336 menu.c:1377 menu.c:1437
+#: menu.c:1361 menu.c:1402 menu.c:1462
 msgid "Create"
 msgstr "Tạo"
 
-#: menu.c:1337
+#: menu.c:1362
 msgid "NewDir"
 msgstr "ThưmụcMới"
 
-#: menu.c:1351 menu.c:1357
+#: menu.c:1376 menu.c:1382
 #, c-format
 msgid "Error creating '%s': %s"
 msgstr "Lỗi khi tạo '%s': %s"
 
-#: menu.c:1378
+#: menu.c:1403
 msgid "NewFile"
 msgstr "TậptinMới"
 
-#: menu.c:1396
+#: menu.c:1421
 #, c-format
 msgid "Error creating file: could not find the template for %s"
 msgstr "Lỗi tạo tập tin: không thể tìm mẫu cho %s"
 
-#: menu.c:1467
+#: menu.c:1492
 #, c-format
 msgid ""
 "The `Send To' menu provides a quick way to send some files to an "
@@ -2333,7 +2383,7 @@ msgstr ""
 "được mở cho loại của các tập tin đó. `.group' chỉ được hiển thị khi nhiều "
 "tập tin được chọn."
 
-#: menu.c:1478
+#: menu.c:1503
 msgid ""
 "I'll show you your SendTo directory now; you should symlink (Ctrl+Shift "
 "drag) any applications you want into it."
@@ -2341,11 +2391,11 @@ msgstr ""
 "Bây giờ tôi sẽ hiện thư mục Gửi đến; bạn cần liên kết (Ctrl+Shift kéo) ứng "
 "dụng bất kì bạn muốn vào đó."
 
-#: menu.c:1481 menu.c:1521
+#: menu.c:1506 menu.c:1546
 msgid "Your CHOICESPATH variable setting prevents customisations - sorry."
 msgstr "Thiết đặt biến CHOICESPATH của bạn không cho phép tùy chỉnh - xin lỗi."
 
-#: menu.c:1514
+#: menu.c:1539
 #, c-format
 msgid ""
 "Any files placed in your Templates directories will appear on the `New' "
@@ -2364,7 +2414,7 @@ msgstr ""
 "%s\n"
 "%s\n"
 
-#: menu.c:1519
+#: menu.c:1544
 msgid ""
 "I'll show you your Templates directory now; you should place any template "
 "files you want inside it."
@@ -2372,15 +2422,15 @@ msgstr ""
 "Bây giờ tôi sẽ mở thư mục Templates; bạn nên đặt vào đó vài tập tin mẫu mà "
 "bạn muốn."
 
-#: menu.c:1636
+#: menu.c:1661
 msgid "Customise"
 msgstr "Tuỳ chọn"
 
-#: menu.c:1702
+#: menu.c:1734
 msgid "This is already the canonical name for this directory."
 msgstr "Đã có tên hợp qui tắc cho thư mục này."
 
-#: menu.c:1733
+#: menu.c:1765
 msgid ""
 "You can't open a second view onto this directory because the `Unique "
 "Windows' option is turned on in the Options window."
@@ -2388,71 +2438,71 @@ msgstr ""
 "Bạn không thể mở cửa sổ thứ hai để xem thư mục này vì tùy chọn 'Cửa sổ Duy "
 "nhất' đã bật trong cửa sổ 'Tùy chọn'."
 
-#: menu.c:1859
+#: menu.c:1891
 msgid "Copy ... ?"
 msgstr "Sao chép...?"
 
-#: menu.c:1862
+#: menu.c:1894
 msgid "Rename ... ?"
 msgstr "Đổi tên ...?"
 
-#: menu.c:1865
+#: menu.c:1897
 msgid "Symlink ... ?"
 msgstr "Liên kết ...?"
 
-#: menu.c:1868
+#: menu.c:1900
 msgid "Shift Open ... ?"
 msgstr "Đổi cách Mở ...?"
 
-#: menu.c:1871
+#: menu.c:1903
 msgid "Properties of ... ?"
 msgstr "Thuộc tính của ...?"
 
-#: menu.c:1874
+#: menu.c:1906
 msgid "Set type of ... ?"
 msgstr "Thiết đặt lọai của ... ?"
 
-#: menu.c:1877
+#: menu.c:1909
 msgid "Set run action for ... ?"
 msgstr "Hành động thực thi cho ... ?"
 
-#: menu.c:1880
+#: menu.c:1912
 msgid "Set icon for ... ?"
 msgstr "Thiết đặt Biểu tượng cho ... ?"
 
-#: menu.c:1883
+#: menu.c:1915
 msgid "Send ... to ... ?"
 msgstr "Gửi ... đến ... ?"
 
-#: menu.c:1886
+#: menu.c:1918
 msgid "DELETE ... ?"
 msgstr "XÓA ... ?"
 
-#: menu.c:1889
+#: menu.c:1921
 msgid "Count the size of ... ?"
 msgstr "Kiểm kê kích cỡ của ... ?"
 
-#: menu.c:1892
+#: menu.c:1924
 msgid "Set permissions on ... ?"
 msgstr "Thiết đặt quyền cho ... ?"
 
-#: menu.c:1895
+#: menu.c:1927
 msgid "Search inside ... ?"
 msgstr "Tìm kiếm bên trong ... ?"
 
-#: menu.c:1959
+#: menu.c:1991
 msgid "You cannot do this to more than one item at a time"
 msgstr "Bạn không thể làm việc này với nhiều hơn một tập tin cùng lúc"
 
-#: menu.c:1991
+#: menu.c:2023
 msgid "Rename"
 msgstr "Đổi tên"
 
-#: menu.c:1996
+#: menu.c:2028
 msgid "Symlink"
 msgstr "Liên kết"
 
-#: menu.c:2025
+#: menu.c:2057
 msgid ""
 "User-definable shortcuts are disabled by default in Gtk2, and you have not "
 "enabled them. You can turn this feature on by:\n"
@@ -2474,7 +2524,7 @@ msgstr ""
 "\tgtk-can-change-accels = 1\n"
 "\t(nó chỉ làm việc nếu bạn KHÔNG dùng XSETTINGS)"
 
-#: menu.c:2036
+#: menu.c:2068
 msgid ""
 "To set a keyboard short-cut for a menu item:\n"
 "\n"
@@ -2494,7 +2544,7 @@ msgstr ""
 "Phím sẽ hiện ra lần kế trong mục menu và sau này bạn chỉ cần nhấn phím mà "
 "không cần mở menu."
 
-#: menu.c:2051
+#: menu.c:2083
 msgid "Set keyboard shortcuts"
 msgstr "Thiết đặt các phím tắt"
 
@@ -2518,7 +2568,7 @@ msgstr "Chọn theo tên:"
 msgid "Pattern:"
 msgstr "Mẫu"
 
-#: minibuffer.c:262
+#: minibuffer.c:265
 msgid ""
 "Enter the name of a file and I'll display it for you. Press Tab to fill in "
 "the longest match. Escape to close the minibuffer."
@@ -2526,13 +2576,13 @@ msgstr ""
 "Nhập tên một tập tin và tôi sẽ hiển thị cho bạn. Nhấn Tab để hòan thành tên "
 "phù hợp. Nhấn Escape để đóng minibuffer."
 
-#: minibuffer.c:268
+#: minibuffer.c:271
 msgid ""
 "Enter a shell command to execute. Click on a file to add it to the buffer."
 msgstr ""
 "Nhập một lệnh shell để thực thi. Nhấp chọn một tập tin để thêm nó đến bộ đệm."
 
-#: minibuffer.c:273
+#: minibuffer.c:276
 msgid ""
 "Enter a file name pattern to select all matching files:\n"
 "\n"
@@ -2550,18 +2600,25 @@ msgstr ""
 "[a-z] nghĩa là kí tự bất kì từ a đến z (chữ thường)\n"
 "*.png nghĩa là tên bất kì kết thúc bằng '.png'"
 
-#: minibuffer.c:285
+#: minibuffer.c:288
 msgid ""
 "Enter a pattern to match for files to be shown.  An empty filter turns the "
 "filter off."
 msgstr ""
 "Nhập một mẫu để các tập tin trùng khớp hiển thị. Để trống sẽ tắt bộ lọc."
 
-#: minibuffer.c:905
+#: minibuffer.c:908
 msgid "Invalid Find condition"
 msgstr "Sai điều kiện tìm kiếm"
 
-#: mount.c:372
+#: mount.c:103
+#, c-format
+msgid "File system table \"%s\" not found, cannot monitor system mounts"
+msgstr ""
+"Bảng hệ thống tập tin \"%s\" không tìm thấy, không tìm thấy các"
+"các gắn kết của hệ thống"
+
+#: mount.c:393
 #, c-format
 msgid "%s total, %s used, %s free (%.1f %%)"
 msgstr "%s tổng, %s dùng, %s trống (%.1f %%)"
@@ -2571,11 +2628,11 @@ msgid "ROX-Filer has converted your Options file to the new XML format"
 msgstr ""
 "ROX-Filer đã chuyển đổi tập tin Tùy chọn của bạn sang định dạng XML mới"
 
-#: options.c:533 options.c:1258
+#: options.c:535 options.c:1256
 msgid "(use default)"
 msgstr "(sử dụng mặc định)"
 
-#: options.c:803
+#: options.c:805
 #, c-format
 msgid "Internal error: %s unreadable"
 msgstr "Lỗi bên trong: không thể đọc %s"
@@ -2610,15 +2667,25 @@ msgstr "(lưu trữ đã tắt bởi CHOICESPATH)"
 msgid "Error saving %s: %s"
 msgstr "Lỗi khi lưu %s: %s"
 
-#: options.c:1795
+#: options.c:1793
 msgid "Missing '='"
 msgstr "Lỗi '='"
 
-#: panel.c:438
+#: panel.c:319
+#, c-format
+msgid "Unable to replace '%s'"
+msgstr "Không thể thay thế '%s'"
+
+#: panel.c:323
+#, c-format
+msgid "Unable to save '%s'"
+msgstr "Không thể lưu"
+
+#: panel.c:526
 msgid "Your old panel file has been converted to the new XML format."
 msgstr "Tập tin panel cũ đã được chuyển đổi sang định dạng XML mới."
 
-#: panel.c:546
+#: panel.c:634
 msgid ""
 "You have tried to close a panel via the window manager - I usually find that "
 "this is accidental... really close?"
@@ -2626,20 +2693,20 @@ msgstr ""
 "Bạn đã cố đóng panel thông qua trình quản lý cửa sổ - Tôi luôn thấy đây là "
 "rủi ro ... đóng nó không??"
 
-#: panel.c:648
+#: panel.c:735
 msgid "Missing < or > in panel config file"
 msgstr "Lỗi < hay > trong tập tin cấu hình panel"
 
-#: panel.c:1533
+#: panel.c:1618
 #, c-format
 msgid "Error saving panel %s: %s"
 msgstr "Lỗi lưu panel %s: %s"
 
-#: panel.c:1849
+#: panel.c:1934
 msgid "Applet quit without ever creating a widget!"
 msgstr "Applet thóat mà không tạo một widget!"
 
-#: panel.c:1948
+#: panel.c:2030
 #, c-format
 msgid ""
 "Error running applet:\n"
@@ -2648,65 +2715,52 @@ msgstr ""
 "Lỗi khi chạy applet:\n"
 "%s"
 
-#: panel.c:2358
+#: panel.c:2655
+msgid "Are you sure you want to remove this panel from the desktop?"
+msgstr "Bạn có muốn xoá panel này khỏi desktop?"
+
+#: panel.c:2658 panel.c:2685
+msgid "Remove Panel"
+msgstr "Xoá Panel"
+
+#: panel.c:2681
 msgid "Panel Options..."
 msgstr "Cấu hình panel..."
 
-#: panel.c:2450
+#: panel.c:2767
 #, c-format
 msgid "Xinerama monitor %d unavailable"
 msgstr "Màn hình Xinerama %d không có"
 
-#: panel.c:2525
-msgid "Panel Options"
-msgstr "Cấu hình panel"
-
-#: panel.c:2540
-#, c-format
-msgid "Panel: %s"
-msgstr "Panel: %s"
-
-#: panel.c:2548
-msgid "Select the panel's position:"
-msgstr "Chọn vị trí cho panel:"
-
-#: panel.c:2554
-msgid "Top-edge panel"
-msgstr "Panel cạnh-trên"
-
-#: panel.c:2555
-msgid "Top edge"
+#: panel.c:2797
+msgid "Top"
 msgstr "Cạnh trên"
 
-#: panel.c:2556
-msgid "Bottom edge panel"
-msgstr "Panel cạnh-dưới"
-
-#: panel.c:2557
-msgid "Bottom edge"
+#: panel.c:2799
+msgid "Bottom"
 msgstr "Cạnh dưới"
 
-#: panel.c:2558
-msgid "Left edge panel"
-msgstr "Panel cạnh-trái"
-
-#: panel.c:2559
-msgid "Left edge"
+#: panel.c:2801
+msgid "Left"
 msgstr "Cạnh trái"
 
-#: panel.c:2560
-msgid "Right-edge panel"
-msgstr "Panel cạnh-phải"
-
-#: panel.c:2561
-msgid "Right edge"
+#: panel.c:2803
+msgid "Right"
 msgstr "Cạnh phải"
+
+#: panel.c:2805
+msgid "Default"
+msgstr "Mặc định:"
+
+#: panel.c:2809
+msgid "Unknown side"
+msgstr "Không biết cạnh"
 
 #: pinboard.c:354
 msgid "Your old pinboard file has been converted to the new XML format."
 msgstr "Tập tin pinboard cũ đã được chuyển đổi đến định dạng XML mới."
 
-#: pinboard.c:637
+#: pinboard.c:711
 msgid ""
 "The backdrop handler must be an application directory. Drag an application "
 "directory into the Set Backdrop dialog box, or (for programmers) pass it to "
@@ -2716,7 +2770,7 @@ msgstr ""
 "dụngvào trong hộp thọai Thiết đặt Nền hoặc là (cho lập trình viên) đưa nó "
 "đến phương thức SOAP SetBackdropApp. "
 
-#: pinboard.c:656
+#: pinboard.c:730
 msgid ""
 "You can only set the backdrop to an image or to a program which knows how to "
 "manage ROX-Filer's backdrop.\n"
@@ -2730,51 +2784,61 @@ msgstr ""
 "Lập trình viên: AppInfo.xml của ứng dụng phải chứa yếu tố CanSetBackdrop, "
 "như miêu tả trong manual của ROX-Filer."
 
-#: pinboard.c:676
+#: pinboard.c:750
 msgid "Set backdrop"
 msgstr "Thiết đặt nền."
 
-#: pinboard.c:687
+#: pinboard.c:761
 msgid "Choose a style and drag an image in:"
 msgstr "Chọn một kiểu và kéo một hình ảnh vào:"
 
-#: pinboard.c:700
+#: pinboard.c:774
 msgid "Centre the image without scaling it"
 msgstr "Giữa hình và không cân xứng nó"
 
-#: pinboard.c:701
+#: pinboard.c:775
 msgid "Centre"
 msgstr "Giữa"
 
-#: pinboard.c:702
+#: pinboard.c:776
 msgid "Scale the image to fit the backdrop area, without distorting it"
 msgstr "Cân xứng hình ảnh vừa vặn vùng nền, không làm méo nó"
 
-#: pinboard.c:704
+#: pinboard.c:778
 msgid "Scale"
 msgstr "Cân xứng"
 
-#: pinboard.c:705
+#: pinboard.c:779
+msgid ""
+"Scale the image to fit the backdrop area, regardless of image dimensions - "
+"overscale"
+msgstr "Cân xứng hình ảnh vừa vặn vùng nền, không làm méo nó"
+
+#: pinboard.c:781
+msgid "Fit"
+msgstr "Vưà vặn"
+
+#: pinboard.c:782
 msgid "Stretch the image to fill the backdrop area"
 msgstr "Kéo dãn hình ảnh để đầy vùng nền"
 
-#: pinboard.c:706
+#: pinboard.c:783
 msgid "Stretch"
 msgstr "Kéo dãn"
 
-#: pinboard.c:707
+#: pinboard.c:784
 msgid "Tile the image over the backdrop area"
 msgstr "Tile hình trên tòan vùng nền"
 
-#: pinboard.c:708
+#: pinboard.c:785
 msgid "Tile"
 msgstr "Tile"
 
-#: pinboard.c:713
+#: pinboard.c:790
 msgid "Drop an image here"
 msgstr "Thả một hình ảnh ở đây"
 
-#: pinboard.c:774
+#: pinboard.c:851
 msgid ""
 "No pinboard was in use... the 'Default' pinboard has been selected. Use 'rox "
 "-p=Default' to turn it on in future."
@@ -2782,31 +2846,35 @@ msgstr ""
 "Không có pinboard được dùng... pinboard 'Mặc định' được chọn. Dùng 'rox -"
 "p=Default' để bật nó sau này."
 
-#: pinboard.c:868
+#: pinboard.c:945
 msgid ""
 "Only files (and certain applications) can be used to set the background "
 "image."
 msgstr ""
 "Chỉ tập tin (và ứng dụng nào đó) có thể được dùng để thiết đặt ảnh nền."
 
-#: pinboard.c:1492
+#: pinboard.c:1570
 msgid "Missing '>' in icon label"
 msgstr "Lỗi '>' trong nhãn biểu tượng"
 
-#: pinboard.c:1501
+#: pinboard.c:1579
 msgid "Missing ',' after icon label"
 msgstr "Lỗi ',' sau nhãn biểu tượng"
 
-#: pinboard.c:1588
+#: pinboard.c:1667
 #, c-format
 msgid "Error saving pinboard %s: %s"
 msgstr "Lỗi lưu pinboard %s: %s"
 
-#: pinboard.c:2132
+#: pinboard.c:2212
 msgid "Backdrop..."
 msgstr "Nền..."
 
-#: pinboard.c:2225
+#: pinboard.c:2215
+msgid "Add Panel"
+msgstr "Thêm Panel"
+
+#: pinboard.c:2309
 #, c-format
 msgid ""
 "Error loading backdrop image:\n"
@@ -2817,7 +2885,7 @@ msgstr ""
 "%s\n"
 "Nền đã xóa."
 
-#: pixmaps.c:962
+#: pixmaps.c:976
 #, c-format
 msgid ""
 "Can't delete thumbnails in %s:\n"
@@ -2826,60 +2894,70 @@ msgstr ""
 "Không thể xóa thumbnail trong %s:\n"
 "%s"
 
-#: pixmaps.c:983
+#: pixmaps.c:997
 msgid "There are no thumbnails to delete"
 msgstr "Không có thumbnail để xóa"
 
-#: pixmaps.c:996
+#: pixmaps.c:1010
 msgid "Purge thumbnails disk cache"
 msgstr "Làm sạch bộ đệm thumbnail"
 
-#: remote.c:660
+#: remote.c:722
 #, c-format
 msgid "Unknown style '%s'"
 msgstr "Không biết kiểu '%s'"
 
-#: remote.c:682
+#: remote.c:744
 #, c-format
 msgid "Unknown details type '%s'"
 msgstr "Không biết lọai chi tiết '%s'"
 
-#: remote.c:710
+#: remote.c:772
 #, c-format
 msgid "Unknown sorting type '%s'"
 msgstr "Không biết lọai sắp xếp '%s'"
 
-#: remote.c:1160
+#: remote.c:1247
 #, c-format
 msgid "Attempt to invoke unknown SOAP method '%s'"
 msgstr "Thử gọi phương thức SOAP không biết '%s'"
 
-#: rox_gettext.c:93
-#, c-format
-msgid "Invalid .gmo translation file (too short): %s"
-msgstr "Sai tập tin dịch .gmo (quá ngắn): %s"
-
-#: rox_gettext.c:106
-#, c-format
-msgid "Invalid .gmo translation file (GNU magic number not found): %s"
-msgstr "Sai tập tin dịch .gmo (không thấy con số kì diệu GNU): %s"
-
-#: run.c:98 run.c:151
+#: run.c:99 run.c:152
 #, c-format
 msgid "Program %s not found - deleted?"
 msgstr "Không thấy chương trình %s - đã xóa?"
 
-#: run.c:301
+#: run.c:302
 #, c-format
 msgid "File doesn't exist, or I can't access it: %s"
 msgstr "Tập tin không có hoặc là tôi không thể truy nhập nó: %s"
 
-#: run.c:306
+#: run.c:307
 #, c-format
 msgid "I don't know how to open '%s'"
 msgstr "Tôi không biết cách mở '%s'"
 
-#: run.c:337
+#: run.c:338
+#, c-format
+msgid "'%s' is not a valid URI"
+msgstr "'%s' không phải là một URI đúng"
+
+#: run.c:349
+#, c-format
+msgid "%s not accessable"
+msgstr "%s không thể truy nhập"
+
+#: run.c:357
+#, c-format
+msgid "Non-local URL %s"
+msgstr "URL %s không nội bộ"
+
+#: run.c:374
+#, c-format
+msgid "%s: no handler for %s"
+msgstr "%s: không trình điều khiển %s"
+
+#: run.c:394
 msgid ""
 "Application:\n"
 "This is an application directory - you can run it as a program, or open it "
@@ -2891,22 +2969,22 @@ msgstr ""
 "mở nó ra (giữ phím Shift trong khi mở). Hấu hết ứng dụng hỗ trợ trợ giúp ở "
 "đây nhưng cái này không có."
 
-#: run.c:421
+#: run.c:478
 #, c-format
 msgid "Could not send data to program: %s"
 msgstr "Không thể gửi dữ liệu đến chương trình: %s"
 
-#: run.c:451
+#: run.c:508
 #, c-format
 msgid "Could not read link: %s"
 msgstr "Không thể đọc liên kết: %s"
 
-#: run.c:479
+#: run.c:536
 #, c-format
 msgid "Broken symlink (or you don't have permission to follow it): %s"
 msgstr "Liên kết vỡ (họăc là bạn không có quyền với nó): %s"
 
-#: run.c:516
+#: run.c:573
 #, c-format
 msgid ""
 "No run action specified for files of this type (%s/%s) - you can set a run "
@@ -2917,7 +2995,7 @@ msgstr ""
 "thiết đặt hành động thực thi bằng cách chọn `Hành động Thực thi'' từ menu "
 "Tập tin, hoặc là kéo tập tin đến một ứng dụng.%s"
 
-#: run.c:522
+#: run.c:579
 msgid ""
 "\n"
 "\n"
@@ -2929,7 +3007,7 @@ msgstr ""
 "Ghi chú: Nếu đây là chương trình bạn muốn khởi chạy, bạn cần thiết đặt bit "
 "thực thi bằng cách chọn Quyền hạn từ menu Tập tin."
 
-#: run.c:677
+#: run.c:746
 #, c-format
 msgid ""
 "Executable '%s' is world-writeable! Refusing to run. Please change the "
@@ -2954,7 +3032,7 @@ msgstr ""
 "Bạn nên kiểm lại, hoặc ngay cả xóa đi, các hành động thưc thi đã có trừ phi "
 "bạn tin vào tất cả mọi người dùng máy tính của bạn."
 
-#: run.c:690
+#: run.c:759
 msgid "go-w (Fix security problem)"
 msgstr "go-w (Sửa chữa vấn đề bảo mật)"
 
@@ -2966,12 +3044,12 @@ msgstr "B"
 msgid "byte"
 msgstr "byte"
 
-#: support.c:1567 support.c:1621
+#: support.c:1596 support.c:1650
 #, c-format
 msgid "Failed to open and stat file '%s': %s"
 msgstr "Lỗi khi mở và thống kê tập tin '%s': %s"
 
-#: support.c:1578 support.c:1632
+#: support.c:1607 support.c:1661
 #, c-format
 msgid "Failed to mmap file '%s': %s"
 msgstr "Lỗi khi mmap tập tin '%s': %s"
@@ -3061,7 +3139,7 @@ msgstr "Hiện trợ giúp của ROX-Filer"
 msgid " (%u hidden)"
 msgstr " (%u ẩn)"
 
-#: toolbar.c:229 tips:83
+#: toolbar.c:229 tips:58
 msgid "items"
 msgstr "mục"
 
@@ -3079,79 +3157,79 @@ msgstr "Không có các mục%s"
 msgid "%u selected (%s)"
 msgstr "%u mục đã được chọn (%s)"
 
-#: toolbar.c:423
+#: toolbar.c:445
 msgid "Sort by name"
 msgstr "Sắp xếp theo tên"
 
-#: toolbar.c:423
+#: toolbar.c:445
 msgid "Sort by type"
 msgstr "Sắp xếp theo lọai"
 
-#: toolbar.c:423
+#: toolbar.c:445
 msgid "Sort by date"
 msgstr "Sắp xếp theo ngày"
 
-#: toolbar.c:424
+#: toolbar.c:446
 msgid "Sort by size"
 msgstr "Sắp xếp theo kích cỡ"
 
-#: toolbar.c:424
+#: toolbar.c:446
 msgid "Sort by owner"
 msgstr "Sắp xếp theo sở hữu"
 
-#: toolbar.c:424
+#: toolbar.c:446
 msgid "Sort by group"
 msgstr "Sắp xếp theo nhóm"
 
-#: toolbar.c:458
+#: toolbar.c:480
 msgid "ascending"
 msgstr "tăng lên"
 
-#: toolbar.c:458
+#: toolbar.c:480
 msgid "descending"
 msgstr "giảm dần"
 
-#: type.c:207
+#: type.c:214
 msgid "Sym link"
 msgstr "Liên kết"
 
-#: type.c:209
+#: type.c:216
 msgid "Mount point"
 msgstr "Điểm gắn kết"
 
-#: type.c:211
+#: type.c:218
 msgid "App dir"
 msgstr "Thư mục Ứng dụng"
 
-#: type.c:218
+#: type.c:225
 msgid "Dir"
 msgstr "Thư mục"
 
-#: type.c:220
+#: type.c:227
 msgid "Char dev"
 msgstr "Thiết bị tượng trưng"
 
-#: type.c:222
+#: type.c:229
 msgid "Block dev"
 msgstr "Khối thiết bị"
 
-#: type.c:224
+#: type.c:231
 msgid "Pipe"
 msgstr "Ống dẫn"
 
-#: type.c:226
+#: type.c:233
 msgid "Socket"
 msgstr "Socket"
 
-#: type.c:228
+#: type.c:235
 msgid "Door"
 msgstr "Cửa"
 
-#: type.c:231
+#: type.c:238
 msgid "Unknown"
 msgstr "Không biết"
 
-#: type.c:496
+#: type.c:554
 msgid ""
 "Enter a shell command which will load \"$@\" into a suitable program. Eg:\n"
 "\n"
@@ -3161,71 +3239,71 @@ msgstr ""
 "\n"
 "gimp \"$@\""
 
-#: type.c:677
+#: type.c:735
 msgid "This is not a program! Give me an application instead!"
 msgstr "Đây không là một chương trình. Cho tôi một ứng dụng thay thế!"
 
-#: type.c:737
+#: type.c:795
 msgid "No run action defined"
 msgstr "Không hành động xác định"
 
-#: type.c:741
+#: type.c:799
 #, c-format
 msgid "Error in handler %s: %s"
 msgstr "Lỗi trong điều khiển (handler) %s: %s"
 
-#: type.c:756
+#: type.c:814
 #, c-format
 msgid "Invalid application %s (bad AppRun)"
 msgstr "Sai ứng dụng %s (AppRun không đúng)"
 
-#: type.c:767
+#: type.c:825
 #, c-format
 msgid "Non-executable %s"
 msgstr "Không thể thực thi %s"
 
-#: type.c:800
+#: type.c:858
 msgid "Set run action"
 msgstr "Thiết lập hành động thực thi"
 
-#: type.c:806
+#: type.c:864
 msgid ""
 "If a handler for the specific type isn't set up, use this as the default."
 msgstr ""
 "Nếu một trình điều khiển cho một lọai riêng biệt không thiết đặt, dùng mặc "
 "định này."
 
-#: type.c:808
+#: type.c:866
 #, c-format
 msgid "Set default for all `%s/<anything>'"
 msgstr "Đặt mặc định cho tất cả `%s/<bất kì>'"
 
-#: type.c:812
+#: type.c:870
 msgid "Use this application for all files with this MIME type."
 msgstr "Dùng ứng dụng này cho tất cả tập tin với lọai MIME này."
 
-#: type.c:814
+#: type.c:872
 #, c-format
 msgid "Only for the type `%s' (%s/%s)"
 msgstr "Chỉ cho lọai `%s' (%s/%s)"
 
-#: type.c:820
+#: type.c:878
 msgid "Drop a suitable application here"
 msgstr "Thả một ứng dụng ở đây"
 
-#: type.c:835
+#: type.c:893
 msgid "OR"
 msgstr "HOẶC"
 
-#: type.c:842
+#: type.c:900
 msgid "Enter a shell command:"
 msgstr "Nhập một lệnh shell:"
 
-#: type.c:871
+#: type.c:929
 msgid "_Use Command"
 msgstr "_Sử dụng lệnh:"
 
-#: type.c:901
+#: type.c:959
 msgid ""
 "A run action already exists and is quite a big program - are you sure you "
 "want to delete it?"
@@ -3233,38 +3311,23 @@ msgstr ""
 "Một hành động thực thi đã có và là một chương trình rất lớn - bạn có chắc "
 "muốn xóa nó?"
 
-#: type.c:912
+#: type.c:970
 #, c-format
 msgid "Can't remove %s: %s"
 msgstr "Không thể xóa %s: %s"
 
-#: type.c:949
+#: type.c:1007
 msgid "Choices saving is disabled by CHOICESPATH variable"
 msgstr "Chọn lựa lưu trữ được tắt bởi biến CHOICESPATH"
 
-#: type.c:1224
-#, c-format
-msgid ""
-"Icon theme '%s' does not contain MIME icons. Using ROX default theme instead."
-msgstr ""
-"Chủ đề biểu tượng '%s' không chứa các biểu tượng MIME. Dùng chủ đề mặc định."
-
-#: type.c:1239
+#: type.c:1309
 #, c-format
 msgid ""
 "Failed to create symlink '%s':\n"
-"%s\n"
-"\n"
-"(this may mean that the ROX theme already exists there, but the 'mime-"
-"application:postscript' icon couldn't be loaded for some reason, or %s is a "
-"link to an invalid directory; try deleting it)"
+"%s"
 msgstr ""
 "Lỗi tạo liên kết '%s':\n"
-"%s\n"
-"\n"
-"(điều này nghĩa là theme của ROX đã có ở đó nhưng biểu tượng 'mime-"
-"application:postscript' không thể được nạp hoặc là %s liên kết đến một thư "
-"mục không đúng; hãy thử xóa nó)"
+"%s"
 
 #: usericons.c:179
 msgid "The pathname you gave does not exist. The icon has not been changed."
@@ -3361,164 +3424,55 @@ msgstr ""
 "Lỗi tạo hình ảnh '%s':\n"
 "%s"
 
-#: view_details.c:942
+#: view_details.c:957
 msgid "Mono font"
 msgstr "Mono font"
 
-#: view_details.c:943
+#: view_details.c:958
 msgid "Font for displaying mono-spaced text"
 msgstr "Font dùng hiển thị văn bản mono-space"
 
-#: view_details.c:1044
+#: view_details.c:1059
 msgid "_Name"
 msgstr "_Tên"
 
-#: view_details.c:1047
+#: view_details.c:1062
 msgid "_Type"
 msgstr "_Loại"
 
-#: view_details.c:1050
+#: view_details.c:1065
 msgid "_Permissions"
 msgstr "_Quyền"
 
-#: view_details.c:1055
+#: view_details.c:1070
 msgid "_Owner"
 msgstr "_Sở hữu"
 
-#: view_details.c:1057
+#: view_details.c:1072
 msgid "_Group"
 msgstr "_Nhóm"
 
-#: view_details.c:1059
+#: view_details.c:1074
 msgid "_Size"
 msgstr "_Kích cỡ"
 
-#: view_details.c:1065
+#: view_details.c:1080
 msgid "Last _Modified"
 msgstr "_Chỉnh Sửa Cuối"
 
 #: tips:1
-msgid "Translation"
-msgstr "Bản dịch"
-
-#: tips:2
-msgid "Language"
-msgstr "Ngôn ngữ"
-
-#: tips:3
-msgid "Use the LANG environment variable"
-msgstr "Dùng biến môi trường LANG"
-
-#: tips:4
-msgid "Basque"
-msgstr "Xứ Basque"
-
-#: tips:5
-msgid "Chinese (traditional)"
-msgstr "Trung Quốc (tradicional)"
-
-#: tips:6
-msgid "Chinese (simplified)"
-msgstr "Trung Quốc (simplificado)"
-
-#: tips:7
-msgid "Czech"
-msgstr "Sec"
-
-#: tips:8
-msgid "Danish"
-msgstr "Đan Mạch"
-
-#: tips:9
-msgid "Dutch"
-msgstr "Hà Lan"
-
-#: tips:10
-msgid "English (no translation)"
-msgstr "Anh (không dịch)"
-
-#: tips:11
-msgid "Estonian"
-msgstr "Estonia"
-
-#: tips:12
-msgid "Finnish"
-msgstr "Phần Lan"
-
-#: tips:13
-msgid "French"
-msgstr "Pháp"
-
-#: tips:14
-msgid "German"
-msgstr "Đức"
-
-#: tips:15
-msgid "Hungarian"
-msgstr "Hungari"
-
-#: tips:16
-msgid "Japanese"
-msgstr "Nhật"
-
-#: tips:17
-msgid "Norwegian"
-msgstr "Na Uy"
-
-#: tips:18
-msgid "Italian"
-msgstr "Ý"
-
-#: tips:19
-msgid "Polish"
-msgstr "Ba Lan"
-
-#: tips:20
-msgid "Portuguese (Portugal)"
-msgstr "Bồ Đào Nha (Bồ Đào Nha)"
-
-#: tips:21
-msgid "Portuguese (Brasil)"
-msgstr "Bồ Đào Nha (Brasil)"
-
-#: tips:22
-msgid "Romanian"
-msgstr "Rumani"
-
-# tips
-#: tips:23
-msgid "Russian"
-msgstr "Nga"
-
-#: tips:24
-msgid "Spanish"
-msgstr "Tây Ban Nha"
-
-#: tips:25
-msgid "Swedish"
-msgstr "Thuỵ Điển"
-
-#: tips:26
-msgid "Ukrainian"
-msgstr "Uc-crai-na"
-
-#: tips:27
-msgid "Vietnamese"
-msgstr "Tiếng Việt"
-
-#: tips:28
 msgid "Filer windows"
 msgstr "Cửa sổ"
 
-#: tips:29
+#: tips:2
 msgid "Auto-resize filer windows"
 msgstr "Tự thay đổi kích cỡ cửa sổ"
 
-#: tips:30
+#: tips:3
 msgid "Never automatically resize"
 msgstr "Không tự thay đổi kích cỡ"
 
-#: tips:31
+#: tips:4
 msgid ""
 "You'll have to resize windows manually, using the window manager, the "
 "`Resize Window' menu entry or by double-clicking on the window background."
@@ -3526,11 +3480,11 @@ msgstr ""
 "Bạn sẽ phải tự thay đổi kích cỡ cửa sổ, dùng trình quản lý cửa sổ, mục trình "
 "đơn 'Đổi Kích cỡ Cửa sổ' hoặc nhấp đúp lên nền cửa sổ."
 
-#: tips:32
+#: tips:5
 msgid "Resize when changing the display style"
 msgstr "Đổi kích cỡ khi thay đổi kiểu hiển thị"
 
-#: tips:33
+#: tips:6
 msgid ""
 "Changing the size of the icons or which details are displayed will resize "
 "the window for you."
@@ -3538,11 +3492,11 @@ msgstr ""
 "Thay đổi kích cỡ biểu tượng hay các chi tiết khi hiển thị sẽ đổi kích cỡ cửa "
 "sổ cho bạn"
 
-#: tips:34
+#: tips:7
 msgid "Always resize"
 msgstr "Luôn đổi kích cỡ"
 
-#: tips:35
+#: tips:8
 msgid ""
 "The filer will resize windows whenever it seems useful (that is, when "
 "changing directory or display style)."
@@ -3550,15 +3504,15 @@ msgstr ""
 "ROX-Filer sẽ đổi kích cỡ cửa sổ khi nó thấy cần (khi đổi thư mục hay kiểu "
 "hiển thị)"
 
-#: tips:36
+#: tips:9
 msgid "Largest window size:"
 msgstr "Kích cỡ cửa sổ lớn nhất:"
 
-#: tips:37
+#: tips:10
 msgid "%"
 msgstr "%"
 
-#: tips:38
+#: tips:11
 msgid ""
 "The largest size, as a percentage of the screen size, that the auto-resizer "
 "will resize a window to."
@@ -3566,15 +3520,15 @@ msgstr ""
 "Kích cỡ lớn nhất, tỉ lệ phần trăm với kích cỡ màn hình, khi tự thay đổi kích "
 "cỡ cửa sổ."
 
-#: tips:39
+#: tips:12
 msgid "Window behaviour"
 msgstr "Trạng thái cửa sổ"
 
-#: tips:40
+#: tips:13
 msgid "Short titlebar flags"
 msgstr "Kí hiệu thanh tiêu đề ngắn"
 
-#: tips:41
+#: tips:14
 msgid ""
 "Use single letters instead of words for Scanning, All and Thumbs indicators "
 "in the titlebar."
@@ -3582,11 +3536,11 @@ msgstr ""
 "Dùng các từ đơn thay thế cho các chỉ thị Quét, Tất cả và Thumb trên thanh "
 "tiêu đề."
 
-#: tips:42
+#: tips:15
 msgid "Unique windows"
 msgstr "Cửa sổ duy nhất"
 
-#: tips:43
+#: tips:16
 msgid ""
 "If you open a directory and that directory is already displayed in another "
 "window, then this option causes the other window to be closed."
@@ -3594,11 +3548,11 @@ msgstr ""
 "Nếu bạn mở một thư mục và thư mục đó đã hiển thị trong một cửa sổ khác, khi "
 "đó, tùy chọn này sẽ đóng cửa sổ khác."
 
-#: tips:44
+#: tips:17
 msgid "New window on button 1"
 msgstr "Cửa sổ mới trên nút nhất 1"
 
-#: tips:45
+#: tips:18
 msgid ""
 "Clicking with mouse button 1 (usually the left button) opens a directory in "
 "a new window with this turned on. Clicking with the button-2 (middle) will "
@@ -3607,11 +3561,11 @@ msgstr ""
 "Nhấp trái chuột (nút nhấn 1) trên một thư mục sẽ mở thư mục đó trong một cửa "
 "sổ mới. Nhấp nút giữa chuột (nút giữa) sẽ dùng cửa sổ hiện tại."
 
-#: tips:46
+#: tips:19
 msgid "Single-click navigation"
 msgstr "Nhấp đơn chuột"
 
-#: tips:47 tips:141
+#: tips:20 tips:116
 msgid ""
 "Clicking on an item opens it with this on. Hold down Control to select the "
 "item instead. If off, clicking once selects an item; double click to open "
@@ -3620,11 +3574,11 @@ msgstr ""
 "Nhấp đơn chuột trên một mục sẽ mở mục đó. Giữ Control để chọn mục. Nếu tắt "
 "chức năng này, thì nhấp đơn để chọn mục; nhấp đúp để mở mục đó."
 
-#: tips:48
+#: tips:21
 msgid "Double-click on background resizes"
 msgstr "Nhấp đúp trên nền để đổi kích cỡ"
 
-#: tips:49
+#: tips:22
 msgid ""
 "If on then double clicking on the window background resizes the window, just "
 "like clicking on the Automatic size mode button in the toolbar."
@@ -3632,15 +3586,15 @@ msgstr ""
 "Nhấp đúp chuột trên nền cửa sổ để đổi kích cỡ cửa sổ, điều này tương tự như "
 "nhấp chọn kiểu Tự đổi kích cỡ trên thanh công cụ."
 
-#: tips:50
+#: tips:23
 msgid "Sorting"
 msgstr "Sắp xếp"
 
-#: tips:51
+#: tips:24
 msgid "Directories come first (for sort by name)"
 msgstr "Thư mục trước (khi sắp xếp theo tên)"
 
-#: tips:52
+#: tips:25
 msgid ""
 "If this is on then directories will always appear before anything else when "
 "sorting by name."
@@ -3648,11 +3602,11 @@ msgstr ""
 "Bất chức năng này để sắp xếp thư mục trước bất kì thứ gì khi sắp xếp theo "
 "tên."
 
-#: tips:53
+#: tips:26
 msgid "Capitalised names first (for sort by name)"
 msgstr "Tên chữ hoa trước ( khi sắp xếp theo tên)"
 
-#: tips:54
+#: tips:27
 msgid ""
 "If on, all filenames starting with a capital letter come before filenames "
 "starting with lowercase ones."
@@ -3660,15 +3614,15 @@ msgstr ""
 "Các tập tin bắt đầu với tên chữ hoa sẽ đứng trước các tập tin có tên chữ "
 "thường."
 
-#: tips:56
+#: tips:29
 msgid "Default settings for new windows"
 msgstr "Thiết đặt mặc định cho cửa sổ mới"
 
-#: tips:57
+#: tips:30
 msgid "Inherit options from source window"
 msgstr "Giữ lại các tùy chọn từ cửa sổ nguồn"
 
-#: tips:58
+#: tips:31
 msgid ""
 "If this is on then display options for a new window are inherited from the "
 "source window if possible, otherwise they are set to the defaults below."
@@ -3676,27 +3630,27 @@ msgstr ""
 "Các tùy chọn hiển thị cho cửa sổ mới sẽ thừa hưởng từ cửa sổ nguồn nếu có "
 "thể, mặc khác chúng được thiết đặt đến mặc định bên dưới."
 
-#: tips:59
+#: tips:32
 msgid "View type:"
 msgstr "Kiểu xem"
 
-#: tips:62
+#: tips:35
 msgid "Sort by:"
 msgstr "Sắp xếp theo:"
 
-#: tips:64 tips:79
+#: tips:37 tips:54
 msgid "Type"
 msgstr "Loại"
 
-#: tips:65
+#: tips:38
 msgid "Date"
 msgstr "Ngày"
 
-#: tips:67
+#: tips:40
 msgid "Show hidden files"
 msgstr "Hiện các tập tin ẩn"
 
-#: tips:68
+#: tips:41
 msgid ""
 "If this is on then files whose names start with a dot are shown too, "
 "otherwise they are hidden."
@@ -3704,43 +3658,55 @@ msgstr ""
 "Các tập tin bắt đầu với một dấu chấm trong tên (tập tin ẩn) cũng được hiển "
 "thị, mặt khác, chúng được ẩn."
 
-#: tips:69
+#: tips:42
+msgid "Show extended attribute indicator"
+msgstr "Hiện dấu hiệu thuộc tính mở rộng"
+
+#: tips:43
+msgid ""
+"If this is on then files which have one or more extended attributes set will "
+"have an emblem added to indicate this."
+msgstr ""
+"Nếu tùy chọn này được chọn khi đó tập tin có một hay nhiều thuộc tính mở"
+"rộng được thiết đặt sẽ có một biểu tượng được thêm để biểu thị." 
+
+#: tips:44
 msgid "Icon View"
 msgstr "Xem kiểu biểu tượng"
 
-#: tips:70
+#: tips:45
 msgid "Default size:"
 msgstr "Kích cỡ mặc định:"
 
-#: tips:71
+#: tips:46
 msgid "Huge Icons"
 msgstr "Lớn nhất"
 
-#: tips:72 tips:258
+#: tips:47 tips:217
 msgid "Large Icons"
 msgstr "Lớn"
 
-#: tips:73 tips:257
+#: tips:48 tips:216
 msgid "Small Icons"
 msgstr "Nhỏ"
 
-#: tips:75
+#: tips:50
 msgid "Default details:"
 msgstr "Chi tiết mặc định:"
 
-#: tips:76
+#: tips:51
 msgid "No details"
 msgstr "Không chi tiết"
 
-#: tips:81
+#: tips:56
 msgid "Automatic small icons:"
 msgstr "Biểu tượng tự thu nhỏ:"
 
-#: tips:82
+#: tips:57
 msgid "Change at:"
 msgstr "Đổi khi có:"
 
-#: tips:84
+#: tips:59
 msgid ""
 "When automatic icon sizing is selected: If the directory contains this many "
 "items then it will be shown using Small Icons, otherwise Large Icons will be "
@@ -3749,15 +3715,15 @@ msgstr ""
 "Nếu tùy chọn này đã chọn: nó sẽ dùng Biểu tượng Nhỏ khi thư mục chứa nhiều "
 "mục, mặc khác, nó sẽ dùng Biểu tượng Lớn."
 
-#: tips:85
+#: tips:60
 msgid "Max width (Large icons):"
 msgstr "Độ rộng lớn nhất (Biểu tượng Lớn):"
 
-#: tips:86 tips:89
+#: tips:61 tips:64
 msgid "pixels"
 msgstr "pixels"
 
-#: tips:87
+#: tips:62
 msgid ""
 "Text wider than this is broken onto two lines in Large Icons mode. In Huge "
 "Icons mode, text is wrapped when 50% wider than this."
@@ -3766,49 +3732,49 @@ msgstr ""
 "Lớn. Trong kiểu Biểu tượng Lớn nhất, text được gói gọn khi rộng hơn số này "
 "50%."
 
-#: tips:88
+#: tips:63
 msgid "(Small Icons):"
 msgstr "(Biểu tượng Nhỏ)"
 
-#: tips:90
+#: tips:65
 msgid "Maximum width for the text beside a Small Icon."
 msgstr "Độ rộng lớn nhất cho text bên cạnh một Biểu tượng Nhỏ."
 
-#: tips:91
+#: tips:66
 msgid "Order small icons vertically"
 msgstr "Xếp các biểu tượng nhỏ thẳng đứng"
 
-#: tips:92
+#: tips:67
 msgid ""
 "If this option is on, then small icons are arranged in columns, not rows."
 msgstr ""
 "Nếu bật tùy chọn này, các biểu tượng nhỏ được sắp xếp theo cột, không phải "
 "hàng."
 
-#: tips:93
+#: tips:68
 msgid "Order large icons vertically"
 msgstr "Xếp các biểu tượng lớn thẳng đứng"
 
-#: tips:94
+#: tips:69
 msgid ""
 "If this option is on, then large icons are arranged in columns, not rows."
 msgstr ""
 "Nếu bật tùy chọn này, các biểu tượng lớn được sắp xếp theo cột, không phải "
 "hàng."
 
-#: tips:96
+#: tips:71
 msgid "Show column headings"
 msgstr "Hiện các cột tiêu đề"
 
-#: tips:97
+#: tips:72
 msgid "If this is on then column headings will be shown in the list view."
 msgstr "Các cột tiêu đề sẽ được hiện trong kiểu xem danh sách."
 
-#: tips:98
+#: tips:73
 msgid "Show full type"
 msgstr "Xem chi tiết loại tập tin"
 
-#: tips:99
+#: tips:74
 msgid ""
 "If this is on then the full description of each object's type will be show "
 "rather than a short summary of its basic type."
@@ -3816,39 +3782,39 @@ msgstr ""
 "Nếu bật tùy chọn này, sẽ hiển thị chi tiết miêu tả về loại đối tượng hơn là "
 "một tóm tắt ngắn về loại cơ bản của nó."
 
-#: tips:100
+#: tips:75
 msgid "Tools/Minibuffer"
 msgstr "Công cụ/Minibuffer"
 
-#: tips:101
+#: tips:76
 msgid "Toolbar"
 msgstr "Thanh công cụ"
 
-#: tips:102
+#: tips:77
 msgid "Toolbar type:"
 msgstr "Kiểu thanh công cụ"
 
-#: tips:103
+#: tips:78
 msgid "No toolbar"
 msgstr "Không có thanh công cụ"
 
-#: tips:104
+#: tips:79
 msgid "Icons only"
 msgstr "Chỉ biểu tượng"
 
-#: tips:105
+#: tips:80
 msgid "Text under icons"
 msgstr "Chữ dưới Biểu tượng"
 
-#: tips:106
+#: tips:81
 msgid "Text beside icons"
 msgstr "Chữ bên cạnh Biểu tượng"
 
-#: tips:107
+#: tips:82
 msgid "Show totals of items"
 msgstr "Hiện tổng số mục"
 
-#: tips:108
+#: tips:83
 msgid ""
 "Show the number of items displayed in a filer window, as well as the number "
 "of hidden items (if any). When there's a selection, show the number of "
@@ -3857,40 +3823,40 @@ msgstr ""
 "Hiện số các mục đã hiển thị trong cửa sổ cũng như số mục ẩn (nếu có). Khi có "
 "sự chọn, hiện số mục đã chọn và kích cỡ của chúng."
 
-#: tips:109
+#: tips:84
 msgid "Select the buttons you want on the bar:"
 msgstr "Chọn nút bạn muốn trên thanh công cụ:"
 
-#: tips:110
+#: tips:85
 msgid "Width of toolbar sets minimum width of window"
 msgstr "Độ rộng của thanh công cụ thiết đặt độ rộng nhỏ nhất của cửa sổ"
 
-#: tips:111
+#: tips:86
 msgid ""
 "Each filer window is constrained to be wide enough to show the whole of the "
 "toolbar"
 msgstr "Mỗi cửa sổ được ép đủ rộng để hiện tòan bộ thanh công cụ"
 
-#: tips:112
+#: tips:87
 msgid "Minibuffer"
 msgstr "Minibuffer"
 
-#: tips:113
+#: tips:88
 msgid "Beep if Tab-completion fails"
 msgstr "Kêu bíp khi Tab-hòan thành lỗi"
 
-#: tips:114
+#: tips:89
 msgid ""
 "When using the `Enter Path...' minibuffer and Tab is pressed, beep if "
 "nothing happens (eg, because there are several possibilities and the next "
 "letter varies)."
 msgstr "Khi dùng 'Nhập Đường dẫn...' và Tab được nhấn, sẽ kêu bíp nếu sai."
 
-#: tips:115
+#: tips:90
 msgid "Beep if there are several matches"
 msgstr "Kêu bíp nếu có nhiều trùng khớp"
 
-#: tips:116
+#: tips:91
 msgid ""
 "When using the `Enter Path...' minibuffer and Tab is pressed, beep if there "
 "is more than one matching file, even though some more letters were added."
@@ -3898,7 +3864,7 @@ msgstr ""
 "Khi dùn 'Nhập Đường dẫn...' và Tab được nhấn, sẽ kêu bíp nếu có nhiều tập "
 "tin trùng khớp."
 
-#: tips:119
+#: tips:94
 msgid ""
 "When thumbnails are turned on, each image file in a directory is loaded and "
 "a small thumbnail of it is shown."
@@ -3906,11 +3872,11 @@ msgstr ""
 "Khi chế độ chân dung được bật, mỗi tập tin hình ảnh trong thư mục được nạp "
 "và một chân dung nhỏ của nó được hiển thị."
 
-#: tips:120
+#: tips:95
 msgid "Show image thumbnails"
 msgstr "Hiện chân dung hình ảnh"
 
-#: tips:121
+#: tips:96
 msgid ""
 "This is the default setting for new windows. Use the Display menu to turn "
 "thumbnails on and off for individual windows."
@@ -3918,15 +3884,15 @@ msgstr ""
 "Đây là thiết đặt mặc định cho cửa sổ mới. Dùng menu Hiển thị để bật tắt chức "
 "năng chân dung cho các cửa sổ riêng biệt."
 
-#: tips:122
+#: tips:97
 msgid "Video thumbnails"
 msgstr "Xem chân dung"
 
-#: tips:123
+#: tips:98
 msgid "Thumbnails cache"
 msgstr "Bộ đệm Chân dung"
 
-#: tips:124
+#: tips:99
 msgid ""
 "To speed things up, the generated thumbnails are stored in the hidden ~/."
 "thumbnails directory. Click here to remove all the cached thumbnails. They "
@@ -3935,15 +3901,15 @@ msgstr ""
 "Để tăng tốc, các chân dung tạo ra sẽ được tích hợp trong thư mục ~/."
 "thumbnails. Nhấp chuột vào đây để xóa bộ đệm. Chúng sẽ được tạo lại nếu cần."
 
-#: tips:125
+#: tips:100
 msgid "Manage thumbnails"
 msgstr "Quản lý các thumbnail"
 
-#: tips:126 tips:203
+#: tips:101 tips:158
 msgid "Pinboard"
 msgstr "Pinboard"
 
-#: tips:127
+#: tips:102
 msgid ""
 "When using a pinboard, you can drag files and applications onto the desktop "
 "background to create shortcuts to them."
@@ -3951,47 +3917,47 @@ msgstr ""
 "Khi dùng một pinboard, bạn có thể kéo tập tin và ứng dụng vào nền của "
 "desktop để tạo lối tắt cho chúng."
 
-#: tips:128 tips:254
+#: tips:103 tips:213
 msgid "Appearance"
 msgstr "Bề ngoài"
 
-#: tips:129
+#: tips:104
 msgid "Foreground:"
 msgstr "Kế hoạch gần"
 
-#: tips:130
+#: tips:105
 msgid "Text shadow:"
 msgstr "Bóng text:"
 
-#: tips:131
+#: tips:106
 msgid "Background:"
 msgstr "Nền"
 
-#: tips:132
+#: tips:107
 msgid "No shadow"
 msgstr "Không có bóng text"
 
-#: tips:133
+#: tips:108
 msgid "Thin"
 msgstr "Mỏng"
 
-#: tips:134
+#: tips:109
 msgid "Thick"
 msgstr "Dày"
 
-#: tips:135
+#: tips:110
 msgid "Use custom font:"
 msgstr "Dùng font tuỳ chọn"
 
-#: tips:136
+#: tips:111
 msgid "The font used for the text displayed under the icons"
 msgstr "Font đã được dùng cho text hiển thị dưới biểu tượng"
 
-#: tips:137
+#: tips:112
 msgid "Fast scaling of images"
 msgstr "Xác định hình ảnh nhanh chóng"
 
-#: tips:138
+#: tips:113
 msgid ""
 "Choose between the fast or slow method of scaling backdrop images.  The slow "
 "method can give better results."
@@ -3999,19 +3965,19 @@ msgstr ""
 "Chọn lựa phương pháp nhanh hay chậm để xác định hình ảnh của nền. Phương "
 "pháp chậm có thể đưa ra kết quả tốt hơn."
 
-#: tips:139
+#: tips:114
 msgid "Pinboard behaviour"
 msgstr "Trạng thái pinboard"
 
-#: tips:140
+#: tips:115
 msgid "Single-click to open"
 msgstr "Nhấp đơn để mở"
 
-#: tips:142
+#: tips:117
 msgid "Keep icons within screen limits"
 msgstr "Giữ biểu tượng trong giới hạn màn hình"
 
-#: tips:143
+#: tips:118
 msgid ""
 "If this is set, pinboard icons are always kept completely within screen "
 "limits, including the label."
@@ -4019,39 +3985,39 @@ msgstr ""
 "Các biểu tượng pinboard luôn được giữ hòan tòan trong giới hạn màn hình, bao "
 "gồm cả nhãn."
 
-#: tips:144
+#: tips:119
 msgid "Icon grid step:"
 msgstr "Bước lưới biểu tượng: "
 
-#: tips:145
+#: tips:120
 msgid "Fine"
 msgstr "Tốt"
 
-#: tips:146
+#: tips:121
 msgid "Use a 2-pixel grid for positioning icons on the desktop."
 msgstr "Dùng lưới 2 pixel cho vị trí biểu tượng trên desktop."
 
-#: tips:147
+#: tips:122
 msgid "Medium"
 msgstr "Trung bình"
 
-#: tips:148
+#: tips:123
 msgid "Use a 16-pixel grid for positioning icons on the desktop."
 msgstr "Dùng lưới 16 pixel cho vị trí biểu tượng trên desktop."
 
-#: tips:149
+#: tips:124
 msgid "Coarse"
 msgstr "Kém"
 
-#: tips:150
+#: tips:125
 msgid "Use a 32-pixel grid for positioning icons on the desktop."
 msgstr "Dùng lưới 32 pixel cho vị trí biểu tượng trên desktop."
 
-#: tips:151 tips:153
+#: tips:126 tips:128
 msgid "Iconified windows"
 msgstr "Thu nhỏ cửa sổ"
 
-#: tips:152
+#: tips:127
 msgid ""
 "Most window managers provide a way to iconify (or 'minimise') windows, and "
 "various programs, including ROX-Filer, can be used to display the iconified "
@@ -4061,11 +4027,11 @@ msgstr ""
 "ứng dụng khác, bao gồm cả ROX-Filer, có thể dùng để hiển thị các cửa sổ thu "
 "nhỏ."
 
-#: tips:154
+#: tips:129
 msgid "Show iconified windows"
 msgstr "Hiện cửa sổ thu nhỏ"
 
-#: tips:155
+#: tips:130
 msgid ""
 "If this option is on, the filer will show each iconified window as a small "
 "button on the pinboard. Requires a compatible window manager, and the "
@@ -4074,11 +4040,11 @@ msgstr ""
 "ROX-Filer sẽ hiện cửa sổ thu nhỏ như một nút nhỏ trên pinboard. Yêu cầu một "
 "trình quản lý cửa sổ tương thích và pinboard phải được dùng."
 
-#: tips:156
+#: tips:131
 msgid "Show per workspace"
 msgstr "Hiển thị từng khung làm việc"
 
-#: tips:157
+#: tips:132
 msgid ""
 "If this option is on, the filer will only show iconified windows associated "
 "with the current workspace."
@@ -4086,39 +4052,39 @@ msgstr ""
 "Nếu bật tùy chọn này, ROX-Filer sẽ chỉ hiển thị các cửa sổ đã thu nhỏ có "
 "trong khung làm việc (ưorkspace) hiện tại."
 
-#: tips:158
+#: tips:133
 msgid "Iconify to the"
 msgstr "Thu nhỏ đến"
 
-#: tips:159
+#: tips:134
 msgid "top-left"
 msgstr "trên-trái"
 
-#: tips:160
+#: tips:135
 msgid "top-right"
 msgstr "trên-phải"
 
-#: tips:161
+#: tips:136
 msgid "bottom-left"
 msgstr "dưới-trái"
 
-#: tips:162
+#: tips:137
 msgid "bottom-right"
 msgstr "dưới-phải"
 
-#: tips:163
+#: tips:138
 msgid ", going"
 msgstr ", theo"
 
-#: tips:164
+#: tips:139
 msgid "horizontally"
 msgstr "phương ngang"
 
-#: tips:165
+#: tips:140
 msgid "vertically"
 msgstr "phương dọc"
 
-#: tips:166
+#: tips:141
 msgid ""
 "Sometimes the filer doesn't know about your desktop furniture and puts "
 "iconified windows under (for example) the Gnome panel. You can define a top "
@@ -4129,130 +4095,43 @@ msgstr ""
 "xuống (ví dụ) thanh panel của Gnome. Bạn có thể xác định một lề trên hay "
 "dưới để đặt biểu tượng ở đó. ROX-Filer nhận biết được panel của nó :)."
 
-#: tips:167
+#: tips:142
 msgid "Top margin"
 msgstr "Lề trên"
 
-#: tips:168
+#: tips:143
 msgid "Height of no-go area at top of screen."
 msgstr "Chiều cao của vùng không đi tại đỉnh màn hình"
 
-#: tips:169
+#: tips:144
 msgid "Bottom margin"
 msgstr "Lề dưới"
 
-#: tips:170
+#: tips:145
 msgid "Height of no-go area at bottom of screen."
 msgstr "Chiều cao của vùng không đi tại đáy màn hình."
 
-#: tips:171
+#: tips:146
 msgid "Left margin"
 msgstr "Lề trái"
 
-#: tips:172
+#: tips:147
 msgid "Width of no-go area at left of screen."
 msgstr "Độ rộng của vùng không-di-chuyển phía trái màn hình"
 
-#: tips:173
+#: tips:148
 msgid "Right margin"
 msgstr "Lề phải"
 
-#: tips:174
+#: tips:149
 msgid "Width of no-go area at right of screen."
 msgstr "Độ rộng của vùng không-di-chuyển phía phải màn hình"
 
-#: tips:175
-msgid "Panels"
-msgstr "Panel"
-
-#: tips:176
-msgid ""
-"Panels are bars of icons that run along the side of the screen. See the "
-"manual for information about using panels."
-msgstr ""
-"Panel là những thanh biểu tượng chạy theo chiều dài cạnh màn hình. Xem sổ "
-"tay để thêm thông tin về cách dùng panel."
-
-#: tips:177
-msgid "Panel style"
-msgstr "Kiểu Panel"
-
-#: tips:178
-msgid "Image and text"
-msgstr "Ảnh và chữ"
-
-#: tips:179
-msgid "Every panel icon is shown with an image and some text."
-msgstr "Mỗi biểu tượng panel được hiển thị với một ảnh và vài chữ."
-
-#: tips:180
-msgid "Image only for applications"
-msgstr "Chỉ ảnh cho ứng dụng"
-
-#: tips:181
-msgid ""
-"Applications have just an image, everything else has both an image and text."
-msgstr "Ứng dụng chỉ có ảnh, mọi thứ khác có cả ảnh và chữ."
-
-#: tips:182
-msgid "Image only"
-msgstr "Chỉ ảnh"
-
-#: tips:183
-msgid "Only the image is shown."
-msgstr "Chỉ ảnh được hiển thị"
-
-#: tips:184
-msgid "Panel width (thin)"
-msgstr "Độ rộng panel (mỏng)"
-
-#: tips:185
-msgid "(thick)"
-msgstr "(dày)"
-
-#: tips:186
-msgid "The size of the panels."
-msgstr "Kích cỡ của panel."
-
-#: tips:187
-msgid "Do not cover panel"
-msgstr "Không che lấp panel"
-
-#: tips:188
-msgid ""
-"Ask the window manager not to cover panels at all when you maximise windows. "
-"Some window managers may not honour this. If unset, the filer asks for just "
-"a couple of pixels at the edge of the screen to remain uncovered, so that "
-"auto-raising works."
-msgstr ""
-"Buộc trình quản lý cửa sổ không che lấp panel khi tất cả cửa sổ cực đại."
-
-#: tips:189
-msgid "Xinerama"
-msgstr "Xinerama"
-
-#: tips:190
-msgid "Confine to Xinerama monitor"
-msgstr "Hạn chế màn hình Xinerama"
-
-#: tips:191
-msgid ""
-"If you have an Xinerama multi-monitor setup, use this option to confine the "
-"panels to one monitor instead of spanning them."
-msgstr ""
-"Nếu bạn có một thiết đặt nhiều màn hình Xinerama, dùng tùy chọn này để hạn "
-"chế các panel đến một màn hình."
-
-#: tips:192
-msgid ""
-"The monitor the panels are confined to in Xinerama mode (numbered from 0)."
-msgstr "Panels bị hạn chế trong chế độ Xinerama (số từ 0)."
-
-#: tips:193
+#: tips:150
 msgid "Desktop"
 msgstr "Desktop"
 
-#: tips:194
+#: tips:151
 msgid ""
 "When run by a session manager program (such as ROX-Session) the filer can "
 "open up a panel and/or the pinboard.  Here you configure which."
@@ -4261,47 +4140,51 @@ msgstr ""
 "quản lý tập tin có thể mở một panel và/hay một pinboard. Đây là nơi bạn cấu "
 "hình nó"
 
-#: tips:195
+#: tips:152
 msgid "Panel only"
 msgstr "Chỉ panel"
 
-#: tips:196
+#: tips:153
 msgid "Only a panel is shown."
 msgstr "Chỉ hiện một panel"
 
-#: tips:197
+#: tips:154
 msgid "Pinboard only"
 msgstr "Chỉ pinboard"
 
-#: tips:198
+#: tips:155
 msgid "Only the pinboard is shown."
 msgstr "Chỉ hiện pinboard"
 
-#: tips:199
+#: tips:156
 msgid "Panel and pinboard"
 msgstr "Panel và pinboard"
 
-#: tips:200
+#: tips:157
 msgid "Both a panel and a pinboard are shown."
 msgstr "Hiện cả panel và pinboard"
 
-#: tips:201
-msgid "Panel"
-msgstr "Panel"
-
-#: tips:202
-msgid "Enter the name of the panel to show here."
-msgstr "Hãy nhập tên của panel để hiện."
-
-#: tips:204
+#: tips:159
 msgid "Enter the name of the pinboard to show here."
 msgstr "Hãy nhập tên của pinboard để hiện."
 
-#: tips:205
+#: tips:160
+msgid "Panel (obsolete)"
+msgstr "Panel (cũ)"
+
+#: tips:161
+msgid ""
+"Enter the name of the panel to show here. This option is now only used when "
+"upgrading from an old version."
+msgstr ""
+"Nhập tên của panel để hiển thị ở đây. Tuỳ chọn này chỉ được dùng khi "
+"cập nhật từ phiên bản cũ."
+
+#: tips:162
 msgid "Changes here take effect the next time the filer is run."
 msgstr "Các thay đổi sẽ có tác dụng trong lần chạy kế tiếp của ROX-Filer."
 
-#: tips:206
+#: tips:163
 msgid ""
 "The session manager activates these options by using the -S or --rox-session "
 "argument to rox."
@@ -4309,11 +4192,11 @@ msgstr ""
 "Trình quản lý phiên khởi chạy các tùy chọn này bằng cách dùng tham số -S "
 "hoặc --rox-session đến rox."
 
-#: tips:207
+#: tips:164
 msgid "Action windows"
 msgstr "Cửa sổ Hành động"
 
-#: tips:208
+#: tips:165
 msgid ""
 "Action windows appear when you start a background\n"
 "operation, such as copying or deleting some files."
@@ -4321,69 +4204,69 @@ msgstr ""
 "Các cửa sổ hành động xuất hiện khi bạn bắt đầu một thao tác\n"
 "nền như là sao chép hoặc xóa tập tin."
 
-#: tips:209
+#: tips:166
 msgid "Auto-start (Quiet) these actions"
 msgstr "Tự bắt đầu (Không hỏi) những hành động này"
 
-#: tips:211
+#: tips:168
 msgid "Copy files without confirming first."
 msgstr "Sao chép tập tin không cần xác nhận."
 
-#: tips:213
+#: tips:170
 msgid "Move files without confirming first."
 msgstr "Di chuyển tập tin không cần xác nhận."
 
-#: tips:215
+#: tips:172
 msgid "Create links to files without confirming first."
 msgstr "Tạo liên kết đến tập tin không cần xác nhận."
 
-#: tips:217
+#: tips:174
 msgid "Delete files without confirming first."
 msgstr "Xóa tập tin không cần xác nhận."
 
-#: tips:218
+#: tips:175
 msgid "Mount"
 msgstr "Gắn kết"
 
-#: tips:219
+#: tips:176
 msgid "Mount and unmount filesystems without confirming first."
 msgstr "Gắn kết và hủy gắn kết hệ thống tập tin không cần xác nhận."
 
-#: tips:220
+#: tips:177
 msgid "Default settings"
 msgstr "Các thiết đặt mặc định"
 
-#: tips:222
+#: tips:179
 msgid "Don't confirm deletion of non-writeable items."
 msgstr "Không xác nhận việc xóa các mục không thể viết."
 
-#: tips:224
+#: tips:181
 msgid "Don't display so much information in the message area."
 msgstr "Không hiển thị quá nhiểu thông tin trong vùng message."
 
-#: tips:226
+#: tips:183
 msgid "Also change contents of subdirectories."
 msgstr "Cũng thay đổi luôn nội dung thư mục con."
 
-#: tips:229
+#: tips:186
 msgid "Mount commands"
 msgstr "Lệnh gắn kết"
 
-#: tips:230
+#: tips:187
 msgid "Mount command"
 msgstr "Lệnh gắn kết"
 
-#: tips:231
+#: tips:188
 msgid "The command used to mount a filesystem. If unsure, use \"mount\"."
 msgstr ""
 "Lệnh dùng để gắn kết một tập tin hệ thống (filesystem). Nếu không chắc, dùng "
 "\"mount\"."
 
-#: tips:232
+#: tips:189
 msgid "Unmount command"
 msgstr "Lệnh huỷ gắn kết"
 
-#: tips:233
+#: tips:190
 msgid ""
 "The command used to unmount a filesystem. If unsure, use \"umount\" (yes, "
 "without the first \"n\")."
@@ -4391,19 +4274,27 @@ msgstr ""
 "Lệnh dùng để hủy gắn kết một tập tin hệ thống (filesystem). Nếu không chắc, "
 "dùng \"umount\""
 
-#: tips:234
+#: tips:191
+msgid "Eject command"
+msgstr "Lệnh eject"
+
+#: tips:192
+msgid "The command used to eject removable media. If unsure, use \"eject\"."
+msgstr "Lệnh dùng để nhả dụng cụ có thể gỡ. Nếu không chắc, dùng \"eject\"."
+
+#: tips:193
 msgid "Drag and Drop"
 msgstr "Kéo và Thả"
 
-#: tips:235
+#: tips:194
 msgid "Dragging to icons"
 msgstr "Kéo đến biểu tượng"
 
-#: tips:236
+#: tips:195
 msgid "Allow dragging to icons in filer windows"
 msgstr "Cho phép kéo đến biểu tượng trong cửa sổ"
 
-#: tips:237
+#: tips:196
 msgid ""
 "When this is on you can drag a file over a sub-directory or program in a "
 "filer window. The item will highlight when you do this and dropping the file "
@@ -4413,11 +4304,11 @@ msgstr ""
 "Mục sẽ tô sáng lên và bạn thả tập tin vào thư mục hay nạp nó vào chương "
 "trình."
 
-#: tips:238
+#: tips:197
 msgid "Directories spring open"
 msgstr "Thư mục xuất hiện"
 
-#: tips:239
+#: tips:198
 msgid ""
 "This option, which requires the above option to be turned on too, causes the "
 "highlighted directory to 'spring open' after the file is held over it for a "
@@ -4426,15 +4317,15 @@ msgstr ""
 "Tùy chọn này yêu cầu tùy chọn trên. Khi thư mục được tô sáng sẽ được mở ra "
 "sau khi giữ tập tin trên nó."
 
-#: tips:240
+#: tips:199
 msgid "Spring delay:"
 msgstr "Độ trễ xuất hiện:"
 
-#: tips:241
+#: tips:200
 msgid "ms"
 msgstr "ms"
 
-#: tips:242
+#: tips:201
 msgid ""
 "This option sets how long, in ms, you must hold a file over a directory "
 "before it will spring open. The above option must be turned on for this to "
@@ -4443,43 +4334,43 @@ msgstr ""
 "Thiết đặt bạn phải giữ tập tin trên thư mục bao lâu, bằng ms, trước khi nó "
 "mở ra."
 
-#: tips:243
+#: tips:202
 msgid "When dragging files with the left mouse button"
 msgstr "Khi kéo tập tin với nút trái chuột"
 
-#: tips:244 tips:248
+#: tips:203 tips:207
 msgid "Show a menu of possible actions"
 msgstr "Hiện menu các hành động có thể"
 
-#: tips:245
+#: tips:204
 msgid "Copy the files"
 msgstr "Sao chép tập tin"
 
-#: tips:246
+#: tips:205
 msgid ""
 "Note that you can still get the menu to appear, by dragging with Alt held "
 "down."
 msgstr "Bạn vẫn có thể lấy menu bằng cách kéo và giữ phím Alt"
 
-#: tips:247
+#: tips:206
 msgid "When dragging files with the middle mouse button"
 msgstr "Khi kéo tập tin với nút chuột"
 
-#: tips:249
+#: tips:208
 msgid "Move the files"
 msgstr "Di chuyển tập tin"
 
-#: tips:250
+#: tips:209
 msgid ""
 "Note that you can still get the menu to appear, by dragging with the left "
 "button and holding down the Alt key."
 msgstr "Bạn vẫn có thể lấy menu bằng cách kéo và giữ phím Alt"
 
-#: tips:251
+#: tips:210
 msgid "Download handler"
 msgstr "Trình điều khiển tải về"
 
-#: tips:252
+#: tips:211
 msgid ""
 "When you drag a file from a web browser or other remote source, this program "
 "will be run to download it. $1 is the URI dragged to the filer, and the "
@@ -4491,35 +4382,35 @@ msgstr ""
 "tại là đích. Ví dụ:\n"
 "xterm -e wget $1"
 
-#: tips:253
+#: tips:212
 msgid "Menus"
 msgstr "Trình đơn"
 
-#: tips:255
+#: tips:214
 msgid "Size of icons in menus:"
 msgstr "Kích cỡ biểu tượng trong menu:"
 
-#: tips:256
+#: tips:215
 msgid "No Icons"
 msgstr "Không biểu tượng"
 
-#: tips:259
+#: tips:218
 msgid "Same as current window"
 msgstr "Như cửa sổ hiện tại"
 
-#: tips:260
+#: tips:219
 msgid "Same as default"
 msgstr "Như mặc định"
 
-#: tips:261
+#: tips:220
 msgid "Behaviour"
 msgstr "Cách chạy"
 
-#: tips:262
+#: tips:221
 msgid "File menu on right-click"
 msgstr "Trình đơn Tập tin khi nhấp chuột phải"
 
-#: tips:263
+#: tips:222
 msgid ""
 "Show the File menu instead of the main menu when right-clicking with files "
 "selected (the main menu can be accessed by holding down Control)."
@@ -4527,23 +4418,23 @@ msgstr ""
 "Hiện menu Tập tin thay thế menu chính khi nhấp chuột phải trên tập tin (menu "
 "chính có thể truy nhập bằng cách giữ Ctrl)."
 
-#: tips:264
+#: tips:223
 msgid "Terminal emulator program"
 msgstr "Chương trình giả lập terminal"
 
-#: tips:265
+#: tips:224
 msgid "The program to launch when you choose `Terminal Here' from the menu."
 msgstr "Chương trình để chạy khi bạn chọn 'Mở Terminal ở đây' từ menu."
 
-#: tips:266
+#: tips:225
 msgid "Keyboard shortcuts"
 msgstr "Phím tắt bàn phím"
 
-#: tips:268
+#: tips:227
 msgid "MIME types"
 msgstr "Loại MIME"
 
-#: tips:269
+#: tips:228
 msgid ""
 "The filer uses a set of rules to work out the correct MIME type for each "
 "regular file, and then chooses a suitable icon for that type."
@@ -4551,23 +4442,23 @@ msgstr ""
 "ROX-Filer thiết đặt một qui luật để thi hành chính xác lọai MIME cho các tập "
 "tin thường, sau đó chọn biểu tượng cho lọai đó."
 
-#: tips:270
+#: tips:229
 msgid "Edit MIME rules"
 msgstr "Chỉnh sửa luật MIME"
 
-#: tips:271
+#: tips:230
 msgid "Themes"
 msgstr "Theme"
 
-#: tips:272
+#: tips:231
 msgid "Icon theme"
 msgstr "Theme của biểu tượng"
 
-#: tips:273
+#: tips:232
 msgid "Themes should be placed inside the ~/.icons directory."
 msgstr "Các theme nên được đặt trong thư mục ~/.icons"
 
-#: tips:274
+#: tips:233
 msgid ""
 "Use the 'Set Icon...' dialog box to set the icon for each MIME type. Note "
 "that icons set this way override those from the selected theme."
@@ -4576,39 +4467,39 @@ msgstr ""
 "MIME. Ghi nhớ rằng các biểu tượng được thiết đặt theo cách này sẽ ghi đè lên "
 "biểu tượng được chọn trong theme."
 
-#: tips:275
+#: tips:234
 msgid "Colours"
 msgstr "Màu sắc"
 
-#: tips:276
+#: tips:235
 msgid "File type colours"
 msgstr "Màu loại tập tin"
 
-#: tips:277
+#: tips:236
 msgid "Colour files based on their types"
 msgstr "Màu sắc tập tin dưa trên lọai của chúng"
 
-#: tips:278
+#: tips:237
 msgid "Filenames (and details) are coloured according to the file's type."
 msgstr "Tên tập tin (và chi tiết) được tô màu phù hợp với lọai tập tin."
 
-#: tips:279
+#: tips:238
 msgid "Directory:"
 msgstr "Thư mục"
 
-#: tips:280
+#: tips:239
 msgid "Regular file:"
 msgstr "Tập tin thường"
 
-#: tips:281
+#: tips:240
 msgid "Pipe:"
 msgstr "Pipe:"
 
-#: tips:282
+#: tips:241
 msgid "Socket:"
 msgstr "Socket:"
 
-#: tips:284
+#: tips:243
 msgid ""
 "Error, such as a symlink which points to a non-existant file, or a file "
 "which the filer does not have permission to examine."
@@ -4616,19 +4507,19 @@ msgstr ""
 "Lỗi, liên kết trỏ đến một tập tin không có hoặc là ROX-Filer không có quyền "
 "truy nhập đến tâp tin"
 
-#: tips:285
+#: tips:244
 msgid "Character device:"
 msgstr "Thiết bị mẫu tự"
 
-#: tips:286
+#: tips:245
 msgid "Block device:"
 msgstr "Thiết bị khối"
 
-#: tips:287
+#: tips:246
 msgid "Door:"
 msgstr "Door:"
 
-#: tips:288
+#: tips:247
 msgid ""
 "Door files are a bit like sockets or pipes, and have only been seen on "
 "Solaris."
@@ -4636,31 +4527,31 @@ msgstr ""
 "Các tập tin door là một nhị phận như socket hay ống dẫn và chỉ có trên "
 "Solaris."
 
-#: tips:289
+#: tips:248
 msgid "Executable file:"
 msgstr "Tập tin thực thi:"
 
-#: tips:290
+#: tips:249
 msgid "Application directory:"
 msgstr "Thư mục ứng dụng:"
 
-#: tips:291
+#: tips:250
 msgid "Unknown type:"
 msgstr "Lọai không biết:"
 
-#: tips:292
+#: tips:251
 msgid "Compatibility"
 msgstr "Tương thích"
 
-#: tips:293
+#: tips:252
 msgid "Window manager problems"
 msgstr "Vấn đề trình quản lý cửa sổ"
 
-#: tips:294
+#: tips:253
 msgid "Override window manager control of the pinboard and panels"
 msgstr "Lọai bỏ sự điều khiển pinboard và panel của Trình Quản lý cửa sổ"
 
-#: tips:295
+#: tips:254
 msgid ""
 "Some window managers don't support the new Extended Window Manager Hints "
 "system, and so treat the pinboard and panels like normal windows. Turn this "
@@ -4674,11 +4565,11 @@ msgstr ""
 "và các trang trí khác có vẻ nằm xung quanh cửa sổ hay có chúng trong danh "
 "sách chọn cửa sổ."
 
-#: tips:296
+#: tips:255
 msgid "Pass all backdrop mouse clicks to window manager"
 msgstr "Đưa các nhấp chuột vào nền đến Trình Quản lý cửa sổ"
 
-#: tips:297
+#: tips:256
 msgid ""
 "Normally, right clicking on the desktop background will open the pinboard "
 "menu and left clicking will clear the selection. Turn this on to forward the "
@@ -4688,11 +4579,11 @@ msgstr ""
 "bỏ chọn. Bật chức năng này để đưa các sự việc đến Trình Quản Lý Cửa Sổ. Các "
 "nhấp chuột trên biểu tượng sẽ không được đưa."
 
-#: tips:298
+#: tips:257
 msgid "Blackbox root menus hack"
 msgstr "Hack menu gốc của Blackbox"
 
-#: tips:299
+#: tips:258
 msgid ""
 "Blackbox, Fluxbox and similar window managers do not yet work well with the "
 "ROX-Filer pinboard. This option enables some workarounds. These window "
@@ -4704,11 +4595,11 @@ msgstr ""
 "trình quản lý cửa sổ này sẽ thay đổi các xử lý trong các phiên bản mới để "
 "điều này không cần thiết nữa."
 
-#: tips:300
+#: tips:259
 msgid "Panel is a 'dock'"
 msgstr "Panel là một 'dock'"
 
-#: tips:301
+#: tips:260
 msgid ""
 "Disable this option if the panel stays above other windows against your "
 "wishes. Requires a restart to take effect."
@@ -4716,15 +4607,15 @@ msgstr ""
 "Tắt tùy chọn này nếu panel ở trên các cửa sổ khác ngòai sự mong muốn của "
 "bạn. Yêu cầu khởi động lại để có hiệu lực."
 
-#: tips:302
+#: tips:261
 msgid "Drag and drop"
 msgstr "Kéo và thả"
 
-#: tips:303
+#: tips:262
 msgid "Don't use hostnames"
 msgstr "Không dùng hostnames"
 
-#: tips:304
+#: tips:263
 msgid ""
 "Some older applications don't support XDND fully and may need to have this "
 "option turned on. Use this if dragging files to an application shows a + "
@@ -4734,15 +4625,15 @@ msgstr ""
 "Dùng nếu khi kéo tập tin hiện một dấu cộng (+) trên chuột nhưng thả không "
 "làm việc."
 
-#: tips:305
+#: tips:264
 msgid "Extended attributes"
 msgstr "Các thuộc tính mở rộng"
 
-#: tips:306
+#: tips:265
 msgid "Don't use extended attributes"
 msgstr "Không dùng các thuộc tính mở rộng"
 
-#: tips:307
+#: tips:266
 msgid ""
 "This disables the use of extended attributes available in newer operating "
 "systems and file systems.  With this option set the 'Set Type' menu entry is "
@@ -4753,6 +4644,265 @@ msgstr ""
 "điều hành mới và các hệ thống tập tin mới. Nó tắt menu 'Thiết đặt Loại', "
 "loại MIME của tập tin chỉ lấy được từ tên tập tin và thuộc tính của cửa sổ "
 "không thông báo các thuộc tính mở rộng."
+
+#: ../Templates.glade:7
+msgid "ROX-Filer log viewer"
+msgstr "Trình xem Bản ghi của ROX-Filer"
+
+#: ../Templates.glade:22
+msgid "Recently performed actions..."
+msgstr "Những hành động gần đây ..."
+
+#: ../Templates.glade:77
+msgid "Open Directory"
+msgstr "Mở Thư mục"
+
+#: ../Templates.glade:129
+msgid "Panel Options"
+msgstr "Cấu hình panel"
+
+#: ../Templates.glade:169
+msgid "Every icon on this panel is shown with an image and some text."
+msgstr "Mỗi biểu tượng trên panel này được hiển thị với một ảnh và vài chữ."
+
+#: ../Templates.glade:170
+msgid "Image and Text"
+msgstr "Ảnh và chữ"
+
+#: ../Templates.glade:186
+msgid ""
+"Applications in this panel have just an image, everything else has both an "
+"image and text."
+msgstr "Ứng dụng trên panel này chỉ có ảnh, mọi thứ khác có cả ảnh và chữ."
+
+#: ../Templates.glade:187
+msgid "Image only for applications"
+msgstr "Chỉ ảnh cho ứng dụng"
+
+#: ../Templates.glade:205
+msgid "Only the image is shown for icons in this panel."
+msgstr "Chỉ ảnh được hiển thị đối với các biểu tượng trên panel này"
+
+#: ../Templates.glade:206
+msgid "Image only"
+msgstr "Chỉ ảnh"
+
+#: ../Templates.glade:235
+msgid "Panel width"
+msgstr "Độ rộng của panel"
+
+#: ../Templates.glade:247
+msgid "The size of this panel."
+msgstr "Kích cỡ của panel này."
+
+#: ../Templates.glade:259
+msgid "px"
+msgstr "px"
+
+#: ../Templates.glade:278
+msgid ""
+"Ask the window manager not to cover this panel when maximising windows, "
+"otherwise leave just 2 pixels at the edge of the screen to allow auto-"
+"raising. Some window managers may not honour this setting."
+msgstr ""
+"Yêu cầu trình quản lý cửa sổ không che lấp panel này khi cửa sổ được"
+"phóng cực đại, mặc khác chỉ đặt 2 pixel tại cạnh màn hình để cho phép tự"
+"động hiện ra. Vài trình quản lý cửa sổ không có thiết lập này."
+
+#: ../Templates.glade:279
+msgid "Do not cover panel"
+msgstr "Không che lấp panel"
+
+#: ../Templates.glade:297
+msgid "<b>Panel style</b>"
+msgstr "<b>Kiểu Panel</b>"
+
+#: ../Templates.glade:331
+msgid ""
+"If you use multiple monitors with Xinerama, use this option to confine the "
+"panel to one monitor."
+msgstr ""
+"Nếu bạn dùng nhiều màn hình với Xinerama, dùng tùy chọn này để hạn ché panel"
+"đến một màn hình."
+
+#: ../Templates.glade:332
+msgid "Confine to Xinerama monitor"
+msgstr "Hạn chế màn hình Xinerama"
+
+#: ../Templates.glade:347
+msgid ""
+"The monitor this panel is confined to when using Xinerama. The numbering "
+"starts from zero."
+msgstr ""
+"Panels bị hạn chế đến màn hình khi dùng Xinerama. Số bắt đầu từ zero."
+
+#: ../Templates.glade:372
+msgid "<b>Xinerama</b>"
+msgstr "<b>Xinerama</b>"
+
+#: ../Templates.glade:407
+msgid "Right edge"
+msgstr "Cạnh phải"
+
+#: ../Templates.glade:426
+msgid "Left edge"
+msgstr "Cạnh trái"
+
+#: ../Templates.glade:443
+msgid "Bottom edge"
+msgstr "Cạnh dưới"
+
+#: ../Templates.glade:462
+msgid "Top edge"
+msgstr "Cạnh trên"
+
+#: ../Templates.glade:496
+msgid "<b>Position</b>"
+msgstr "<b>Vị trí</b>"
+
+#~ msgid "Panel: %s"
+#~ msgstr "Panel: %s"
+
+#~ msgid "Select the panel's position:"
+#~ msgstr "Chọn vị trí cho panel:"
+
+#~ msgid "Top-edge panel"
+#~ msgstr "Panel cạnh-trên"
+
+#~ msgid "Bottom edge panel"
+#~ msgstr "Panel cạnh-dưới"
+
+#~ msgid "Left edge panel"
+#~ msgstr "Panel cạnh-trái"
+
+#~ msgid "Right-edge panel"
+#~ msgstr "Panel cạnh-phải"
+
+#~ msgid "Invalid .gmo translation file (too short): %s"
+#~ msgstr "Sai tập tin dịch .gmo (quá ngắn): %s"
+
+#~ msgid "Invalid .gmo translation file (GNU magic number not found): %s"
+#~ msgstr "Sai tập tin dịch .gmo (không thấy con số kì diệu GNU): %s"
+
+#~ msgid ""
+#~ "Icon theme '%s' does not contain MIME icons. Using ROX default theme "
+#~ "instead."
+#~ msgstr ""
+#~ "Chủ đề biểu tượng '%s' không chứa các biểu tượng MIME. Dùng chủ đề mặc "
+#~ "định."
+
+#~ msgid ""
+#~ "Failed to create symlink '%s':\n"
+#~ "%s\n"
+#~ "\n"
+#~ "(this may mean that the ROX theme already exists there, but the 'mime-"
+#~ "application:postscript' icon couldn't be loaded for some reason, or %s is "
+#~ "a link to an invalid directory; try deleting it)"
+#~ msgstr ""
+#~ "Lỗi tạo liên kết '%s':\n"
+#~ "%s\n"
+#~ "\n"
+#~ "(điều này nghĩa là theme của ROX đã có ở đó nhưng biểu tượng 'mime-"
+#~ "application:postscript' không thể được nạp hoặc là %s liên kết đến một "
+#~ "thư mục không đúng; hãy thử xóa nó)"
+
+#~ msgid "Translation"
+#~ msgstr "Bản dịch"
+
+#~ msgid "Language"
+#~ msgstr "Ngôn ngữ"
+
+#~ msgid "Use the LANG environment variable"
+#~ msgstr "Dùng biến môi trường LANG"
+
+#~ msgid "Basque"
+#~ msgstr "Xứ Basque"
+
+#~ msgid "Chinese (traditional)"
+#~ msgstr "Trung Quốc (tradicional)"
+
+#~ msgid "Chinese (simplified)"
+#~ msgstr "Trung Quốc (simplificado)"
+
+#~ msgid "Czech"
+#~ msgstr "Sec"
+
+#~ msgid "Danish"
+#~ msgstr "Đan Mạch"
+
+#~ msgid "Dutch"
+#~ msgstr "Hà Lan"
+
+#~ msgid "English (no translation)"
+#~ msgstr "Anh (không dịch)"
+
+#~ msgid "Estonian"
+#~ msgstr "Estonia"
+
+#~ msgid "Finnish"
+#~ msgstr "Phần Lan"
+
+#~ msgid "French"
+#~ msgstr "Pháp"
+
+#~ msgid "German"
+#~ msgstr "Đức"
+
+#~ msgid "Hungarian"
+#~ msgstr "Hungari"
+
+#~ msgid "Japanese"
+#~ msgstr "Nhật"
+
+#~ msgid "Norwegian"
+#~ msgstr "Na Uy"
+
+#~ msgid "Italian"
+#~ msgstr "Ý"
+
+#~ msgid "Polish"
+#~ msgstr "Ba Lan"
+
+#~ msgid "Portuguese (Portugal)"
+#~ msgstr "Bồ Đào Nha (Bồ Đào Nha)"
+
+#~ msgid "Portuguese (Brasil)"
+#~ msgstr "Bồ Đào Nha (Brasil)"
+
+#~ msgid "Romanian"
+#~ msgstr "Rumani"
+
+# tips
+#~ msgid "Russian"
+#~ msgstr "Nga"
+
+#~ msgid "Spanish"
+#~ msgstr "Tây Ban Nha"
+
+#~ msgid "Swedish"
+#~ msgstr "Thuỵ Điển"
+
+#~ msgid "Ukrainian"
+#~ msgstr "Uc-crai-na"
+
+#~ msgid "Vietnamese"
+#~ msgstr "Tiếng Việt"
+
+#~ msgid "Panels"
+#~ msgstr "Panel"
+
+#~ msgid ""
+#~ "Panels are bars of icons that run along the side of the screen. See the "
+#~ "manual for information about using panels."
+#~ msgstr ""
+#~ "Panel là những thanh biểu tượng chạy theo chiều dài cạnh màn hình. Xem sổ "
+#~ "tay để thêm thông tin về cách dùng panel."
+
+#~ msgid "(thick)"
+#~ msgstr "(dày)"
+
+#~ msgid "Enter the name of the panel to show here."
+#~ msgstr "Hãy nhập tên của panel để hiện."
 
 #~ msgid ""
 #~ ".\n"
