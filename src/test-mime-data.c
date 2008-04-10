@@ -320,6 +320,10 @@ main (int argc, char *argv[])
 	printf (", %d unexpected successes", xmatch);
       printf ("\n");
 
+      if (xmatch > 0)
+        return 1;
+      if (xfailed == failed)
+        return 0;
       return 1;
     }
 
