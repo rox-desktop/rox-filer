@@ -1,3 +1,14 @@
+2008-04-18  Bastien Nocera  <hadess@hadess.net>
+
+	* src/xdgmimecache.c (cache_magic_lookup_data),
+	(_xdg_mime_cache_mime_type_subclass): Fix possible crasher when
+	XDG_DATA_DIRS contains the same directory twice, patch by Joe Shaw
+	<joeshaw@novell.com> (#12512)
+
+	Make _xdg_mime_cache_mime_type_subclass use the internal version of
+	xdg_mime_media_type_equal(), spotted by Federico Mena-Quintero
+	<federico@ximian.com>
+
 2008-04-10  Bastien Nocera  <hadess@hadess.net>
 
 	* src/test-mime-data.c (main): Only error out when
