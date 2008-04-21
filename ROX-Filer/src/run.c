@@ -621,6 +621,7 @@ static gboolean run_desktop(const char *full_path,
 	GError *error = NULL;
 	char *exec = NULL;
 	char *terminal = NULL;
+	char *req_dir = NULL;
 	gint argc = 0;
 	gchar **argv = NULL;
 	GPtrArray *expanded = NULL;
@@ -632,6 +633,7 @@ static gboolean run_desktop(const char *full_path,
 					&error,
 					"Desktop Entry", "Exec", &exec,
 					"Desktop Entry", "Terminal", &terminal,
+				        "Desktop Entry", "Path", &req_dir,
 					NULL);
 	if (error)
 	{
@@ -699,6 +701,9 @@ static gboolean run_desktop(const char *full_path,
 	}
 	g_ptr_array_add(expanded, NULL);
 
+	if(req_dir)
+		dir = req_dir;
+
 	success = rox_spawn(dir, (const gchar **) expanded->pdata);
 err:
 	if (error != NULL)
@@ -707,6 +712,8 @@ err:
 		g_free(exec);
 	if (terminal != NULL)
 		g_free(terminal);
+	if (req_dir != NULL)
+		g_free(req_dir);
 	if (argv != NULL)
 		g_strfreev(argv);
 	if (expanded != NULL)
