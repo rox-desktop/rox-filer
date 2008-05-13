@@ -1222,6 +1222,7 @@ static void rox_wmspec_change_state(gboolean add, GdkWindow *window,
 		   &xev);
 }
 
+/* Tell the window manager whether to keep this window below others. */
 void keep_below(GdkWindow *window, gboolean setting)
 {
 	g_return_if_fail(GDK_IS_WINDOW(window));

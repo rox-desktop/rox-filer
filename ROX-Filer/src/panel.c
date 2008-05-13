@@ -201,6 +201,7 @@ static GList *build_monitor_number(Option *option,
 					xmlNode *node, guchar *label);
 static gboolean may_autoscroll(Panel *panel);
 static void panel_update_geometry(Panel *panel);
+static gboolean panel_keep_below(Panel *panel, gboolean setting);
 
 
 static GtkWidget *dnd_highlight = NULL; /* (stops flickering) */
@@ -214,6 +215,7 @@ static Option o_panel_xinerama;
 static Option o_panel_monitor;
 static Option o_panel_avoid;
 static Option o_panel_is_dock;
+static Option o_panel_on_top;
 
 static gint panel_monitor = -1;
 
@@ -232,7 +234,8 @@ void panel_init(void)
 	option_add_int(&o_panel_monitor, "panel_monitor", 0);
 
 	option_add_int(&o_panel_avoid, "panel_avoid", TRUE);
-	option_add_int(&o_panel_is_dock, "panel_is_dock", FALSE);
+	option_add_int(&o_panel_is_dock, "panel_is_dock", TRUE);
+	option_add_int(&o_panel_on_top, "panel_on_top", FALSE);
 
 	option_add_notify(panel_style_changed);
 
@@ -556,8 +559,7 @@ Panel *panel_new(const gchar *name, PanelSide side)
 	gdk_window_lower(panel->window->window);
 	gtk_widget_show(panel->window);
 	/* This has no effect until after window is showing; GTK+ bug? */
-	keep_below(panel->window->window, TRUE);
-
+	if (panel_keep_below(panel, TRUE))
 	{
 		GdkWindow *pinboard;
 
@@ -1671,12 +1673,13 @@ static gint panel_leave_event(GtkWidget *widget,
 	if (event->mode != GDK_CROSSING_NORMAL)
 		return FALSE;	/* Grab for menu, DnD, etc */
 
-	keep_below(panel->window->window, TRUE);
-
-	/* Shouldn't need this as well as keep_below but some WMs don't
-	 * automatically lower as soon as the hint is set */ 
-	pinboard = pinboard_get_window();
-	window_put_just_above(panel->window->window, pinboard);
+	if (panel_keep_below(panel, TRUE))
+	{
+		/* Shouldn't need this as well as keep_below but some WMs don't
+		 * automatically lower as soon as the hint is set */ 
+		pinboard = pinboard_get_window();
+		window_put_just_above(panel->window->window, pinboard);
+	}
 
 	return FALSE;
 }
@@ -1695,10 +1698,8 @@ static void motion_may_raise(Panel *panel, int x, int y)
 	else
 		raise = x == panel->window->allocation.width - 1;
 
-	if (raise)
+	if (raise && panel_keep_below(panel, FALSE))
 	{
-		keep_below(panel->window->window, FALSE);
-
 		/* Shouldn't need this as well as keep_below but some WMs don't
 		 * automatically raise as soon as the hint is set */ 
 		gdk_window_raise(panel->window->window);
@@ -2749,10 +2750,9 @@ static void panel_drag_leave(GtkWidget	*widget,
 	
 	window = panel->window->window;
 	gdk_window_get_pointer(window, &x, &y, NULL);
-	if (x < 0 || y < 0 || x > alloc->width || y > alloc->height)
+	if ((x < 0 || y < 0 || x > alloc->width || y > alloc->height) &&
+		panel_keep_below(panel, TRUE))
 	{
-		keep_below(panel->window->window, TRUE);
-
 		/* Shouldn't need this as well as keep_below but some WMs don't
 		 * automatically lower as soon as the hint is set */ 
 		pinboard = pinboard_get_window();
@@ -2869,3 +2869,19 @@ GtkWidget *panel_new_panel_submenu(void)
 	}
 	return menu;
 }
+
+/* Set the panel to be above/below other windows (setting = TRUE for below),
+ * and return TRUE.
+ *
+ * If o_panel_on_top is set then do nothing and return FALSE.
+ */
+static gboolean panel_keep_below(Panel *panel, gboolean setting)
+{
+	if (!o_panel_on_top.int_value)
+	{
+		keep_below(panel->window->window, setting);
+		return TRUE;
+	}
+	return FALSE;
+}
+
