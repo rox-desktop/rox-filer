@@ -6,6 +6,95 @@
 * log message with the commit and I'll update this file only when making a new
 * release.
 
+Release 2.8 (2008-05-17)
+
+- Add a "keep panel on top" option (Tony Houghton)
+  On compiz-fusion 0.7.4, the panels come off the screen; I think it's
+  compiz's fault. This is a work-around (reported by Lucas Hazel).
+
+- Support "Path" key in .desktop files (Stephen Watson)
+  Reported by Mildred in http://sourceforge.net/tracker/index.php?func=detail&aid=19
+  36189&group_id=7023&atid=107023
+
+- Updated Vietnamese translation (Anh Tuan).
+
+- Renamed icons to use new freedesktop.org scheme.
+- Use correct name for coredump icon (Stephen Watson).
+
+- Don't crash trying to display invalid timestamps. localtime() can
+  return NULL if the input is out-of-range.
+
+- MIME magic lookup now returns text/plain for certain unknown file
+  types (Stephen Watson). Restored the code, lost in the update to the
+  newer XDG MIME code, which checks unknown files to see if they are
+  text.
+
+- Updated Russian translation (Nikita E. Shalaev).
+
+- Fix validity error in French manual XML (Stephen Watson)
+
+- Italian translation update (Yuri Bongiorno).
+
+- Typo in panel options (Vincent Lefèvre).
+
+- Updated Italian translation (Yuri Bongiorno).
+
+- Updated French manual translation (Arnaud Calvo).
+
+
+Release 2.7.1
+
+- Don't try to copy install.sh when building binary release.
+
+- Give choice of using 0launch when building. 'make' gives the old
+  behaviour. 'make with0launch' gets the headers using 0launch.
+
+- Updated Chinese Translations (BabyfaiCheung)
+
+- Fixed segfault on startup due to missing import. Recent versions of
+  GTK import time.h for us, but older ones didn't, leading to a segfault
+  in log_info_paths.
+
+- Running 'make' in the src directory now uses 0launch to find the
+  headers. This ensures that doing a normal build uses the same headers
+  that 0compile will use, hopefully detecting problems earlier (e.g. use
+  of a function from a newer GTK than the one we want to support). Note
+  that 'AppRun --compile' is unaffected.
+
+- Fixed check to ensure that the ROX theme is available. Before, we
+  just checked that the postscript icon could be found, but now we
+  fallback to the GNOME theme so that always succeeds. Also, if the
+  theme exists but is a broken link then we fix it automatically rather
+  than popping up a box telling the user to fix it.
+
+- Fix: Set the output codeset to UTF-8 (Andras Mohari). This should fix
+  the problems in non-UTF-8 locales.
+
+- Ensure the Glade templates go in the binary release. Reported by
+  Lennon Cook.
+
+- Fix checking for gcc version (Stephen Watson).
+
+- Don't use -fno-stack-protector unless we are using GCC 4.1 or later
+  (Stephen Watson). Should probably also check for GLIBC as well.
+
+- Fix typo in the save display settings window (Stephen Watson).
+  (Reported by Vincent Lefèvre)
+
+- Fixed typo in label. Reported by Vincent Lefèvre.
+
+- Updated README. Was *very* out-of-date (reported by Vincent Lefevre).
+
+- Removed install script. I haven't run this thing for years. There are
+  plenty of better ways of adding the filer to your system (using a
+  package, Zero Install, running it in-place, etc). Also added Glade to
+  the requirements in the manual, and updated the instructions there.
+
+- Remove unnecessary argument in the unmount message (Adam Sampson).
+
+- Only set -fno-stack-protector when using GCC.
+
+
 Release 2.7 (2007-11-29)
 
 
