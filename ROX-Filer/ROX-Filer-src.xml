@@ -7,7 +7,7 @@
 Use 0compile to build this program.</description>
   <icon href="http://rox.sourceforge.net/Icons/ROX-Filer.png" type="image/png"/>
 
-  <group arch="*-src" compile:binary-main="ROX-Filer/AppRun" compile:min-version='0.12' compile:command="&quot;$SRCDIR/ROX-Filer/src/build&quot;">
+  <group arch="*-src" compile:binary-main="ROX-Filer/AppRun" compile:command="&quot;$SRCDIR/ROX-Filer/src/build&quot;" compile:min-version="0.12">
     <requires interface="http://0install.net/2006/interfaces/GTK-dev">
       <version before="2.5" not-before="2.4"/>
       <environment insert="lib/pkgconfig" name="PKG_CONFIG_PATH"/>
@@ -31,6 +31,6 @@ Use 0compile to build this program.</description>
       <environment insert="lib/pkgconfig" name="PKG_CONFIG_PATH"/>
     </requires>
 
-    <implementation id=".."  version="2.7.1-post"/>
+    <implementation id=".." released="2008-05-17" version="2.8"/>
   </group>
 </interface>
