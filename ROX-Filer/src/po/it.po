@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: ROX-Filer 2.7.1\n"
+"Project-Id-Version: ROX-Filer 2.8.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-05-11 18:31+0200\n"
+"POT-Creation-Date: 2008-05-26 19:33+0200\n"
 "PO-Revision-Date: 2008-01-12 15:56+0100\n"
 "Last-Translator: Yuri Bongiorno http://yuri.bongiorno.googlepages.com <>\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
@@ -1544,12 +1544,12 @@ msgstr ""
 msgid "Incorrect or missing line break in text/uri-list data"
 msgstr "Non corretto o a capo mancante nei dati di tipo text/uri-list"
 
-#: gui_support.c:1339
+#: gui_support.c:1340
 #, c-format
 msgid "Failed to open file '%s': %s"
 msgstr "Apertura del file «%s» fallita: %s"
 
-#: gui_support.c:1383
+#: gui_support.c:1384
 #, c-format
 msgid ""
 "Failed to load image '%s': reason not known, probably a corrupt image file"
@@ -1557,7 +1557,7 @@ msgstr ""
 "Caricamento dell'immagine «%s» fallito: motivo sconosciuto, probabilmente il "
 "file è corrotto."
 
-#: gui_support.c:1434
+#: gui_support.c:1435
 #, c-format
 msgid ""
 "This program (%s) cannot be run, as the 0launch command is not available. It "
@@ -2710,21 +2710,21 @@ msgstr "Errore nel salvare %s: %s"
 msgid "Missing '='"
 msgstr "Manca «=»"
 
-#: panel.c:319
+#: panel.c:322
 #, c-format
 msgid "Unable to replace '%s'"
 msgstr "Impossibile sostituire «%s»"
 
-#: panel.c:323
+#: panel.c:326
 #, c-format
 msgid "Unable to save '%s'"
 msgstr "Impossibile salvare «%s»"
 
-#: panel.c:526
+#: panel.c:529
 msgid "Your old panel file has been converted to the new XML format."
 msgstr "Il file del vecchio pannello è stato convertito nel nuovo formato XML."
 
-#: panel.c:634
+#: panel.c:636
 msgid ""
 "You have tried to close a panel via the window manager - I usually find that "
 "this is accidental... really close?"
@@ -2732,20 +2732,20 @@ msgstr ""
 "Tentativo di chiusura di un pannello attraverso il window manager. "
 "Solitamente questo avviene in maniera accidentale: chiuderlo veramente?"
 
-#: panel.c:735
+#: panel.c:737
 msgid "Missing < or > in panel config file"
 msgstr "Mancano < o > nel file di configurazione del pannello"
 
-#: panel.c:1618
+#: panel.c:1620
 #, c-format
 msgid "Error saving panel %s: %s"
 msgstr "Errore nel salvare il pannello %s: %s"
 
-#: panel.c:1934
+#: panel.c:1935
 msgid "Applet quit without ever creating a widget!"
 msgstr "L'applet è terminata senza aver mai creato un widget."
 
-#: panel.c:2030
+#: panel.c:2031
 #, c-format
 msgid ""
 "Error running applet:\n"
@@ -2754,15 +2754,15 @@ msgstr ""
 "Errore durante l'esecuzione dell'applet:\n"
 "%s"
 
-#: panel.c:2655
+#: panel.c:2656
 msgid "Are you sure you want to remove this panel from the desktop?"
 msgstr "Rimuovere veramente questo pannello dal desktop?"
 
-#: panel.c:2658 panel.c:2685
+#: panel.c:2659 panel.c:2686
 msgid "Remove Panel"
 msgstr "Rimuovi pannello"
 
-#: panel.c:2681
+#: panel.c:2682
 msgid "Panel Options..."
 msgstr "Opzioni pannello..."
 
@@ -3053,7 +3053,7 @@ msgstr ""
 "Nota: se è un programma che si desidera eseguire, è necessario renderlo "
 "eseguibile selezionando «Permessi» dal menù «File»."
 
-#: run.c:746
+#: run.c:753
 #, c-format
 msgid ""
 "Executable '%s' is world-writeable! Refusing to run. Please change the "
@@ -3079,7 +3079,7 @@ msgstr ""
 "bisogna preoccuparsi. Altrimenti, si devono controllare o addirittura "
 "eliminare tutti questi eseguibili."
 
-#: run.c:759
+#: run.c:766
 msgid "go-w (Fix security problem)"
 msgstr "go-w (Corregge il problema di sicurezza)"
 
@@ -4678,22 +4678,37 @@ msgstr "Il pannello è un \"dock\""
 
 #: tips:260
 msgid ""
-"Disable this option if the panel stays above other windows against your "
-"wishes. Requires a restart to take effect."
+"Makes sure panels stay against screen edges. Disable this option if the "
+"panel stays above other windows against your wishes. Requires a restart to "
+"take effect."
 msgstr ""
+"Assicura che i pannelli stìano contro i bordi dello schermo. "
 "Disabilitare questa opzione se non si desidera che il pannello stìa sopra le "
-"altre finestre. È necessario riavviare rox affinché la modifica abbia "
-"effetto."
+"altre finestre. Per avere effetto, richiede un riavvio."
 
 #: tips:261
+msgid "Panel stays on top"
+msgstr "Il pannello sta in alto"
+
+#: tips:262
+msgid ""
+"Keeps the panel above other windows. Enable this option to make sure the "
+"dock option works correctly in some versions of compiz. May require a "
+"restart to take effect."
+msgstr ""
+"Tiene il pannello sopra le altre finestre. Abilitare questa opzione per "
+"assicurarsi che l'opzione \"dock\" funzioni correttamente con alcune "
+"versioni di compiz. Per avere effetto, potrebbe richiedere un riavvio."
+
+#: tips:263
 msgid "Drag and drop"
 msgstr "Trascinamento"
 
-#: tips:262
+#: tips:264
 msgid "Don't use hostnames"
 msgstr "Non usare i nomi di rete"
 
-#: tips:263
+#: tips:265
 msgid ""
 "Some older applications don't support XDND fully and may need to have this "
 "option turned on. Use this if dragging files to an application shows a + "
@@ -4703,15 +4718,15 @@ msgstr ""
 "bisogno di questa opzione. Usarla se il trascinamento dei file su "
 "un'applicazione mostra il segno + sul puntatore, ma non funziona."
 
-#: tips:264
+#: tips:266
 msgid "Extended attributes"
 msgstr "Attributi estesi"
 
-#: tips:265
+#: tips:267
 msgid "Don't use extended attributes"
 msgstr "Non usare gli attributi estesi"
 
-#: tips:266
+#: tips:268
 msgid ""
 "This disables the use of extended attributes available in newer operating "
 "systems and file systems.  With this option set the 'Set Type' menu entry is "
@@ -4806,8 +4821,8 @@ msgid ""
 "If you use multiple monitors with Xinerama, use this option to confine the "
 "panel to one monitor."
 msgstr ""
-"Se si usano più monitor con Xinerama, usare questa opzione "
-"per limitare il pannello a un monitor."
+"Se si usano più monitor con Xinerama, usare questa opzione per limitare il "
+"pannello a un monitor."
 
 #: ../Templates.glade:332
 msgid "Confine to Xinerama monitor"
