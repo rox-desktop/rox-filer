@@ -13,15 +13,13 @@ extern GFSCache *desktop_icon_cache;
 
 extern MaskedPixmap *im_error;
 extern MaskedPixmap *im_unknown;
-extern MaskedPixmap *im_symlink;
 
-extern MaskedPixmap *im_unmounted;
-extern MaskedPixmap *im_mounted;
 extern MaskedPixmap *im_exec_file;
 extern MaskedPixmap *im_appdir;
-extern MaskedPixmap *im_xattr;
 
 extern MaskedPixmap *im_dirs;
+
+extern GtkIconSize mount_icon_size;
 
 /* If making the huge size larger, be sure to update SMALL_IMAGE_THRESHOLD! */
 #define HUGE_WIDTH 96

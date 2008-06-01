@@ -78,14 +78,12 @@ static const char * bad_xpm[] = {
 
 MaskedPixmap *im_error;
 MaskedPixmap *im_unknown;
-MaskedPixmap *im_symlink;
 
-MaskedPixmap *im_unmounted;
-MaskedPixmap *im_mounted;
 MaskedPixmap *im_appdir;
-MaskedPixmap *im_xattr;
 
 MaskedPixmap *im_dirs;
+
+GtkIconSize mount_icon_size = -1;
 
 typedef struct _ChildThumbnail ChildThumbnail;
 
@@ -105,8 +103,6 @@ static const char *stocks[] = {
 	ROX_STOCK_SYMLINK,
 	ROX_STOCK_XATTR,
 };
-
-static GtkIconSize mount_icon_size = -1;
 
 /* Static prototypes */
 
@@ -200,7 +196,9 @@ static MaskedPixmap *mp_from_stock(const char *stock_id, int size)
 	GdkPixbuf  *pixbuf;
 	MaskedPixmap *retval;
 
-	icon_set = gtk_icon_factory_lookup_default(stock_id);
+	/*icon_set = gtk_icon_factory_lookup_default(stock_id);*/
+	icon_set = gtk_style_lookup_icon_set(gtk_widget_get_default_style(),
+					     stock_id);
 	if (!icon_set)
 		return get_bad_image();
 	
@@ -931,11 +929,6 @@ static void load_default_pixmaps(void)
 	im_unknown = mp_from_stock(GTK_STOCK_DIALOG_QUESTION,
 				   GTK_ICON_SIZE_DIALOG);
 	
-	im_symlink = mp_from_stock(ROX_STOCK_SYMLINK, mount_icon_size);
-	im_unmounted = mp_from_stock(ROX_STOCK_MOUNT, mount_icon_size);
-	im_mounted = mp_from_stock(ROX_STOCK_MOUNTED, mount_icon_size);
-	im_xattr = mp_from_stock(ROX_STOCK_XATTR, mount_icon_size);
-
 	im_dirs = load_pixmap("dirs");
 	im_appdir = load_pixmap("application");
 

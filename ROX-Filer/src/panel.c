@@ -1079,27 +1079,16 @@ static gint draw_icon(GtkWidget *widget, GdkRectangle *badarea, PanelIcon *pi)
 
 	if (icon->item->flags & ITEM_FLAG_SYMLINK)
 	{
-		gdk_pixbuf_render_to_drawable_alpha(im_symlink->pixbuf,
-				widget->window,
-				0, 0, 				/* src */
-				image_x, image_y + 2,	/* dest */
-				-1, -1,
-				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
-				GDK_RGB_DITHER_NORMAL, 0, 0);
+		draw_emblem_on_icon(widget->window, widget->style,
+				    ROX_STOCK_SYMLINK, &image_x, image_y+2);
 	}
 	if (icon->item->flags & ITEM_FLAG_MOUNT_POINT)
 	{
-		MaskedPixmap	*mp = icon->item->flags & ITEM_FLAG_MOUNTED
-					? im_mounted
-					: im_unmounted;
-
-		gdk_pixbuf_render_to_drawable_alpha(mp->pixbuf,
-				widget->window,
-				0, 0, 				/* src */
-				image_x, image_y + 2,	/* dest */
-				-1, -1,
-				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
-				GDK_RGB_DITHER_NORMAL, 0, 0);
+		draw_emblem_on_icon(widget->window, widget->style,
+				    icon->item->flags & ITEM_FLAG_MOUNTED
+				    ? ROX_STOCK_MOUNTED
+				    : ROX_STOCK_MOUNT,
+				    &image_x, image_y+2);
 	}
 	return FALSE;
 }

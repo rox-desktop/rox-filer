@@ -350,18 +350,18 @@ static void draw_item(GtkWidget *widget,
 	if (template.icon.width <= SMALL_WIDTH &&
 			template.icon.height <= SMALL_HEIGHT)
 	{
-		draw_small_icon(widget->window, &template.icon,
+		draw_small_icon(widget->window, widget->style, &template.icon,
 				item, view->image, selected, color);
 	}
 	else if (template.icon.width <= ICON_WIDTH &&
 			template.icon.height <= ICON_HEIGHT)
 	{
-		draw_large_icon(widget->window, &template.icon,
+		draw_large_icon(widget->window, widget->style, &template.icon,
 				item, view->image, selected, color);
 	}
 	else
 	{
-		draw_huge_icon(widget->window, &template.icon,
+		draw_huge_icon(widget->window, widget->style, &template.icon,
 				item, view->image, selected, color);
 	}
 	
