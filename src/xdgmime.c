@@ -153,8 +153,8 @@ xdg_mime_init_from_directory (const char *directory)
     }
   free (file_name);
 
-  file_name = malloc (strlen (directory) + strlen ("/mime/globs2") + 1);
-  strcpy (file_name, directory); strcat (file_name, "/mime/globs2");
+  file_name = malloc (strlen (directory) + strlen ("/mime/globs") + 1);
+  strcpy (file_name, directory); strcat (file_name, "/mime/globs");
   if (stat (file_name, &st) == 0)
     {
       _xdg_mime_glob_read_from_file (global_hash, file_name);
@@ -168,17 +168,6 @@ xdg_mime_init_from_directory (const char *directory)
   else
     {
       free (file_name);
-      file_name = malloc (strlen (directory) + strlen ("/mime/globs") + 1);
-      strcpy (file_name, directory); strcat (file_name, "/mime/globs");
-      if (stat (file_name, &st) == 0)
-        {
-          _xdg_mime_glob_read_from_file (global_hash, file_name);
-          xdg_dir_time_list_add (file_name, st.st_mtime);
-        }
-      else
-        {
-          free (file_name);
-        }
     }
 
   file_name = malloc (strlen (directory) + strlen ("/mime/magic") + 1);
@@ -822,8 +811,6 @@ xdg_mime_dump (void)
   _xdg_mime_alias_list_dump (alias_list);
   printf ("\n*** PARENTS ***\n\n");
   _xdg_mime_parent_list_dump (parent_list);
-  printf ("\n*** GLOBS ***\n\n");
-  _xdg_glob_hash_dump (global_hash);
   printf ("\n*** CACHE ***\n\n");
   _xdg_glob_hash_dump (global_hash);
 }
