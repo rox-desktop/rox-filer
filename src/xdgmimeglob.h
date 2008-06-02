@@ -60,7 +60,8 @@ int          _xdg_glob_hash_lookup_file_name (XdgGlobHash *glob_hash,
 					      int          n_mime_types);
 void         _xdg_glob_hash_append_glob      (XdgGlobHash *glob_hash,
 					      const char  *glob,
-					      const char  *mime_type);
+					      const char  *mime_type,
+					      int          weight);
 XdgGlobType  _xdg_glob_determine_type        (const char  *glob);
 void         _xdg_glob_hash_dump             (XdgGlobHash *glob_hash);
 
