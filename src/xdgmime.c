@@ -822,6 +822,8 @@ xdg_mime_dump (void)
   _xdg_mime_alias_list_dump (alias_list);
   printf ("\n*** PARENTS ***\n\n");
   _xdg_mime_parent_list_dump (parent_list);
+  printf ("\n*** GLOBS ***\n\n");
+  _xdg_glob_hash_dump (global_hash);
   printf ("\n*** CACHE ***\n\n");
   _xdg_glob_hash_dump (global_hash);
 }
