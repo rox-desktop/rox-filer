@@ -1,5 +1,57 @@
 2008-06-02  Bastien Nocera  <hadess@hadess.net>
 
+	* src/Makefile: Remove test-mime-data on clean
+	* src/test-mime-data.c (test_by_data): Fix for API changes below
+
+	* src/xdgmime.c (xdg_dir_time_list_add),
+	(xdg_mime_init_from_directory), (xdg_check_file), (xdg_check_dir),
+	(xdg_mime_get_mime_type_for_data),
+	(xdg_mime_get_mime_type_for_file),
+	(xdg_mime_get_mime_type_from_file_name),
+	(xdg_mime_get_mime_types_from_file_name), (xdg_mime_shutdown),
+	(xdg_mime_get_max_buffer_extents), (_xdg_mime_unalias_mime_type),
+	(xdg_mime_media_type_equal), (_xdg_mime_mime_type_subclass),
+	(xdg_mime_list_mime_parents):
+	* src/xdgmime.h:
+	* src/xdgmimealias.h:
+	* src/xdgmimecache.c (cache_magic_lookup_data),
+	(cache_alias_lookup), (cache_glob_lookup_literal),
+	(cache_glob_lookup_fnmatch), (cache_glob_node_lookup_suffix),
+	(cache_glob_lookup_suffix), (find_stopchars),
+	(_xdg_mime_cache_get_max_buffer_extents),
+	(cache_get_mime_type_for_data),
+	(_xdg_mime_cache_get_mime_type_for_data),
+	(_xdg_mime_cache_get_mime_type_for_file),
+	(_xdg_mime_cache_get_mime_type_from_file_name),
+	(_xdg_mime_cache_get_mime_types_from_file_name),
+	(_xdg_mime_cache_mime_type_subclass),
+	(_xdg_mime_cache_list_mime_parents):
+	* src/xdgmimecache.h:
+	* src/xdgmimeglob.c (_xdg_glob_hash_node_lookup_file_name):
+	* src/xdgmimeglob.h:
+	* src/xdgmimemagic.c (_xdg_mime_magic_parse_magic_line),
+	(_xdg_mime_magic_lookup_data):
+	* src/xdgmimemagic.h:
+	* src/xdgmimeparent.h:
+
+	Merge from downstream changes in GIO/GTK+:
+	- Rename _xdg_mime_caches to _caches and make sure it's not exported
+	- Rework the timestamp checking code
+	to protect against duplicate directories in XDG_DATA_DIRS.
+	- Fix a thinko that leads to constantly reloading
+	the mime data if a mime.cache is present.
+	- Support more than 2 duplicate globs
+	- Add xdg_mime_get_mime_types_from_file_name()
+	- xdg_mime_media_type_equal() doesn't require an _init after all
+	- Handle super-types in _xdg_mime_mime_type_subclass()
+	- Make cache_get_mime_type_for_data() and
+	_xdg_mime_magic_lookup_data() return the priority of the
+	matching mime-type
+	- Fix _xdg_mime_cache_list_mime_parents returning duplicate parents in
+	some cases
+
+2008-06-02  Bastien Nocera  <hadess@hadess.net>
+
 	* src/xdgmime.c (xdg_mime_init_from_directory), (xdg_mime_dump):
 	* src/xdgmimecache.c (cache_glob_lookup_literal),
 	(cache_glob_lookup_fnmatch), (cache_glob_node_lookup_suffix),

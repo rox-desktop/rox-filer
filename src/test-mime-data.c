@@ -105,6 +105,7 @@ test_by_data (const char *dir,
   int max_extent;
   char *data;
   int bytes_read;
+  int result_prio;
   char path[1024];
 
   snprintf (path, 1024, "%s/%s", dir, filename);
@@ -143,7 +144,7 @@ test_by_data (const char *dir,
      return;
     }
 
-  mt = xdg_mime_get_mime_type_for_data (data, bytes_read);
+  mt = xdg_mime_get_mime_type_for_data (data, bytes_read, &result_prio);
   
   free (data);
   fclose (file);

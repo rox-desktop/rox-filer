@@ -48,7 +48,7 @@
 #endif
 
 #if !defined getc_unlocked && !defined HAVE_GETC_UNLOCKED
-#define getc_unlocked(fp) getc (fp)
+# define getc_unlocked(fp) getc (fp)
 #endif
 
 typedef struct XdgMimeMagicMatch XdgMimeMagicMatch;
@@ -476,9 +476,7 @@ _xdg_mime_magic_parse_magic_line (FILE              *magic_file,
       /* We clean up the matchlet, byte swapping if needed */
       if (matchlet->word_size > 1)
 	{
-#if LITTLE_ENDIAN
 	  int i;
-#endif
 	  if (matchlet->value_length % matchlet->word_size != 0)
 	    {
 	      _xdg_mime_magic_matchlet_free (matchlet);
@@ -658,35 +656,24 @@ const char *
 _xdg_mime_magic_lookup_data (XdgMimeMagic *mime_magic,
 			     const void   *data,
 			     size_t        len,
+			     int           *result_prio,
                              const char   *mime_types[],
                              int           n_mime_types)
 {
   XdgMimeMagicMatch *match;
   const char *mime_type;
   int n;
-  int priority;
-  int had_match;
+  int prio;
 
+  prio = 0;
   mime_type = NULL;
-  priority = 0;
-  had_match = 0;
   for (match = mime_magic->match_list; match; match = match->next)
     {
       if (_xdg_mime_magic_match_compare_to_data (match, data, len))
 	{
-	  if (!had_match || match->priority > priority ||
-	      (mime_type != NULL && _xdg_mime_mime_type_subclass (match->mime_type, mime_type)))
-	    {
-	      mime_type = match->mime_type;
-	      priority = match->priority;
-	    }
-	  else if (had_match && match->priority == priority &&
-		   !_xdg_mime_mime_type_subclass (mime_type, match->mime_type))
-	    /* multiple unrelated patterns with the same priority matched,
-	     * so we can't tell what type this is. */
-	    mime_type = NULL;
-
-	  had_match = 1;
+	  prio = match->priority;
+	  mime_type = match->mime_type;
+	  break;
 	}
       else 
 	{
@@ -707,6 +694,9 @@ _xdg_mime_magic_lookup_data (XdgMimeMagic *mime_magic,
 	    mime_type = mime_types[n];
 	}
     }
+  
+  if (result_prio)
+    *result_prio = prio;
 
   return mime_type;
 }
