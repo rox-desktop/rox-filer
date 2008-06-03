@@ -113,7 +113,37 @@ test_subclassing (void)
   test_subclass ("image/vnd.djvu", "image/x-djvu", 1);
   test_subclass ("image/vnd.djvu", "text/plain", 0);
   test_subclass ("image/vnd.djvu", "text/*", 0);
-  test_subclass ("text/*", "text/plain", 0);
+  test_subclass ("text/*", "text/plain", 1);
+}
+
+static void
+test_one_match (const char *filename, const char *expected)
+{
+  const char *actual;
+
+  actual = xdg_mime_get_mime_type_from_file_name (filename);
+
+  if (strcmp (actual, expected) != 0) 
+    {
+      printf ("Test Failed: mime type of %s is %s, expected %s\n", 
+	      filename, actual, expected);
+    }  
+}
+
+static void
+test_matches (void)
+{
+  test_one_match ("foo.bar.epub", "application/epub+zip");
+  test_one_match ("core", "application/x-core");
+  test_one_match ("README.in", "text/x-readme");
+  test_one_match ("README.gz", "application/x-gzip");
+  test_one_match ("blabla.cs", "text/x-csharp");
+  test_one_match ("blabla.f90", "text/x-fortran");
+  test_one_match ("blabla.F95", "text/x-fortran");
+  test_one_match ("tarball.tar.gz", "application/x-compressed-tar");
+  test_one_match ("file.gz", "application/x-gzip");
+  test_one_match ("file.tar.lzo", "application/x-tzo");
+  test_one_match ("file.lzo", "application/x-lzop");
 }
 
 int
@@ -126,6 +156,7 @@ main (int argc, char *argv[])
   test_glob_type ();
   test_aliasing ();
   test_subclassing ();
+  test_matches ();
 
   for (i = 1; i < argc; i++)
     {
