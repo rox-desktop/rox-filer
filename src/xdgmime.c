@@ -813,6 +813,8 @@ xdg_mime_dump (void)
   _xdg_mime_parent_list_dump (parent_list);
   printf ("\n*** CACHE ***\n\n");
   _xdg_glob_hash_dump (global_hash);
+  printf ("\n*** GLOBS ***\n\n");
+  _xdg_glob_hash_dump (global_hash);
 }
 
 
