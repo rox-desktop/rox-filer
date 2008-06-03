@@ -155,8 +155,8 @@ xdg_mime_init_from_directory (const char *directory)
     }
   free (file_name);
 
-  file_name = malloc (strlen (directory) + strlen ("/mime/globs") + 1);
-  strcpy (file_name, directory); strcat (file_name, "/mime/globs");
+  file_name = malloc (strlen (directory) + strlen ("/mime/globs2") + 1);
+  strcpy (file_name, directory); strcat (file_name, "/mime/globs2");
   if (stat (file_name, &st) == 0)
     {
       _xdg_mime_glob_read_from_file (global_hash, file_name);
@@ -165,6 +165,17 @@ xdg_mime_init_from_directory (const char *directory)
   else
     {
       free (file_name);
+      file_name = malloc (strlen (directory) + strlen ("/mime/globs") + 1);
+      strcpy (file_name, directory); strcat (file_name, "/mime/globs");
+      if (stat (file_name, &st) == 0)
+        {
+          _xdg_mime_glob_read_from_file (global_hash, file_name);
+          xdg_dir_time_list_add (file_name, st.st_mtime);
+        }
+      else
+        {
+          free (file_name);
+        }
     }
 
   file_name = malloc (strlen (directory) + strlen ("/mime/magic") + 1);
