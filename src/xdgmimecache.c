@@ -919,3 +919,59 @@ _xdg_mime_cache_list_mime_parents (const char *mime)
   return result;
 }
 
+static const char *
+cache_lookup_icon (const char *mime, int header)
+{
+  const char *ptr;
+  int i, min, max, mid, cmp;
+
+  for (i = 0; _caches[i]; i++)
+    {
+      XdgMimeCache *cache = _caches[i];
+      xdg_uint32_t list_offset = GET_UINT32 (cache->buffer, header);
+      xdg_uint32_t n_entries = GET_UINT32 (cache->buffer, list_offset);
+      xdg_uint32_t offset;
+
+      min = 0; 
+      max = n_entries - 1;
+      while (max >= min) 
+        {
+          mid = (min + max) / 2;
+
+          offset = GET_UINT32 (cache->buffer, list_offset + 4 + 8 * mid);
+          ptr = cache->buffer + offset;
+          cmp = strcmp (ptr, mime);
+         
+          if (cmp < 0)
+            min = mid + 1;
+          else if (cmp > 0)
+            max = mid - 1;
+          else
+            {
+              offset = GET_UINT32 (cache->buffer, list_offset + 4 + 8 * mid + 4);
+              return cache->buffer + offset;
+            }
+        }
+    }
+
+  return NULL;
+}
+
+const char *
+_xdg_mime_cache_get_generic_icon (const char *mime)
+{
+  return cache_lookup_icon (mime, 36);
+}
+
+const char *
+_xdg_mime_cache_get_icon (const char *mime)
+{
+  const char *icon;
+ 
+  icon = cache_lookup_icon (mime, 32);
+ 
+  if (icon == NULL)
+    icon = _xdg_mime_cache_get_generic_icon (mime);
+
+  return icon;
+}

@@ -1,5 +1,19 @@
 2008-06-03  Bastien Nocera  <hadess@hadess.net>
 
+	* src/Makefile:
+	* src/test-mime.c (test_one_icon), (test_icons), (main):
+	* src/xdgmime.c (xdg_mime_init_from_directory), (xdg_mime_init),
+	(xdg_mime_get_icon), (xdg_mime_get_generic_icon):
+	* src/xdgmime.h:
+	* src/xdgmimecache.c (cache_lookup_icon),
+	(_xdg_mime_cache_get_generic_icon), (_xdg_mime_cache_get_icon):
+	* src/xdgmimecache.h:
+	* src/xdgmimeicon.c:
+	* src/xdgmimeicon.h: Patch from Matthias Clasen
+	<mclasen@redhat.com>: Add icon and generic-icon support
+
+2008-06-03  Bastien Nocera  <hadess@hadess.net>
+
 	* src/xdgmimecache.c (cache_glob_lookup_file_name):
 	* src/xdgmimeglob.c (_xdg_glob_hash_insert_text),
 	(_xdg_glob_hash_lookup_file_name):

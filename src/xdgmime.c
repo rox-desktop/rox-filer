@@ -34,6 +34,7 @@
 #include "xdgmimeglob.h"
 #include "xdgmimemagic.h"
 #include "xdgmimealias.h"
+#include "xdgmimeicon.h"
 #include "xdgmimeparent.h"
 #include "xdgmimecache.h"
 #include <stdio.h>
@@ -56,6 +57,8 @@ static XdgAliasList *alias_list = NULL;
 static XdgParentList *parent_list = NULL;
 static XdgDirTimeList *dir_time_list = NULL;
 static XdgCallbackList *callback_list = NULL;
+static XdgIconList *icon_list = NULL;
+static XdgIconList *generic_icon_list = NULL;
 
 XdgMimeCache **_caches = NULL;
 static int n_caches = 0;
@@ -198,6 +201,16 @@ xdg_mime_init_from_directory (const char *directory)
   file_name = malloc (strlen (directory) + strlen ("/mime/subclasses") + 1);
   strcpy (file_name, directory); strcat (file_name, "/mime/subclasses");
   _xdg_mime_parent_read_from_file (parent_list, file_name);
+  free (file_name);
+
+  file_name = malloc (strlen (directory) + strlen ("/mime/icons") + 1);
+  strcpy (file_name, directory); strcat (file_name, "/mime/icons");
+  _xdg_mime_icon_read_from_file (icon_list, file_name);
+  free (file_name);
+
+  file_name = malloc (strlen (directory) + strlen ("/mime/generic-icons") + 1);
+  strcpy (file_name, directory); strcat (file_name, "/mime/generic-icons");
+  _xdg_mime_icon_read_from_file (generic_icon_list, file_name);
   free (file_name);
 
   return FALSE; /* Keep processing */
@@ -434,6 +447,8 @@ xdg_mime_init (void)
       global_magic = _xdg_mime_magic_new ();
       alias_list = _xdg_mime_alias_list_new ();
       parent_list = _xdg_mime_parent_list_new ();
+      icon_list = _xdg_mime_icon_list_new ();
+      generic_icon_list = _xdg_mime_icon_list_new ();
 
       xdg_run_command_on_dirs ((XdgDirectoryFunc) xdg_mime_init_from_directory,
 			       NULL);
@@ -867,4 +882,33 @@ xdg_mime_remove_callback (int callback_id)
 	  return;
 	}
     }
+}
+
+const char *
+xdg_mime_get_icon (const char *mime)
+{
+  const char *icon;
+
+  xdg_mime_init ();
+  
+  if (_caches)
+    return _xdg_mime_cache_get_icon (mime);
+
+  icon = _xdg_mime_icon_list_lookup (icon_list, mime);
+
+  if (!icon)
+    icon = xdg_mime_get_generic_icon (mime);
+
+  return icon;
+}
+
+const char *
+xdg_mime_get_generic_icon (const char *mime)
+{
+  xdg_mime_init ();
+  
+  if (_caches)
+    return _xdg_mime_cache_get_generic_icon (mime);
+
+  return _xdg_mime_icon_list_lookup (generic_icon_list, mime);
 }

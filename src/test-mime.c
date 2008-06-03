@@ -146,6 +146,28 @@ test_matches (void)
   test_one_match ("file.lzo", "application/x-lzop");
 }
 
+static void
+test_one_icon (const char *mimetype, const char *expected)
+{
+  const char *actual;
+
+  actual = xdg_mime_get_icon (mimetype);
+
+  if (actual != expected && strcmp (actual, expected) != 0) 
+    {
+      printf ("Test Failed: icon of %s is %s, expected %s\n", 
+             mimetype, actual, expected);
+    }  
+}
+
+static void
+test_icons (void)
+{
+  test_one_icon ("application/x-font-ttx", "font-x-generic");
+  test_one_icon ("application/mathematica", "x-office-document");
+  test_one_icon ("text/plain", NULL);
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -157,6 +179,7 @@ main (int argc, char *argv[])
   test_aliasing ();
   test_subclassing ();
   test_matches ();
+  test_icons ();
 
   for (i = 1; i < argc; i++)
     {
