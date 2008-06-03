@@ -272,42 +272,6 @@ _xdg_glob_hash_insert_ucs4 (XdgGlobHashNode *glob_hash_node,
   return glob_hash_node;
 }
 
-static xdg_unichar_t *
-to_ucs4 (const char *in, int *len)
-{
-  xdg_unichar_t *out;
-  int i;
-  const char *p;
-
-  out = malloc (sizeof (xdg_unichar_t) * (strlen (in) + 1));
-
-  p = in;
-  i = 0;
-  while (*p) 
-    {
-      out[i++] = _xdg_utf8_to_ucs4 (p);
-      p = _xdg_utf8_next_char (p);
-    }
-  out[i] = 0;
-  *len = i;
- 
-  return out;
-}
-
-static void
-ucs4_reverse (xdg_unichar_t *in, int len)
-{
-  int i;
-  xdg_unichar_t c;
-
-  for (i = 0; i < len - i - 1; i++) 
-    {
-      c = in[i]; 
-      in[i] = in[len - i - 1];
-      in[len - i - 1] = c;
-    }
-}
-
 /* glob must be valid UTF-8 */
 static XdgGlobHashNode *
 _xdg_glob_hash_insert_text (XdgGlobHashNode *glob_hash_node,
@@ -319,8 +283,8 @@ _xdg_glob_hash_insert_text (XdgGlobHashNode *glob_hash_node,
   xdg_unichar_t *unitext;
   int len;
 
-  unitext = to_ucs4 (text, &len);
-  ucs4_reverse (unitext, len);
+  unitext = _xdg_convert_to_ucs4 (text, &len);
+  _xdg_reverse_ucs4 (unitext, len);
   node = _xdg_glob_hash_insert_ucs4 (glob_hash_node, unitext, mime_type, weight);
   free (unitext);
   return node;
@@ -428,7 +392,7 @@ _xdg_glob_hash_lookup_file_name (XdgGlobHash *glob_hash,
 	}
     }
 
-  ucs4 = to_ucs4 (file_name, &len);
+  ucs4 = _xdg_convert_to_ucs4 (file_name, &len);
   n = _xdg_glob_hash_node_lookup_file_name (glob_hash->simple_node, ucs4, len, FALSE,
 					    mimes, n_mimes);
   if (n == 0)

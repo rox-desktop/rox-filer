@@ -561,28 +561,6 @@ static int compare_mime_weight (const void *a, const void *b)
   return aa->weight - bb->weight;
 }
 
-static xdg_unichar_t *
-to_ucs4 (const char *in, int *len)
-{
-  xdg_unichar_t *out;
-  int i;
-  const char *p;
-
-  out = malloc (sizeof (xdg_unichar_t) * (strlen (in) + 1));
-
-  p = in;
-  i = 0;
-  while (*p)
-    {
-      out[i++] = _xdg_utf8_to_ucs4 (p);
-      p = _xdg_utf8_next_char (p);
-    }
-  out[i] = 0;
-  *len = i;
-
-  return out;
-}
-
 static int
 cache_glob_lookup_file_name (const char *file_name, 
 			     const char *mime_types[],
@@ -602,7 +580,7 @@ cache_glob_lookup_file_name (const char *file_name,
   if (n > 0)
     return n;
 
-  ucs4 = to_ucs4 (file_name, &len);
+  ucs4 = _xdg_convert_to_ucs4 (file_name, &len);
   n = cache_glob_lookup_suffix (ucs4, len, FALSE, mimes, n_mimes);
 
   if (n == 0)

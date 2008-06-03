@@ -1,5 +1,14 @@
 2008-06-03  Bastien Nocera  <hadess@hadess.net>
 
+	* src/xdgmimecache.c (cache_glob_lookup_file_name):
+	* src/xdgmimeglob.c (_xdg_glob_hash_insert_text),
+	(_xdg_glob_hash_lookup_file_name):
+	* src/xdgmimeint.c (_xdg_convert_to_ucs4), (_xdg_reverse_ucs4):
+	* src/xdgmimeint.h: Patch from Matthias Clasen
+	<mclasen@redhat.com>: Cleanups
+
+2008-06-03  Bastien Nocera  <hadess@hadess.net>
+
 	* src/xdgmimecache.c (cache_glob_node_lookup_suffix),
 	(cache_glob_lookup_suffix), (to_ucs4),
 	(cache_glob_lookup_file_name):
