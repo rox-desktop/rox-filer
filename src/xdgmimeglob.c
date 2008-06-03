@@ -164,15 +164,15 @@ _xdg_glob_hash_node_dump (XdgGlobHashNode *glob_hash_node,
 }
 
 static XdgGlobHashNode *
-_xdg_glob_hash_insert_text (XdgGlobHashNode *glob_hash_node,
-			    const char      *text,
+_xdg_glob_hash_insert_ucs4 (XdgGlobHashNode *glob_hash_node,
+			    xdg_unichar_t   *text,
 			    const char      *mime_type,
 			    int              weight)
 {
   XdgGlobHashNode *node;
   xdg_unichar_t character;
 
-  character = _xdg_utf8_to_ucs4 (text);
+  character = text[0];
 
   if ((glob_hash_node == NULL) ||
       (character < glob_hash_node->character))
@@ -226,7 +226,7 @@ _xdg_glob_hash_insert_text (XdgGlobHashNode *glob_hash_node,
 	}
     }
 
-  text = _xdg_utf8_next_char (text);
+  text++;
   if (*text == 0)
     {
       if (node->mime_type)
@@ -267,9 +267,63 @@ _xdg_glob_hash_insert_text (XdgGlobHashNode *glob_hash_node,
     }
   else
     {
-      node->child = _xdg_glob_hash_insert_text (node->child, text, mime_type, weight);
+      node->child = _xdg_glob_hash_insert_ucs4 (node->child, text, mime_type, weight);
     }
   return glob_hash_node;
+}
+
+static xdg_unichar_t *
+to_ucs4 (const char *in, int *len)
+{
+  xdg_unichar_t *out;
+  int i;
+  const char *p;
+
+  out = malloc (sizeof (xdg_unichar_t) * (strlen (in) + 1));
+
+  p = in;
+  i = 0;
+  while (*p) 
+    {
+      out[i++] = _xdg_utf8_to_ucs4 (p);
+      p = _xdg_utf8_next_char (p);
+    }
+  out[i] = 0;
+  *len = i;
+ 
+  return out;
+}
+
+static void
+ucs4_reverse (xdg_unichar_t *in, int len)
+{
+  int i;
+  xdg_unichar_t c;
+
+  for (i = 0; i < len - i - 1; i++) 
+    {
+      c = in[i]; 
+      in[i] = in[len - i - 1];
+      in[len - i - 1] = c;
+    }
+}
+
+/* glob must be valid UTF-8 */
+static XdgGlobHashNode *
+_xdg_glob_hash_insert_text (XdgGlobHashNode *glob_hash_node,
+			    const char      *text,
+			    const char      *mime_type,
+			    int              weight)
+{
+  XdgGlobHashNode *node;
+  xdg_unichar_t *unitext;
+  int len;
+
+  unitext = to_ucs4 (text, &len);
+  ucs4_reverse (unitext, len);
+  node = _xdg_glob_hash_insert_ucs4 (glob_hash_node, unitext, mime_type, weight);
+  free (unitext);
+  return node;
 }
 
 typedef struct {
@@ -279,7 +333,8 @@ typedef struct {
 
 static int
 _xdg_glob_hash_node_lookup_file_name (XdgGlobHashNode *glob_hash_node,
-				      const char      *file_name,
+				      xdg_unichar_t   *file_name,
+				      int              len,
 				      int              ignore_case,
 				      MimeWeight       mime_types[],
 				      int              n_mime_types)
@@ -291,18 +346,27 @@ _xdg_glob_hash_node_lookup_file_name (XdgGlobHashNode *glob_hash_node,
   if (glob_hash_node == NULL)
     return 0;
 
-  character = _xdg_utf8_to_ucs4 (file_name);
+  character = file_name[len - 1];
   if (ignore_case)
     character = _xdg_ucs4_to_lower(character);
 
   for (node = glob_hash_node; node && character >= node->character; node = node->next)
     {
       if (character == node->character)
-	{
-	  file_name = _xdg_utf8_next_char (file_name);
-	  if (*file_name == '\0')
+        {
+          len--;
+          n = 0;
+          if (len > 0) 
 	    {
-	      n = 0;
+	      n = _xdg_glob_hash_node_lookup_file_name (node->child,
+							file_name,
+							len,
+							ignore_case,
+							mime_types,
+							n_mime_types);
+	    }
+	  if (n == 0)
+	    {
               if (node->mime_type)
                 {
 	          mime_types[n].mime = node->mime_type;
@@ -320,14 +384,6 @@ _xdg_glob_hash_node_lookup_file_name (XdgGlobHashNode *glob_hash_node,
 		    }
 		  node = node->next;
 		}
-	    }
-	  else
-	    {
-	      n = _xdg_glob_hash_node_lookup_file_name (node->child,
-							file_name,
-							ignore_case,
-							mime_types,
-							n_mime_types);
 	    }
 	  return n;
 	}
@@ -351,12 +407,11 @@ _xdg_glob_hash_lookup_file_name (XdgGlobHash *glob_hash,
 				 int          n_mime_types)
 {
   XdgGlobList *list;
-  const char *ptr;
-  char stopchars[128];
   int i, n;
-  XdgGlobHashNode *node;
   MimeWeight mimes[10];
   int n_mimes = 10;
+  xdg_unichar_t *ucs4;
+  int len;
 
   /* First, check the literals */
 
@@ -373,29 +428,13 @@ _xdg_glob_hash_lookup_file_name (XdgGlobHash *glob_hash,
 	}
     }
 
-  i = 0;
-  for (node = glob_hash->simple_node; node; node = node->next)
-    {
-      if (node->character < 128)
- 	stopchars[i++] = (char)node->character;
-    }
-  stopchars[i] = '\0';
- 
-  ptr = strpbrk (file_name, stopchars);
-  while (ptr)
-    {
-      n = _xdg_glob_hash_node_lookup_file_name (glob_hash->simple_node, ptr, FALSE,
-						mimes, n_mimes);
-      if (n > 0)
-	break;
-      
-      n = _xdg_glob_hash_node_lookup_file_name (glob_hash->simple_node, ptr, TRUE,
-						mimes, n_mimes);
-      if (n > 0)
-	break;
-      
-      ptr = strpbrk (ptr + 1, stopchars);
-    }
+  ucs4 = to_ucs4 (file_name, &len);
+  n = _xdg_glob_hash_node_lookup_file_name (glob_hash->simple_node, ucs4, len, FALSE,
+					    mimes, n_mimes);
+  if (n == 0)
+    n = _xdg_glob_hash_node_lookup_file_name (glob_hash->simple_node, ucs4, len, TRUE,
+					      mimes, n_mimes);
+  free(ucs4);
 
   /* FIXME: Not UTF-8 safe */
   if (n == 0)

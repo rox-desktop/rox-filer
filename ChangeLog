@@ -1,5 +1,16 @@
 2008-06-03  Bastien Nocera  <hadess@hadess.net>
 
+	* src/xdgmimecache.c (cache_glob_node_lookup_suffix),
+	(cache_glob_lookup_suffix), (to_ucs4),
+	(cache_glob_lookup_file_name):
+	* src/xdgmimeglob.c (_xdg_glob_hash_insert_ucs4), (to_ucs4),
+	(ucs4_reverse), (_xdg_glob_hash_insert_text),
+	(_xdg_glob_hash_node_lookup_file_name),
+	(_xdg_glob_hash_lookup_file_name): Patch from Matthias Clasen
+	<mclasen@redhat.com>: Use reverted suffix trees
+
+2008-06-03  Bastien Nocera  <hadess@hadess.net>
+
 	* src/test-mime.c (test_subclassing), (test_one_match),
 	(test_matches), (main): Patch from Matthias Clasen
 	<mclasen@redhat.com>: Add some glob tests
