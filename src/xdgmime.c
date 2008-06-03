@@ -822,6 +822,8 @@ xdg_mime_get_mime_parents (const char *mime)
 void 
 xdg_mime_dump (void)
 {
+  xdg_mime_init();
+
   printf ("*** ALIASES ***\n\n");
   _xdg_mime_alias_list_dump (alias_list);
   printf ("\n*** PARENTS ***\n\n");
@@ -830,6 +832,8 @@ xdg_mime_dump (void)
   _xdg_glob_hash_dump (global_hash);
   printf ("\n*** GLOBS ***\n\n");
   _xdg_glob_hash_dump (global_hash);
+  printf ("\n*** GLOBS REVERSE TREE ***\n\n");
+  _xdg_mime_cache_glob_dump ();
 }
 
 

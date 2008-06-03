@@ -1,5 +1,15 @@
 2008-06-03  Bastien Nocera  <hadess@hadess.net>
 
+	* src/xdgmime.c (xdg_mime_dump):
+	* src/xdgmimecache.c (cache_glob_node_lookup_suffix),
+	(dump_glob_node), (_xdg_mime_cache_glob_dump):
+	* src/xdgmimecache.h: dumping code for the suffix reverse tree
+	from Matthias Clasen <mclasen@redhat.com>, and hooked up in
+	xdg_mime_dump, init the cache in xdg_mime_dump() in case
+	it's the only xdgmime function called
+
+2008-06-03  Bastien Nocera  <hadess@hadess.net>
+
 	* src/xdgmimecache.c: Patch from Matthias Clasen
 	<mclasen@redhat.com>: Bump the cache version to 1.1
 

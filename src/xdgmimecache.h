@@ -45,6 +45,7 @@ typedef struct _XdgMimeCache XdgMimeCache;
 #define _xdg_mime_cache_unalias_mime_type             XDG_RESERVED_ENTRY(cache_unalias_mime_type)
 #define _xdg_mime_cache_get_icon                      XDG_RESERVED_ENTRY(cache_get_icon)
 #define _xdg_mime_cache_get_generic_icon              XDG_RESERVED_ENTRY(cache_get_generic_icon)
+#define _xdg_mime_cache_glob_dump                     XDG_RESERVED_ENTRY(cache_glob_dump)
 #endif
 
 extern XdgMimeCache **_caches;
@@ -75,5 +76,6 @@ const char  *_xdg_mime_cache_unalias_mime_type            (const char *mime);
 int          _xdg_mime_cache_get_max_buffer_extents       (void);
 const char  *_xdg_mime_cache_get_icon                     (const char *mime);
 const char  *_xdg_mime_cache_get_generic_icon             (const char *mime);
+void         _xdg_mime_cache_glob_dump                    (void);
 
 #endif /* __XDG_MIME_CACHE_H__ */

@@ -497,7 +497,7 @@ cache_glob_node_lookup_suffix (XdgMimeCache  *cache,
 		  mime_types[n].weight = weight;
 		  n++;
 		}
-	      
+
 	      n_children = GET_UINT32 (cache->buffer, offset + 20 * mid + 8);
 	      child_offset = GET_UINT32 (cache->buffer, offset + 20 * mid + 12);
 	      i = 0;
@@ -975,3 +975,51 @@ _xdg_mime_cache_get_icon (const char *mime)
 
   return icon;
 }
+
+static void
+dump_glob_node (XdgMimeCache *cache,
+		xdg_uint32_t  offset,
+		int           depth)
+{
+  xdg_unichar_t character;
+  xdg_uint32_t mime_offset;
+  xdg_uint32_t n_children;
+  xdg_uint32_t child_offset;
+  int i;
+
+  character = GET_UINT32 (cache->buffer, offset);
+  mime_offset = GET_UINT32 (cache->buffer, offset + 4);
+  n_children = GET_UINT32 (cache->buffer, offset + 8);
+  child_offset = GET_UINT32 (cache->buffer, offset + 12);
+  for (i = 0; i < depth; i++)
+    printf (" ");
+  printf ("%c", character);
+  if (mime_offset)
+    printf (" - %s", cache->buffer + mime_offset);
+  printf ("\n");
+  if (child_offset)
+  {
+    for (i = 0; i < n_children; i++)
+      dump_glob_node (cache, child_offset + 20 * i, depth + 1);
+  }
+}
+
+void
+_xdg_mime_cache_glob_dump (void)
+{
+  int i, j;
+  for (i = 0; _caches[i]; i++)
+  {
+    XdgMimeCache *cache = _caches[i];
+    xdg_uint32_t list_offset;
+    xdg_uint32_t n_entries;
+    xdg_uint32_t offset;
+    list_offset = GET_UINT32 (cache->buffer, 16);
+    n_entries = GET_UINT32 (cache->buffer, list_offset);
+    offset = GET_UINT32 (cache->buffer, list_offset + 4);
+    for (j = 0; j < n_entries; j++)
+	    dump_glob_node (cache, offset + 20 * j, 0);
+  }
+}
+
+
