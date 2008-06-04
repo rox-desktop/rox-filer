@@ -1038,6 +1038,33 @@ static void set_size_and_style(PinIcon *pi)
 	gtk_widget_set_size_request(pi->widget, iwidth, iheight);
 }
 
+static GdkPixbuf *get_stock_icon(GtkWidget *widget,
+				 const char *stock_id)
+{
+	GtkIconSet      *icon_set;
+	GdkPixbuf	*pixbuf;
+	
+	icon_set = gtk_style_lookup_icon_set(widget->style,
+					     stock_id);
+	if (icon_set)
+	{
+		pixbuf = gtk_icon_set_render_icon(icon_set,
+						  widget->style,
+						  GTK_TEXT_DIR_LTR,
+						  GTK_STATE_NORMAL,
+						  mount_icon_size,
+						  NULL,
+						  NULL);
+	}
+	else
+	{
+		pixbuf=im_unknown->pixbuf;
+		g_object_ref(pixbuf);
+	}
+
+	return pixbuf;
+}
+
 static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 {
 	static GtkWidgetClass *parent_class = NULL;
@@ -1075,19 +1102,24 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 
 	if (item->flags & ITEM_FLAG_SYMLINK)
 	{
-		render_pixbuf(im_symlink->pixbuf, pi->widget->window,
+		GdkPixbuf *emblem = get_stock_icon(pi->widget,
+						   ROX_STOCK_SYMLINK);
+		render_pixbuf(emblem, pi->widget->window,
 				pi->widget->style->black_gc,
 				x, y, -1, -1);
+		g_object_unref(emblem);
 	}
 	else if (item->flags & ITEM_FLAG_MOUNT_POINT)
 	{
-		MaskedPixmap	*mp = item->flags & ITEM_FLAG_MOUNTED
-					? im_mounted
-					: im_unmounted;
+		GdkPixbuf *emblem = get_stock_icon(pi->widget,
+					     item->flags & ITEM_FLAG_MOUNTED
+						   ? ROX_STOCK_MOUNTED
+						   : ROX_STOCK_MOUNT);
 					
-		render_pixbuf(mp->pixbuf, pi->widget->window,
+		render_pixbuf(emblem, pi->widget->window,
 				pi->widget->style->black_gc,
 				x, y, -1, -1);
+		g_object_unref(emblem);
 	}
 
 	gdk_gc_set_clip_region(pi->widget->style->black_gc, NULL);
