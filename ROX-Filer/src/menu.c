@@ -1069,6 +1069,8 @@ static void find(FilerWindow *filer_window)
 	destroy_glist(&paths);
 }
 
+static gboolean last_symlink_check_relative = TRUE;
+
 /* This creates a new savebox widget, and allows the user to pick a new path
  * for the file.
  * Once the new path has been picked, the callback will be called with
@@ -1092,7 +1094,7 @@ static void savebox_show(const gchar *action, const gchar *path,
 		check_relative = gtk_check_button_new_with_mnemonic(
 							_("_Relative link"));
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_relative),
-					     TRUE);
+					     last_symlink_check_relative);
 
 		GTK_WIDGET_UNSET_FLAGS(check_relative, GTK_CAN_FOCUS);
 		gtk_tooltips_set_tip(tooltips, check_relative,
@@ -1220,7 +1222,9 @@ static gboolean link_cb(GObject *savebox,
 
 	check_relative = g_object_get_data(savebox, "check_relative");
 
-	if (gtk_toggle_button_get_active(check_relative))
+	last_symlink_check_relative = gtk_toggle_button_get_active(check_relative);
+
+	if (last_symlink_check_relative)
 		link_path = get_relative_path(path, initial);
 	else
 		link_path = g_strdup(initial);
@@ -1409,7 +1413,7 @@ static gboolean new_file_type_cb(GObject *savebox,
 			         const gchar *initial, const gchar *path)
 {
 	const gchar *oleaf, *leaf;
-	gchar *templ, *templ_dname, *dest;
+	gchar *templ, *rtempl, *templ_dname, *dest;
 	GList *paths;
 
 	/* We can work out the template path from the initial name */
@@ -1425,16 +1429,18 @@ static gboolean new_file_type_cb(GObject *savebox,
 
 	templ = g_strconcat(templ_dname, "/", oleaf, NULL);
 	g_free(templ_dname);
+	rtempl = pathdup(templ);
+	g_free(templ);
 
 	dest = g_path_get_dirname(path);
 	leaf = g_basename(path);
-	paths = g_list_append(NULL, templ);
+	paths = g_list_append(NULL, rtempl);
 
 	action_copy(paths, dest, leaf, TRUE);
 
 	g_list_free(paths);
 	g_free(dest);
-	g_free(templ);
+	g_free(rtempl);
 
 	if (filer_exists(window_with_focus))
 		display_set_autoselect(window_with_focus, leaf);
