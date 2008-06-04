@@ -1413,7 +1413,7 @@ static gboolean new_file_type_cb(GObject *savebox,
 			         const gchar *initial, const gchar *path)
 {
 	const gchar *oleaf, *leaf;
-	gchar *templ, *templ_dname, *dest;
+	gchar *templ, *rtempl, *templ_dname, *dest;
 	GList *paths;
 
 	/* We can work out the template path from the initial name */
@@ -1429,16 +1429,18 @@ static gboolean new_file_type_cb(GObject *savebox,
 
 	templ = g_strconcat(templ_dname, "/", oleaf, NULL);
 	g_free(templ_dname);
+	rtempl = pathdup(templ);
+	g_free(templ);
 
 	dest = g_path_get_dirname(path);
 	leaf = g_basename(path);
-	paths = g_list_append(NULL, templ);
+	paths = g_list_append(NULL, rtempl);
 
 	action_copy(paths, dest, leaf, TRUE);
 
 	g_list_free(paths);
 	g_free(dest);
-	g_free(templ);
+	g_free(rtempl);
 
 	if (filer_exists(window_with_focus))
 		display_set_autoselect(window_with_focus, leaf);
