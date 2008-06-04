@@ -46,13 +46,6 @@ case $1 in
 		exit 1
 esac
 
-if [ -z "$XDG_DATA_DIRS" -a -d /uri/0install/zero-install.sourceforge.net ]; then
-  # Try to get MIME database through Zero Install, if possible
-  0refresh zero-install.sourceforge.net/share/mime 2003-08-07
-  XDG_DATA_DIRS=/usr/local/share/:/usr/share/:/uri/0install/zero-install.sourceforge.net/share
-  export XDG_DATA_DIRS
-fi
-
 BIN="$APP_DIR/$PROG"
 
 if [ -x "$BIN" ]; then

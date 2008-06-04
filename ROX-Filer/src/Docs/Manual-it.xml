@@ -16,7 +16,7 @@
   <othercredit role="translator">
     	 <firstname>Yuri</firstname>
 	 <surname>Bongiorno</surname>
-	 <contrib><ulink url="http://yuri.webhop.org">Traduzione italiana</ulink></contrib>
+	 <contrib><ulink url="http://yuri.bongiorno.googlepages.com">Traduzione italiana</ulink></contrib>
   </othercredit>
   <copyright><year>2005</year><holder>Thomas Leonard</holder></copyright>
   <legalnotice>
@@ -2719,7 +2719,7 @@
 
      <listitem><para>Spedire il file aggiornato all'autore di <application>ROX-Filer</application>. 
      (NdT: se avete trovato errori nella traduzione italiana, 
-     segnalateli a <ulink url="http://yuri.webhop.org">me</ulink>.)</para></listitem>
+     segnalateli a <ulink url="http://yuri.bongiorno.googlepages.com">me</ulink>.)</para></listitem>
 
     </orderedlist>
 
@@ -2850,8 +2850,13 @@
     </para></listitem>
 
     <listitem><para>
-      GTK+ 2.4.0 o successiva (librerie e header). L'ultima versione è disponibile
+      GTK+ 2.4.0 o successivo (librerie e header). L'ultima versione è disponibile
       su <citation>GTK+</citation>,
+    </para></listitem>
+
+    <listitem><para>
+      Glade 2.0.0 o successivo (librerie e header) &mdash; L'ultima versione è disponibile
+      su <citation>Glade</citation>,
     </para></listitem>
 
     <listitem><para>
@@ -2874,7 +2879,36 @@
 2.6.8</screen>
   </para>
 
-  <procedure><title>Per compilare:</title>
+  <procedure><title>Per compilare (con Zero Install):</title>
+
+   <step><para>
+     Lanciare Zero Install per ROX-Filer. Per esempio, nella shell digitare:
+
+     <screen>$ 0launch --gui http://rox.sourceforge.net/2005/interfaces/ROX-Filer</screen>
+   </para></step>
+
+   <step><para>
+     Nella finestra fare clic col tasto destro del mouse sulla riga ROX-Filer e scegliere 
+     <guimenuitem>Compile...</guimenuitem> dal menù.
+   </para></step>
+     
+   <step><para>
+     Scegliere la versione di ROX-Filer da compilare e i file header richiesti.
+     È possibile accettare i valori predefiniti e lasciare che vengano scaricati.
+   </para></step>
+     
+   <step><para>
+     Scegliere una directory nella quale memorizzare il codice compilato e fare clic
+     sul pulsante <guibutton>Build</guibutton> per compilare.
+   </para></step>
+
+   <step><para>
+     Quando terminato, fare clic su <guibutton>Register</guibutton> per aggiungere
+     questa versione a quelle disponibili.
+   </para></step>
+  </procedure>
+
+  <procedure><title>Per compilare (a mano):</title>
 
    <step><para>
      Il filer usa il database condiviso MIME <citation>SharedMIME</citation>
@@ -2888,55 +2922,25 @@
    </para></step>
 
    <step><para>
-     Eseguire lo script <command>install.sh</command>, in questo modo:
+     Eseguire lo script AppRun, in questo modo:
 
-     <screen>$ ./install.sh</screen>
+     <screen>$ ./ROX-Filer/AppRun --compile</screen>
 
    </para></step>
 
    <step><para>
      <application>ROX-Filer</application> eseguirà dei controlli per scoprire
      che tipo di sistema si sta usando e poi inizierà la compilazione. Se qualcosa
-     non funziona, contattare via email l'autore di ROX-Filer. Spiegare (in inglese)
+     non funziona, contattare via email gli sviluppatori di ROX-Filer. Spiegare (in inglese)
      che tipo di sistema si ha e quali errori compaiono. Se si è capaci di risolvere
-     il problema, informare comunque l'autore via email.
+     il problema, informare comunque gli sviluppatori via email.
    </para></step>
 
    <step><para>
-     Dopo la compilazione, viene chiesto dove si vuole installare il filer.
-     Se si vuole fare un'installazione globale, utile anche per gli altri utenti,
-     bisogna fermarsi, diventare «root» con il comando <command>su</command> 
-     e rieseguire lo script.
-
-     Se non si ha la password di root, ci si deve accontentare di un'installazione
-     locale e, seguendo le istruzioni, il filer viene installato nella directory home
-     dell'utente.
+     Dopo la compilazione, ROX-Filer verrà eseguito automaticamente. È possibile
+     comunque lanciarlo più tardi eseguendo lo script AppRun senza argomenti.
    </para></step>
   </procedure>
-
-  <para>
-   Ora è possibile eseguire il filer con lo script <command>rox</command> senza
-   nessuna opzione, in questo modo:
-
-   <screen>$ rox</screen>
-
-   Dovrebbe quindi apparire una finestra e visualizzare il contenuto della directory attuale.
-
-   Se lo script è stato installato nella directory home dell'utente, probabilmente è necessario
-   modificare la variabile d'ambiente <envar>PATH</envar> in modo da trovarlo.
-   Per esempio, se è installato nella home in una sottodirectory di nome 
-   <filename>bin</filename>, digitare:
-
-   <screen>$ PATH=$HOME/bin:$PATH; export PATH</screen>
-
-   o se si sta usando la shell <citerefentry><refentrytitle>csh</refentrytitle>
-    <manvolnum>1</manvolnum></citerefentry>:
-
-   <screen>$ setenv PATH $HOME/bin:$PATH
-$ rehash</screen>
-
-  </para>
-
  </appendix>
 
  <appendix id="manpage"><title>Pagina di manuale</title>
@@ -3410,6 +3414,11 @@ EOF</screen>
   <bibliomixed>
    <abbrev>GTK+</abbrev><citetitle>GTK+ Toolkit,
     <ulink url="http://www.gtk.org"/></citetitle>
+  </bibliomixed>
+
+  <bibliomixed>
+   <abbrev>Glade</abbrev><citetitle>Glade - a User Interface Designer for GTK+ and GNOME,
+    <ulink url="http://glade.gnome.org/"/></citetitle>
   </bibliomixed>
 
   <bibliomixed>
