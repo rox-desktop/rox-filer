@@ -1,3 +1,10 @@
+2008-06-05  Bastien Nocera  <hadess@hadess.net>
+
+	* src/xdgmimecache.c (cache_glob_node_lookup_suffix):
+	Patch by Matthias Clasen <mclasen@redhat.com> to fix reading
+	the suffix lookup (wrong offsets when reading the mime-type
+	offset and weight)
+
 2008-06-03  Bastien Nocera  <hadess@hadess.net>
 
 	* src/xdgmime.c (xdg_mime_dump):

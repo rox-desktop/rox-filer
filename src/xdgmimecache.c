@@ -507,8 +507,8 @@ cache_glob_node_lookup_suffix (XdgMimeCache  *cache,
 		  if (match_char != 0)
 		    break;
 
-		  mimetype_offset = GET_UINT32 (cache->buffer, offset + 20 * i + 4);
-		  weight = GET_UINT32 (cache->buffer, offset + 20 * i + 16);
+		  mimetype_offset = GET_UINT32 (cache->buffer, child_offset + 20 * i + 4);
+		  weight = GET_UINT32 (cache->buffer, child_offset + 20 * i + 16);
 
 		  mime_types[n].mime = cache->buffer + mimetype_offset;
 		  mime_types[n].weight = weight;
