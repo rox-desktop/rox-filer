@@ -458,14 +458,14 @@ cache_glob_node_lookup_suffix (XdgMimeCache  *cache,
   if (ignore_case)
     character = _xdg_ucs4_to_lower (character);
 
+  assert (character != 0);
+
   min = 0;
   max = n_entries - 1;
   while (max >= min)
     {
       mid = (min + max) /  2;
-
-      match_char = GET_UINT32 (cache->buffer, offset + 20 * mid);
-
+      match_char = GET_UINT32 (cache->buffer, offset + 12 * mid);
       if (match_char < character)
 	min = mid + 1;
       else if (match_char > character)
@@ -474,11 +474,11 @@ cache_glob_node_lookup_suffix (XdgMimeCache  *cache,
 	{
           len--;
           n = 0;
+          n_children = GET_UINT32 (cache->buffer, offset + 12 * mid + 4);
+          child_offset = GET_UINT32 (cache->buffer, offset + 12 * mid + 8);
+      
           if (len > 0)
             {
-              n_children = GET_UINT32 (cache->buffer, offset + 20 * mid + 8);
-              child_offset = GET_UINT32 (cache->buffer, offset + 20 * mid + 12);
-      
               n = cache_glob_node_lookup_suffix (cache, 
                                                  n_children, child_offset,
                                                  file_name, len, 
@@ -488,27 +488,15 @@ cache_glob_node_lookup_suffix (XdgMimeCache  *cache,
             }
           if (n == 0)
             {
-              mimetype_offset = GET_UINT32 (cache->buffer, offset + 20 * mid + 4);
-              weight = GET_UINT32 (cache->buffer, offset + 20 * mid + 16);
-
-	      if (mimetype_offset)
-		{
-		  mime_types[n].mime = cache->buffer + mimetype_offset;
-		  mime_types[n].weight = weight;
-		  n++;
-		}
-
-	      n_children = GET_UINT32 (cache->buffer, offset + 20 * mid + 8);
-	      child_offset = GET_UINT32 (cache->buffer, offset + 20 * mid + 12);
 	      i = 0;
 	      while (n < n_mime_types && i < n_children)
 		{
-		  match_char = GET_UINT32 (cache->buffer, child_offset + 20 * i);
+		  match_char = GET_UINT32 (cache->buffer, child_offset + 12 * i);
 		  if (match_char != 0)
 		    break;
 
-		  mimetype_offset = GET_UINT32 (cache->buffer, child_offset + 20 * i + 4);
-		  weight = GET_UINT32 (cache->buffer, child_offset + 20 * i + 16);
+		  mimetype_offset = GET_UINT32 (cache->buffer, child_offset + 12 * i + 4);
+		  weight = GET_UINT32 (cache->buffer, child_offset + 12 * i + 8);
 
 		  mime_types[n].mime = cache->buffer + mimetype_offset;
 		  mime_types[n].weight = weight;
@@ -519,7 +507,6 @@ cache_glob_node_lookup_suffix (XdgMimeCache  *cache,
 	  return n;
 	}
     }
-
   return 0;
 }
 
