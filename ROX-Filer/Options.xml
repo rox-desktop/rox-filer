@@ -112,13 +112,13 @@ indicator'>If this is on then files which have one or more extended attributes s
         <label help='1'>When thumbnails are turned on, each image file in a directory is loaded and a small thumbnail of it is shown.</label>
          <toggle name='display_show_thumbs' label='Show image thumbnails'>This is the default setting for new windows. Use the Display menu to turn thumbnails on and off for individual windows.</toggle>
 	 <spacer/>
-         <launch uri="http://www.kerofin.demon.co.uk/2005/interfaces/VideoThumbnail" label="Video thumbnails"/>
+         <launch uri="http://www.kerofin.demon.co.uk/2005/interfaces/VideoThumbnail" label="Video thumbnails" appname="VideoThumbnail"/>
       </frame>
       <frame label='Thumbnails cache'>
 	<label help='1'>To speed things up, the generated thumbnails are stored in the hidden ~/.thumbnails directory. Click here to remove all the cached thumbnails. They will be created again as needed.</label>
         <thumbs-purge-cache/>
 	<spacer/>
-        <launch uri="http://www.kerofin.demon.co.uk/2005/interfaces/Thumbs" label="Manage thumbnails"/>
+        <launch uri="http://www.kerofin.demon.co.uk/2005/interfaces/Thumbs" label="Manage thumbnails" appname="Thumbs"/>
       </frame>
     </section>
   </section>
@@ -279,7 +279,7 @@ xterm -e wget $1</entry>
     <frame label='MIME types'>
       <label help='1'>The filer uses a set of rules to work out the correct MIME type for each regular file, and then chooses a suitable icon for that type.</label>
 
-	<launch uri="http://rox.sourceforge.net/2005/interfaces/MIME-Editor" label="Edit MIME rules"/>
+	<launch uri="http://rox.sourceforge.net/2005/interfaces/MIME-Editor" label="Edit MIME rules" appname="MIME-Editor"/>
      </frame>
      <frame label='Themes'>
       <icon-theme-chooser label='Icon theme' name='icon_theme'/>

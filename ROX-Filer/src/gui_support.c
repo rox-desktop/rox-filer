@@ -43,6 +43,7 @@
 #include "pixmaps.h"
 #include "choices.h"
 #include "options.h"
+#include "run.h"
 
 gint	screen_width, screen_height;
 
@@ -1420,7 +1421,7 @@ void make_heading(GtkWidget *label, double scale_factor)
 /* Launch a program using 0launch.
  * If button-3 is used, open the GUI with -g.
  */
-void launch_uri(const char *uri)
+void launch_uri(GObject *button, const char *uri)
 {
 	const char *argv[] = {"0launch", NULL, NULL, NULL};
 	const char *uri_0launch = "/uri/0install/zero-install.sourceforge.net"
@@ -1432,6 +1433,20 @@ void launch_uri(const char *uri)
 			argv[0] = uri_0launch;
 		else
 		{
+			const char *appname=g_object_get_data(button,
+							      "appname");
+
+			if (appname)
+			{
+				gchar *path=find_app(appname);
+				if(path)
+				{
+					run_by_path(path);
+					g_free(path);
+					return;
+				}
+			}
+			
 			delayed_error(_("This program (%s) cannot be run, "
 				"as the 0launch command is not available. "
 				"It can be downloaded from here:\n\n"

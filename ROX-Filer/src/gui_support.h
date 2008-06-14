@@ -85,7 +85,7 @@ GdkPixbuf * rox_pixbuf_new_from_file_at_scale (const char *filename,
 					       gboolean  preserve_aspect_ratio,
 					       GError    **error);
 void make_heading(GtkWidget *label, double scale_factor);
-void launch_uri(const char *uri);
+void launch_uri(GObject *button, const char *uri);
 void allow_right_click(GtkWidget *button);
 gint current_event_button(void);
 GdkPixbuf *create_spotlight_pixbuf(GdkPixbuf *src, GdkColor *color);

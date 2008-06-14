@@ -70,5 +70,6 @@ gboolean get_values_from_desktop_file(const char *path,
 				      const char *key,
 				      gchar **value, ...);
 gchar *build_command_with_path(const char *cmd, const char *path);
+gchar *find_app(const char *appname);
 
 #endif /* _SUPPORT_H */

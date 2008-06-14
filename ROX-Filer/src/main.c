@@ -878,7 +878,8 @@ static void add_default_panel_and_pinboard(xmlNodePtr body)
 	}
 }
 
-static GtkWidget *launch_button_new(const char *label, const char *uri)
+static GtkWidget *launch_button_new(const char *label, const char *uri,
+				    const char *appname)
 {
 	GtkWidget *button;
 	GClosure *closure;
@@ -886,11 +887,16 @@ static GtkWidget *launch_button_new(const char *label, const char *uri)
 	gchar *tip;
 
 	button = button_new_mixed(GTK_STOCK_PREFERENCES, label);
-	closure = g_cclosure_new_swap(G_CALLBACK(launch_uri),
+	closure = g_cclosure_new(G_CALLBACK(launch_uri),
 					g_strdup(uri),
 					(GClosureNotify) g_free);
 	g_signal_connect_closure(button, "clicked", closure, FALSE);
-
+	if(appname) {
+		g_object_set_data_full(G_OBJECT(button), "appname",
+				       g_strdup(appname),
+				       (GDestroyNotify) g_free);
+	}
+	
 	allow_right_click(button);
 
 	slash = strrchr(uri, '/');
@@ -912,20 +918,24 @@ static GList *build_launch(Option *option, xmlNode *node, guchar *label)
 {
 	GtkWidget *align;
 	char *uri;
+	char *appname;
 
 	g_return_val_if_fail(option == NULL, NULL);
 	g_return_val_if_fail(label != NULL, NULL);
 
 	uri = xmlGetProp(node, "uri");
+	appname = xmlGetProp(node, "appname");
 
 	g_return_val_if_fail(uri != NULL, NULL);
 
 	align = gtk_alignment_new(0, 0.5, 0, 0);
 
 	gtk_container_add(GTK_CONTAINER(align),
-			launch_button_new(_(label), uri));
+			  launch_button_new(_(label), uri, appname));
 
 	g_free(uri);
+	if(appname)
+	  g_free(appname);
 
 	return g_list_append(NULL, align);
 }

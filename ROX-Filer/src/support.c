@@ -1724,3 +1724,41 @@ gchar *build_command_with_path(const char *cmd, const char *path)
 
 	return result;
 }
+
+/* Search for a application on $APPDIRPATH
+ * (~/Apps:/usr/local/apps:/usr/apps) and return a copy of the path found.
+ * Returns NULL if not found
+ */
+gchar *find_app(const char *appname)
+{
+  const gchar *path=g_getenv(appname);
+  gchar **search;
+  gchar *app=NULL;
+  int i;
+
+  if(path)
+  {
+	  search=g_strsplit(path, ":", 0);
+  }
+  else
+  {
+	  gchar *tmp;
+	  
+	  tmp=g_strdup_printf("%s/Apps:/usr/local/apps:/usr/apps",
+			       g_get_home_dir());
+	  search=g_strsplit(tmp, ":", 0);
+	  g_free(tmp);
+  }
+
+  for(i=0; search[i]; i++)
+  {
+	  app=g_strconcat(search[i], "/", appname, NULL);
+	  if(access(app, X_OK)==0)
+		  goto out;
+  }
+  app=NULL;
+
+ out:
+  g_strfreev(search);
+  return app;
+}
