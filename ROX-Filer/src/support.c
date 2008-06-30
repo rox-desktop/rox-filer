@@ -1755,6 +1755,7 @@ gchar *find_app(const char *appname)
 	  app=g_strconcat(search[i], "/", appname, NULL);
 	  if(access(app, X_OK)==0)
 		  goto out;
+	  g_free(app);
   }
   app=NULL;
 
