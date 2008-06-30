@@ -1731,7 +1731,7 @@ gchar *build_command_with_path(const char *cmd, const char *path)
  */
 gchar *find_app(const char *appname)
 {
-  const gchar *path=g_getenv(appname);
+  const gchar *path=g_getenv("APPDIRPATH");
   gchar **search;
   gchar *app=NULL;
   int i;
