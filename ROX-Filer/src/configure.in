@@ -21,7 +21,7 @@ if test "x$GCC" = "xyes"; then
   AC_MSG_CHECKING(for GCC version)
   if $CC --version | grep -i gcc > /dev/null; then 
 [
-    ver=`$CC --version | head -1 | sed -e 's/.* \([0-9][0-9]*\.[0-9][0-9]*\.[0-9][-_0-9a-zA-Z]*\) .*/\1/'`
+    ver=`$CC --version | head -1 | sed -e 's/.* \([0-9][0-9]*\.[0-9][0-9]*\.[0-9][-_0-9a-zA-Z]*\).*/\1/'`
 ]
     major=`echo $ver | cut -d"." -f 1`
     minor=`echo $ver | cut -d"." -f 2`
