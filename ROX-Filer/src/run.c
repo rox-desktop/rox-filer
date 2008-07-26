@@ -701,7 +701,7 @@ static gboolean run_desktop(const char *full_path,
 	}
 	g_ptr_array_add(expanded, NULL);
 
-	if(req_dir)
+	if(req_dir && req_dir[0])
 		dir = req_dir;
 
 	success = rox_spawn(dir, (const gchar **) expanded->pdata);
