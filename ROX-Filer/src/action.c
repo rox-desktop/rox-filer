@@ -818,7 +818,7 @@ static GUIside *start_action(GtkWidget *abox, ActionChild *func, gpointer data,
 
 			quiet = autoq;
 
-			dir_drop_all_dnotifies();
+			dir_drop_all_notifies();
 
 			/* Reset the SIGCHLD handler */
 			act.sa_handler = SIG_DFL;

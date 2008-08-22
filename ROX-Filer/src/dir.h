@@ -13,9 +13,14 @@
 #include <signal.h>
 #include <fcntl.h>
 
-/* Check for dnotify support */
-#if defined(DN_MULTISHOT) && defined(SIGRTMIN)
+/* Check for [id]notify support */
+#if defined(HAVE_SYS_INOTIFY_H)
+# define USE_INOTIFY
+#elif defined(DN_MULTISHOT) && defined(SIGRTMIN)
 # define USE_DNOTIFY
+#endif
+#if defined(USE_INOTIFY) || defined(USE_DNOTIFY)
+#define USE_NOTIFY
 extern gboolean dnotify_wakeup_flag;
 #endif
 
@@ -84,8 +89,11 @@ struct _Directory
 
 	gint		rescan_timeout;	/* See dir_rescan_soon() */
 
-#ifdef USE_DNOTIFY
-	int		dnotify_fd;	/* -1 if not watching */
+#ifdef USE_NOTIFY
+	int		notify_fd;	/* -1 if not watching */
+#endif
+#ifdef USE_INOTIFY
+        guint           inotify_source;
 #endif
 };
 
@@ -98,8 +106,10 @@ void dir_check_this(const guchar *path);
 DirItem *dir_update_item(Directory *dir, const gchar *leafname);
 void dir_merge_new(Directory *dir);
 void dir_force_update_path(const gchar *path);
+#if defined(USE_DNOTIFY)
 void dnotify_wakeup(void);
-void dir_drop_all_dnotifies(void);
+#endif
+void dir_drop_all_notifies(void);
 void dir_queue_recheck(Directory *dir, DirItem *item);
 
 #endif /* _DIR_H */

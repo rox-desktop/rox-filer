@@ -695,6 +695,13 @@ static void show_features(void)
 		_("No")
 #endif
 		);
+	g_print("%s... %s\n", _("Inotify support"),
+#ifdef USE_INOTIFY
+		_("Yes")
+#else
+		_("No")
+#endif
+	       );
 	g_print("%s... %s\n", _("Dnotify support"),
 #ifdef USE_DNOTIFY
 		_("Yes")
