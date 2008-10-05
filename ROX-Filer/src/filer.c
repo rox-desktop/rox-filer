@@ -2657,7 +2657,13 @@ gint filer_motion_notify(FilerWindow *filer_window, GdkEventMotion *event)
 	
 	if (!view_get_selected(view, &iter))
 	{
-		if (event->state & GDK_BUTTON1_MASK)
+		/* If we drag an unselected item, select it only.
+		 * Unless we're also holding down Ctrl, in which case
+		 * it's probably unselected only because we
+		 * mis-interpreted the click as toggle-selected.
+		 */
+		if ((event->state & GDK_BUTTON1_MASK) &&
+		    !(event->state & GDK_CONTROL_MASK))
 		{
 			/* Select just this one */
 			filer_window->temp_item_selected = TRUE;
