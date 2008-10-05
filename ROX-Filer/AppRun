@@ -32,7 +32,7 @@ case $1 in
 		echo "Compiling $APP_DIR... please wait..." >&2
 		if [ ! -x "$APP_DIR/src/configure" ]; then
 		  echo "No 'configure' script! Trying to run autoconf..."
-		  (cd "$APP_DIR/src"; autoconf)
+		  (cd "$APP_DIR/src"; autogen.sh)
 		fi
 		BUILDDIR="$APP_DIR/build"
 		[ ! -d "$BUILDDIR" ] && mkdir "$BUILDDIR"
