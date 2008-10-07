@@ -128,7 +128,7 @@ else
 fi
 
 AC_MSG_CHECKING(for large file support)
-case "$with_platform" in
+case `uname -s` in
 OpenBSD*)
   AC_MSG_RESULT(yes)
   AC_DEFINE(LARGE_FILE_SUPPORT)
