@@ -145,7 +145,6 @@ static void clear_selection(gpointer data, guint action, GtkWidget *widget);
 static void invert_selection(gpointer data, guint action, GtkWidget *widget);
 static void new_directory(gpointer data, guint action, GtkWidget *widget);
 static void new_file(gpointer data, guint action, GtkWidget *widget);
-static void new_script(gpointer data, guint action, GtkWidget *widget);
 static void customise_new(gpointer data);
 static void xterm_here(gpointer data, guint action, GtkWidget *widget);
 
@@ -237,7 +236,6 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {N_("New"),			NULL, NULL, 0, "<Branch>"},
 {">" N_("Directory"),		NULL, new_directory, 0, NULL},
 {">" N_("Blank file"),		NULL, new_file, 0, "<StockItem>", GTK_STOCK_NEW},
-{">" N_("Start script"),	NULL, new_script, 0, NULL},
 {">" N_("Customise Menu..."),	NULL, customise_new, 0, NULL},
 {N_("Window"),			NULL, NULL, 0, "<Branch>"},
 {">" N_("Parent, New Window"), 	NULL, open_parent, 0, "<StockItem>", GTK_STOCK_GO_UP},
@@ -1409,50 +1407,6 @@ static void new_file(gpointer data, guint action, GtkWidget *widget)
 		make_path(window_with_focus->sym_path, _("NewFile")),
 		type_to_icon(text_plain),
 		new_file_cb, GDK_ACTION_COPY);
-}
-
-static gboolean new_script_cb(GObject *savebox,
-			    const gchar *initial, const gchar *path)
-{
-	FILE *fp;
-
-	fp = fopen(path, "w");
-
-	if (fp == NULL)
-	{
-		report_error(_("Error creating '%s': %s"),
-				path, g_strerror(errno));
-		return FALSE;
-	}
-
-	fprintf(fp, "#!/bin/sh\n");
-	/* Add 0launch call here, but don't assume it will work */
-	fprintf(fp, "exec %s/AppRun \"$@\"\n", app_dir);
-
-	fclose(fp);
-	chmod(path, 0755);
-
-	dir_check_this(path);
-
-	if (filer_exists(window_with_focus))
-	{
-		guchar	*leaf;
-		leaf = strrchr(path, '/');
-		if (leaf)
-			display_set_autoselect(window_with_focus, leaf + 1);
-	}
-
-	return TRUE;
-}
-
-static void new_script(gpointer data, guint action, GtkWidget *widget)
-{
-	g_return_if_fail(window_with_focus != NULL);
-	
-	savebox_show(_("Start script"),
-		     make_path(window_with_focus->sym_path, _("rox")),
-		     type_to_icon(application_x_shellscript),
-		     new_script_cb, GDK_ACTION_COPY);
 }
 
 static gboolean new_file_type_cb(GObject *savebox,
