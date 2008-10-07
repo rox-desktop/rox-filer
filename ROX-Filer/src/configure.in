@@ -7,9 +7,6 @@ AC_CONFIG_HEADER(config.h)
 	exit 1
 fi
 
-dnl Look up the target platform
-AC_CANONICAL_TARGET
-
 dnl Checks for programs.
 AC_PROG_CC
 
@@ -131,12 +128,12 @@ else
 fi
 
 AC_MSG_CHECKING(for large file support)
-case "$target_os" in
-openbsd*)
+case "$with_platform" in
+OpenBSD*)
   AC_MSG_RESULT(yes)
   AC_DEFINE(LARGE_FILE_SUPPORT)
   ;;
-freebsd*)
+FreeBSD*)
   AC_MSG_RESULT(yes)
   AC_DEFINE(LARGE_FILE_SUPPORT)
   ;;
