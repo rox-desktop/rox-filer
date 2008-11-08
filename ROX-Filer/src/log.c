@@ -146,18 +146,18 @@ void log_show_window()
 
 	renderer = gtk_cell_renderer_text_new();
 
-	column = gtk_tree_view_column_new_with_attributes("Time", renderer,
+	column = gtk_tree_view_column_new_with_attributes(_("Time"), renderer,
 							   "text", TIMESTAMP,
 							   NULL);
 	gtk_tree_view_append_column(tv, column);
 
-	column = gtk_tree_view_column_new_with_attributes("Action", renderer,
+	column = gtk_tree_view_column_new_with_attributes(_("Action"), renderer,
 							   "text", MESSAGE,
 							   NULL);
 	gtk_tree_view_column_set_resizable(column, TRUE);
 	gtk_tree_view_append_column(tv, column);
 
-	column = gtk_tree_view_column_new_with_attributes("Path", renderer,
+	column = gtk_tree_view_column_new_with_attributes(_("Path"), renderer,
 							   "text", DIRECTORY,
 							   NULL);
 	gtk_tree_view_append_column(tv, column);
