@@ -75,6 +75,8 @@ static GdkAtom xa__NET_WM_STATE = GDK_NONE;
 static GdkAtom xa__NET_WM_STATE_HIDDEN = GDK_NONE;
 static GdkAtom xa__NET_WM_DESKTOP = GDK_NONE;
 static GdkAtom xa__NET_CURRENT_DESKTOP = GDK_NONE;
+static GdkAtom xa__NET_DESKTOP_GEOMETRY = GDK_NONE;
+static GdkAtom xa__NET_DESKTOP_VIEWPORT = GDK_NONE;
 
 /* We have selected destroy and property events on every window in
  * this table.
@@ -97,8 +99,9 @@ static void update_supported(void);
 static gboolean update_title(gpointer data);
 static void update_current_desktop(void);
 
-/* remember what desktop number is currently displayed */
+/* remember what desktop number (and viewport) is currently displayed */
 static int cur_desktop = 0;
+static GdkRectangle cur_viewport;
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -117,9 +120,6 @@ void tasklist_set_active(gboolean active)
 	}
 	tasklist_active = active;
 	
-	if (active)
-		update_current_desktop();
-
 	if (need_init)
 	{
 		GdkWindow *root;
@@ -145,7 +145,9 @@ void tasklist_set_active(gboolean active)
 			gdk_atom_intern("_NET_WM_STATE_HIDDEN", FALSE);
 		xa__NET_WM_DESKTOP = gdk_atom_intern("_NET_WM_DESKTOP", FALSE);
 		xa__NET_CURRENT_DESKTOP = gdk_atom_intern("_NET_CURRENT_DESKTOP", FALSE);
-		
+		xa__NET_DESKTOP_GEOMETRY = gdk_atom_intern("_NET_DESKTOP_GEOMETRY", FALSE);
+		xa__NET_DESKTOP_VIEWPORT = gdk_atom_intern("_NET_DESKTOP_VIEWPORT", FALSE);
+
 		known = g_hash_table_new_full((GHashFunc) xid_hash,
 					      (GEqualFunc) xid_equal,
 					      NULL,
@@ -157,6 +159,7 @@ void tasklist_set_active(gboolean active)
 	
 	if (active)
 	{
+		update_current_desktop();
 		gdk_window_add_filter(NULL, window_filter, NULL);
 		update_supported();
 	}
@@ -321,6 +324,33 @@ static gboolean update_title(gpointer data)
 	return FALSE;
 }
 
+/* Call from within error_push/pop
+ * See wnck_window_is_in_viewport */
+static gboolean within_viewport(Window xwindow)
+{
+  int x, y;
+  unsigned int width, height, bw, depth;
+  Window root_window, child;
+  GdkRectangle win_rect;
+
+  XGetGeometry (gdk_display,
+                xwindow,
+                &root_window,
+                &x, &y, &width, &height, &bw, &depth);
+  XTranslateCoordinates (gdk_display,
+                         xwindow,
+			 root_window,
+                         0, 0,
+                         &x, &y, &child);
+
+  win_rect.x = x + cur_viewport.x;
+  win_rect.y = y + cur_viewport.y;
+  win_rect.width = width;
+  win_rect.height = height;
+
+  return gdk_rectangle_intersect (&cur_viewport, &win_rect, &win_rect);
+}
+
 /* Call from within error_push/pop */
 static void window_check_status(IconWindow *win)
 {
@@ -376,8 +406,9 @@ static void window_check_status(IconWindow *win)
 			&bytes_after, &data) == Success && data)
 	{
 		guint32 desk_on = ((guint32 *) data)[0];
-		
-		if ((desk_on != 0xffffffff) && (desk_on != cur_desktop))
+
+		if ((desk_on != 0xffffffff) && ((desk_on != cur_desktop) ||
+					       !within_viewport(win->xwindow)))
 			iconic = FALSE;
 		XFree(data);
 	}
@@ -407,6 +438,19 @@ static void update_current_desktop(void)
 		cur_desktop = ((gint32*)data)[0];
 		XFree(data);
 	}
+
+	if (XGetWindowProperty(gdk_display, gdk_x11_get_default_root_xwindow(),
+			gdk_x11_atom_to_xatom(xa__NET_DESKTOP_VIEWPORT),
+			0, G_MAXLONG, False, XA_CARDINAL, &type, &format,
+			&nitems,
+			&bytes_after, (unsigned char **)(&data)) == Success &&
+	    data) {
+		cur_viewport.x = ((gint32*)data)[0];
+		cur_viewport.y = ((gint32*)data)[1];
+		cur_viewport.width = screen_width;
+		cur_viewport.height = screen_height;
+		XFree(data);
+	}
 }
 
 /* Called for all events on all windows */
@@ -434,7 +478,9 @@ static GdkFilterReturn window_filter(GdkXEvent *xevent,
 					g_hash_table_remove(known, &win);
 			}
 		}
-		else if (atom == xa__NET_CURRENT_DESKTOP)
+		else if (atom == xa__NET_CURRENT_DESKTOP ||
+			 atom == xa__NET_DESKTOP_VIEWPORT ||
+			 atom == xa__NET_DESKTOP_GEOMETRY)
 		{
 			update_current_desktop();
 			tasklist_update(FALSE);
