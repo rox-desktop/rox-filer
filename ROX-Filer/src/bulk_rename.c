@@ -113,7 +113,9 @@ void bulk_rename(const char *dir, GList *items)
 	gtk_tooltips_set_tip(tooltips, with_entry,
 			_("The first match in each filename will be replaced "
 			"by this string. "
-			"There are no special characters."), NULL);
+			"The only special characters are back-references "
+			"from \\0 to \\9. To use them literally, "
+			"they have to be escaped with a backslash."), NULL);
 
 	button = gtk_button_new_with_label(_("Apply"));
 	gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 0);
@@ -204,6 +206,7 @@ static void update_model(GtkListStore *list, regex_t *replace, const char *with)
 {
 	GtkTreeIter iter;
 	GtkTreeModel *model = (GtkTreeModel *) list;
+	int max_subs = 10;
 	int n_matched = 0;
 	int n_changed = 0;
 	int with_len;
@@ -218,36 +221,50 @@ static void update_model(GtkListStore *list, regex_t *replace, const char *with)
 
 	do
 	{
-		regmatch_t match;
+		regmatch_t match[max_subs];
 		char *old = NULL;
 
 		gtk_tree_model_get(model, &iter, 1, &old, -1);
 
-		if (regexec(replace, old, 1, &match, 0) == 0)
+		if (regexec(replace, old, max_subs, match, 0) == 0)
 		{
-			char *new;
-			int new_len;
+			GString *new;
 
 			n_matched++;
-			g_return_if_fail(match.rm_so != -1);
+			g_return_if_fail(match[0].rm_so != -1);
 
-			new_len = match.rm_so + with_len +
-				  (strlen(old) - match.rm_eo) + 1;
-			new = g_malloc(new_len);
+			new = g_string_new(NULL);
+			g_string_append_len(new, old, match[0].rm_so);
 
-			strncpy(new, old, match.rm_so);
-			strcpy(new + match.rm_so, with);
-			strcpy(new + match.rm_so + with_len, old + match.rm_eo);
-
-			g_return_if_fail(new[new_len - 1] == '\0');
-
-			if (strcmp(old, new) != 0)
+			int i;
+			for (i = 0; i < with_len; i++)
 			{
-				n_changed++;
-				gtk_list_store_set(list, &iter, 1, new, -1);
+				if (with[i] == '\\' && with[i+1] >= '0' && with[i+1]-'0' < max_subs)
+				{
+					if (i != 0 && with[i-1] == '\\')
+						continue;
+
+					int subpat = with[i+1] - '0';
+
+					if (match[subpat].rm_so != -1)
+						g_string_append_len(new, old + match[subpat].rm_so,
+								match[subpat].rm_eo - match[subpat].rm_so);
+
+					i++;
+				}
+				else
+					g_string_append_c(new, with[i]);
 			}
 
-			g_free(new);
+			g_string_append(new, old + match[0].rm_eo);
+
+			if (strcmp(old, new->str) != 0)
+			{
+				n_changed++;
+				gtk_list_store_set(list, &iter, 1, new->str, -1);
+			}
+
+			g_string_free(new, TRUE);
 		}
 		g_free(old);
 
