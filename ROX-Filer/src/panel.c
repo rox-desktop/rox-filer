@@ -618,6 +618,7 @@ void panel_update_size(void)
 	{
 		if (current_panel[i])
 		{
+			panel_update_geometry(current_panel[i]);
 			reposition_panel(current_panel[i]->window,
 					&current_panel[i]->window->allocation,
 					current_panel[i]);
