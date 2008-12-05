@@ -72,6 +72,7 @@
 #include "session.h"
 #include "minibuffer.h"
 #include "xtypes.h"
+#include "bulk_rename.h"
 
 int number_of_windows = 0;	/* Quit when this reaches 0 again... */
 int to_wakeup_pipe = -1;	/* Write here to get noticed */
@@ -340,6 +341,10 @@ int main(int argc, char **argv)
 	option_add_string(&o_session_pinboard_name, "session_pinboard_name",
 			  "Default");
 	option_register_widget("launch", build_launch);
+
+#ifdef UNIT_TESTS
+	bulk_rename_tests();
+#endif
 
 	/* The idea here is to convert the command-line arguments
 	 * into a SOAP RPC.

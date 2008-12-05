@@ -8,4 +8,8 @@
 
 void bulk_rename(const char *dir, GList *items);
 
+#ifdef UNIT_TESTS
+void bulk_rename_tests(void);
+#endif
+
 #endif /* _BULK_RENAME_H */

@@ -10,6 +10,8 @@
 
 #include <glib.h>
 
+//#define UNIT_TESTS
+
 /* We put all the global typedefs here to avoid creating dependencies
  * between header files.
  */

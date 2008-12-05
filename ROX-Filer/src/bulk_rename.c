@@ -201,17 +201,64 @@ static void response(GtkWidget *box, int resp, GtkListStore *model)
 		gtk_widget_destroy(box);
 }
 
+/** Substitute: s/old/with/
+ * Returns the result as a new string, or NULL if there is no match.
+ * "replace" is a compiled version of "with".
+ * Caller must free the result.
+ */
+static GString *subst(const char *old, regex_t *replace, const char *with)
+{
+	int max_subs = 10;
+	GString *new;
+	regmatch_t match[max_subs];
+
+	if (regexec(replace, old, max_subs, match, 0) != 0)
+		return NULL;		/* No match */
+
+	g_return_val_if_fail(match[0].rm_so != -1, NULL);
+
+	new = g_string_new(NULL);
+	g_string_append_len(new, old, match[0].rm_so);
+
+	int i;
+	for (i = 0; with[i]; i++)
+	{
+		if (with[i] == '\\' && with[i+1])
+		{
+			i++;
+			if (with[i] >= '0' && with[i]-'0' < max_subs)
+			{
+				int subpat;
+
+				subpat = with[i] - '0';
+
+				if (match[subpat].rm_so != -1)
+					g_string_append_len(new, old + match[subpat].rm_so,
+							match[subpat].rm_eo - match[subpat].rm_so);
+
+			}
+			else
+			{
+				// Escape next character
+				g_string_append_c(new, with[i]);
+			}
+		}
+		else
+			g_string_append_c(new, with[i]);
+	}
+
+	g_string_append(new, old + match[0].rm_eo);
+
+	return new;
+}
+
 /* Do a search-and-replace on the second column. */
 static void update_model(GtkListStore *list, regex_t *replace, const char *with)
 {
 	GtkTreeIter iter;
 	GtkTreeModel *model = (GtkTreeModel *) list;
-	int max_subs = 10;
 	int n_matched = 0;
 	int n_changed = 0;
-	int with_len;
-
-	with_len = strlen(with);
 
 	if (!gtk_tree_model_get_iter_first(model, &iter))
 	{
@@ -221,43 +268,15 @@ static void update_model(GtkListStore *list, regex_t *replace, const char *with)
 
 	do
 	{
-		regmatch_t match[max_subs];
+		GString *new;
 		char *old = NULL;
 
 		gtk_tree_model_get(model, &iter, 1, &old, -1);
 
-		if (regexec(replace, old, max_subs, match, 0) == 0)
+		new = subst(old, replace, with);
+		if (new)
 		{
-			GString *new;
-
 			n_matched++;
-			g_return_if_fail(match[0].rm_so != -1);
-
-			new = g_string_new(NULL);
-			g_string_append_len(new, old, match[0].rm_so);
-
-			int i;
-			for (i = 0; i < with_len; i++)
-			{
-				if (with[i] == '\\' && with[i+1] >= '0' && with[i+1]-'0' < max_subs)
-				{
-					if (i != 0 && with[i-1] == '\\')
-						continue;
-
-					int subpat = with[i+1] - '0';
-
-					if (match[subpat].rm_so != -1)
-						g_string_append_len(new, old + match[subpat].rm_so,
-								match[subpat].rm_eo - match[subpat].rm_so);
-
-					i++;
-				}
-				else
-					g_string_append_c(new, with[i]);
-			}
-
-			g_string_append(new, old + match[0].rm_eo);
-
 			if (strcmp(old, new->str) != 0)
 			{
 				n_changed++;
@@ -310,7 +329,7 @@ static gboolean apply_replace(GtkWidget *box)
 		return TRUE;
 	}
 
-	error = regcomp(&compiled, replace, 0);
+	error = regcomp(&compiled, replace, REG_EXTENDED);
 	if (error)
 	{
 		char *message;
@@ -505,3 +524,44 @@ static void cell_edited(GtkCellRendererText *cell,
 
 	gtk_list_store_set(GTK_LIST_STORE(model), &iter, 1, new_text, -1);
 }
+
+#ifdef UNIT_TESTS
+static void test_subst(const char *string, const char *pattern, const char *with, const char *expected)
+{
+	regex_t compiled;
+	GString *new;
+
+	g_print("Testing s/%s/%s\n", pattern, with);
+
+	if (regcomp(&compiled, pattern, REG_EXTENDED))
+		g_error("Failed to compiled '%s'", pattern);
+
+	new = subst(string, &compiled, with);
+
+	if (new == NULL)
+	{
+		g_return_if_fail(expected == NULL);
+	}
+	else
+	{
+		//g_print("Got: %s\n", new->str);
+		g_return_if_fail(expected != NULL);
+		g_return_if_fail(strcmp(new->str, expected) == 0);
+		g_string_free(new, TRUE);
+	}
+
+	regfree(&compiled);
+}
+
+void bulk_rename_tests()
+{
+	test_subst("hello", "l", "L", "heLlo");
+	test_subst("hello", "h(.*)l", "\\1-\\1", "el-elo");
+	test_subst("hello", "(h)", "\\1", "hello");
+	test_subst("hello", "(h)", "\\\\1", "\\1ello");
+	test_subst("hello", "(h)", "\\\\\\1", "\\hello");
+	test_subst("hello", "(h)", "\\", "\\ello");
+	test_subst("hello", "(h)$", "\\", NULL);
+	test_subst("hello", "(.)(.)(.).*", "\\0-\\1-\\2-\\3-\\4-\\9-\\:", "hello-h-e-l---:");
+}
+#endif
