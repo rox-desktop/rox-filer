@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: ROX-Filer 1.2.0\n"
+"Project-Id-Version: ROX-Filer 2.8\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-01-01 21:54+0800\n"
-"PO-Revision-Date: 2007-12-30 01:00+0100\n"
+"POT-Creation-Date: 2008-12-29 15:11+0800\n"
+"PO-Revision-Date: 2008-12-29 16:00+0100\n"
 "Last-Translator: Babyfai Cheung<babyfai1@yahoo.com.hk>\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -97,6 +97,42 @@ msgid ""
 "a % in 'command' is replaced with the path of the current file)\n"
 "<b>prune</b> (false, and prevents searching the contents of a directory)."
 msgstr ""
+"<u>快速指引</u>\n"
+"只需將要搜尋的檔案名稱放進單引號中：\n"
+"<b>'index.html'</b> (搜尋檔案名為 'index.html')\n"
+"\n"
+"<u>例子</u>\n"
+"<b>'*.htm', '*.html'</b> (搜尋 HTML 類的檔案)\n"
+"<b>IsDir 'lib'</b> (搜尋目錄名為 'lib')\n"
+"<b>IsReg 'core'</b> (搜尋常規檔案名為 'core')\n"
+"<b>! (IsDir, IsReg)</b> (並非目錄及常規檔案)\n"
+"<b>mtime after 1 day ago and size > 1Mb</b> (大過 1Mb，及一日前修改的)\n"
+"<b>'CVS' prune, isreg</b> (一個常規檔及不存在於 CVS)\n"
+"<b>IsReg system(grep -q fred \"%\")</b> (包合字詞 'fred')\n"
+"\n"
+"<u>簡單測試</u>\n"
+"<b>IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket, IsDoor</"
+"b> (類別)\n"
+"<b>IsSUID, IsSGID, IsSticky, IsReadable, IsWriteable, IsExecutable</b> (權"
+"限)\n"
+"<b>IsEmpty, IsMine</b>\n"
+"包含在單引號內的萬用字元如 '*tmp*'，只會在當前的路徑搜尋'tmp' 或 'tmpfile' 等"
+"檔案。\n"
+"但若單引號內的萬用字元為 '/*tmp*' ；即包含一個斜號 '/'，\n"
+"搜尋便會指向完整的路徑，如 /tmp/file 等。\n"
+"\n"
+"<u>比較</u>\n"
+"<b>&lt;, &lt;=, =, !=, &gt;, &gt;=, After, Before</b> (比較兩個值)\n"
+"<b>5 bytes, 1Kb, 2Mb, 3Gb</b> (比較大小值)\n"
+"<b>2 secs|mins|hours|days|weeks|years  ago|hence</b> (比較時間值)\n"
+"<b>atime, ctime, mtime, now, size, inode, nlinks, uid, gid, blocks</b> (任何"
+"的值)\n"
+"\n"
+"<u>特殊</u>\n"
+"<b>system(command)</b> (搜尋條件為是，假如執行 'command(某個指令)' 回傳為零並"
+"退出。\n"
+"在指令'command' 內的 '%' 則代表檔案的路徑)\n"
+"<b>prune</b> (搜尋條件為否，避免搜尋某一目錄的內容)。"
 
 #: action.c:249
 msgid "Change permissions reference"
@@ -132,6 +168,32 @@ msgid ""
 "\n"
 "See the chmod(1) man page for full details."
 msgstr ""
+"通常，您只需在拉下選單中選一個指令 (點擊\n"
+"指令框傍拉下箭咀)。但在某情況下，您可能需要更多…\n"
+"\n"
+"更改檔案權限的指令方式為：<b>改變，改變，...</b>\n"
+"每個 <b>改變</b> 分別為： <b>誰人．怎樣．權限</b>\n"
+"<b>誰人</b> 是一些字母的組合 <b>u</b>, <b>g</b> 及 <b>o</b> 用以判斷權限是"
+"針\n"
+"對誰個包括 User (owner) '用戶'，Group '組別' 或 Others '其他'。\n"
+"<b>怎樣</b> 是符號 <b>+</b>, <b>-</b> 或 <b>=</b> 用作 增加，減除或直接設定某"
+"些權限。\n"
+"<b>權限</b> 是一些字母的組合 <b>rwxXstugo</b>\n"
+"\n"
+"括號內的字母及空格會被忽略。\n"
+"\n"
+"<u>例子</u>\n"
+"<b>u+rw</b>:'用戶' 或檔案擁有者增加讀寫權\n"
+"<b>g=u</b>:'組別' 的權限被直接設定等同用戶或檔案擁有者\n"
+"<b>o=u-w</b>:'其他' 的權限被直接設定等同用戶或檔案擁有者，但卻減除了寫入權\n"
+"<b>a+x</b>:<b>a</b>ll 即全部人也增加讀寫權 - 寫法等同 <b>ugo+x</b>\n"
+"<b>a+X</b>:目錄變為可被每人訪問；檔案則為\n"
+"可被每人執行\n"
+"<b>u+rw, go+r</b>:兩個指令同時進行！\n"
+"<b>u+s</b>:'用戶' 增加  SetUID - 通常對 script 檔無效\n"
+"<b>755</b>:權限被直接設定\n"
+"\n"
+"詳細解釋請參閱 chmod(1) 的 man page。"
 
 #: action.c:301
 msgid "Set type reference"
@@ -198,11 +260,11 @@ msgstr ""
 msgid "ERROR"
 msgstr "錯誤"
 
-#: action.c:714 main.c:693 main.c:700 main.c:714
+#: action.c:714 main.c:698 main.c:705 main.c:712 main.c:726
 msgid "Yes"
 msgstr "是"
 
-#: action.c:717 main.c:695 main.c:702 main.c:714
+#: action.c:717 main.c:700 main.c:707 main.c:714 main.c:726
 msgid "No"
 msgstr "否"
 
@@ -597,7 +659,7 @@ msgstr "改變子目錄的內容"
 msgid "Type:"
 msgstr "類型："
 
-#: action.c:2267 dnd.c:122 menu.c:2018 tips:167
+#: action.c:2267 dnd.c:122 menu.c:2024 tips:167
 msgid "Copy"
 msgstr "複製"
 
@@ -673,7 +735,7 @@ msgstr "自定選單..."
 msgid "Help"
 msgstr "說明"
 
-#: bookmarks.c:148
+#: bookmarks.c:148 log.c:160
 msgid "Path"
 msgstr "路徑"
 
@@ -760,57 +822,60 @@ msgstr "改為："
 
 #: bulk_rename.c:114
 msgid ""
-"The first match in each filename will be replaced by this string. There are "
-"no special characters."
-msgstr "每個檔案名稱的對應部份，會被這字串取代。並沒有特殊的字符."
+"The first match in each filename will be replaced by this string. The only "
+"special characters are back-references from \\0 to \\9. To use them "
+"literally, they have to be escaped with a backslash."
+msgstr ""
+"每個檔案名稱的對應部份，會先被這字串取代。"
+"而只可使用的正則字符為逆向引用 \\0 至 \\9。"
 
-#: bulk_rename.c:118
+#: bulk_rename.c:120
 msgid "Apply"
 msgstr "套用"
 
-#: bulk_rename.c:121
+#: bulk_rename.c:123
 msgid ""
 "Do a search-and-replace in the New column. The files are not actually "
 "renamed until you click on the Rename button below."
 msgstr "完成搜尋取代後, 檔案名稱並未真正改變，必須點擊下面 '改名' 的按鈕."
 
-#: bulk_rename.c:140
+#: bulk_rename.c:142
 msgid "Old name"
 msgstr "舊名稱"
 
-#: bulk_rename.c:149
+#: bulk_rename.c:151
 msgid "New name"
 msgstr "新名稱"
 
-#: bulk_rename.c:257
+#: bulk_rename.c:293
 msgid "No strings (in the New column) matched the given expression"
 msgstr "沒有可對應的字串"
 
-#: bulk_rename.c:262
+#: bulk_rename.c:298
 msgid "One name matched, but the result was the same"
 msgstr "一個名稱已匹配，但結果沒有改變"
 
-#: bulk_rename.c:265
+#: bulk_rename.c:301
 #, c-format
 msgid "%d names matched, but the results were all the same"
 msgstr "%d 個名稱已匹配，但結果沒有改變"
 
-#: bulk_rename.c:291
+#: bulk_rename.c:327
 msgid ""
 "Specify a regular expression to match, and a string to replace matches with."
 msgstr "請指定一個常規表示式，及一個字串用以置換對應名稱."
 
-#: bulk_rename.c:308
+#: bulk_rename.c:344
 #, c-format
 msgid "%s (for '%s')"
 msgstr "%s (for '%s')"
 
-#: bulk_rename.c:341
+#: bulk_rename.c:377
 #, c-format
 msgid "A file called '%s' already exists. Aborting bulk rename."
 msgstr "檔案 '%s' 經已存在，退出多檔案更改名稱."
 
-#: bulk_rename.c:346
+#: bulk_rename.c:382
 #, c-format
 msgid ""
 "Failed to rename '%s' as '%s':\n"
@@ -821,12 +886,12 @@ msgstr ""
 "%s\n"
 "退出多檔案更改名稱."
 
-#: bulk_rename.c:408
+#: bulk_rename.c:444
 #, c-format
 msgid "A file called '%s' already exists"
 msgstr "檔案 '%s' 經已存在"
 
-#: bulk_rename.c:419
+#: bulk_rename.c:455
 #, c-format
 msgid ""
 "Some of the New names contain / characters (eg '%s'). This will cause the "
@@ -834,7 +899,7 @@ msgid ""
 msgstr ""
 "有些新名稱含有 / 字符 (如 '%s')，這樣會使生成的檔案終結到不同的目錄，繼續？"
 
-#: bulk_rename.c:434
+#: bulk_rename.c:470
 msgid "None of the names have changed. Nothing to do!"
 msgstr "沒有名稱被改變！"
 
@@ -858,24 +923,24 @@ msgstr ""
 "%s\n"
 "%s"
 
-#: dir.c:980
+#: dir.c:1041
 #, c-format
 msgid "Can't stat directory: %s"
 msgstr "不能打開目錄：%s"
 
-#: dir.c:989
+#: dir.c:1050
 #, c-format
 msgid "Can't open directory: %s"
 msgstr "不能打開目錄：%s"
 
-#: display.c:629
+#: display.c:659
 #, c-format
 msgid "lstat(2) failed: %s"
 msgstr "lstat(2) 失敗：%s"
 
 #: dnd.c:124
 msgid "Link (relative)"
-msgstr "連結 (相關路徑)"
+msgstr "連結 (相對路徑)"
 
 #: dnd.c:125
 msgid "Link (absolute)"
@@ -1100,7 +1165,7 @@ msgstr ""
 #: filer.c:2045
 #, c-format
 msgid "Glob (%s), "
-msgstr "整團 (%s),"
+msgstr "只匹配 (%s), "
 
 #: filer.c:2053
 msgid "Scanning, "
@@ -1118,149 +1183,149 @@ msgstr "連結指向 "
 msgid "This filename is not valid UTF-8. You should rename it.\n"
 msgstr "不是正確的 UTF-8 名稱，請重新命名.\n"
 
-#: filer.c:2684 menu.c:2008
+#: filer.c:2690 menu.c:2014
 msgid "Item no longer exists!"
 msgstr "項目已不存在！"
 
-#: filer.c:3411
+#: filer.c:3417
 msgid "Select display properties to save"
 msgstr "選擇顯示內容以儲存"
 
-#: filer.c:3415
+#: filer.c:3421
 msgid "<b>Save display settings for directory</b>"
 msgstr "<b>儲存目錄的顯示設定</b>"
 
-#: filer.c:3422
+#: filer.c:3428
 msgid "Select settings to save"
 msgstr "選擇設定以儲存"
 
-#: filer.c:3429
+#: filer.c:3435
 msgid "Position"
 msgstr "位置"
 
-#: filer.c:3434 toolbar.c:133 toolbar.c:137 tips:39
+#: filer.c:3440 toolbar.c:133 toolbar.c:137 tips:39
 msgid "Size"
 msgstr "大小"
 
-#: filer.c:3439
+#: filer.c:3445
 msgid "Show hidden"
 msgstr "顯示隱藏檔"
 
-#: filer.c:3445
+#: filer.c:3451
 msgid "Display style"
 msgstr "顯示風格"
 
-#: filer.c:3451
+#: filer.c:3457
 msgid "Sort type and order"
 msgstr "以類型排序"
 
-#: filer.c:3456 toolbar.c:141
+#: filer.c:3462 toolbar.c:141
 msgid "Details"
 msgstr "詳述"
 
-#: filer.c:3461 tips:92 tips:93
+#: filer.c:3467 tips:92 tips:93
 msgid "Thumbnails"
 msgstr "縮圖"
 
-#: filer.c:3467
+#: filer.c:3473
 msgid "Filter"
 msgstr "過濾"
 
 #: find.c:485
 msgid "And"
-msgstr "及"
+msgstr ""
 
 #: find.c:509
 msgid "Not"
-msgstr "否"
+msgstr ""
 
 #: find.c:552
 msgid "system"
-msgstr "系統"
+msgstr ""
 
 #: find.c:560
 msgid "prune"
-msgstr "刪剪"
+msgstr ""
 
 #: find.c:648
 msgid "After"
-msgstr "之後"
+msgstr ""
 
 #: find.c:650
 msgid "Before"
-msgstr "之前"
+msgstr ""
 
 #: find.c:744
 msgid "IsReg"
-msgstr "匹配常規檔"
+msgstr ""
 
 #: find.c:746
 msgid "IsLink"
-msgstr "匹配連結檔"
+msgstr ""
 
 #: find.c:748
 msgid "IsDir"
-msgstr "匹配目錄"
+msgstr ""
 
 #: find.c:750
 msgid "IsChar"
-msgstr "匹配字符檔"
+msgstr ""
 
 #: find.c:752
 msgid "IsBlock"
-msgstr "匹配區塊檔"
+msgstr ""
 
 #: find.c:754
 msgid "IsDev"
-msgstr "匹配裝置檔"
+msgstr ""
 
 #: find.c:756
 msgid "IsPipe"
-msgstr "匹配管導"
+msgstr ""
 
 #: find.c:758
 msgid "IsSocket"
-msgstr "匹配套接"
+msgstr ""
 
 #: find.c:760
 msgid "IsDoor"
-msgstr "匹配入口"
+msgstr ""
 
 #: find.c:762
 msgid "IsSUID"
-msgstr "匹配SUID"
+msgstr ""
 
 #: find.c:764
 msgid "IsSGID"
-msgstr "匹配SGID"
+msgstr ""
 
 #: find.c:766
 msgid "IsSticky"
-msgstr "匹配Sticky"
+msgstr ""
 
 #: find.c:768
 msgid "IsReadable"
-msgstr "匹配可讀檔"
+msgstr ""
 
 #: find.c:770
 msgid "IsWriteable"
-msgstr "匹配可寫入檔"
+msgstr ""
 
 #: find.c:772
 msgid "IsExecutable"
-msgstr "匹配可執行檔"
+msgstr ""
 
 #: find.c:774
 msgid "IsEmpty"
-msgstr "匹配空檔"
+msgstr ""
 
 #: find.c:776
 msgid "IsMine"
-msgstr "匹配類別"
+msgstr ""
 
 #: find.c:904
 msgid "Now"
-msgstr "現在"
+msgstr ""
 
 #: find.c:917
 msgid "Byte"
@@ -1292,59 +1357,59 @@ msgstr ""
 
 #: find.c:925
 msgid "Sec"
-msgstr "秒"
+msgstr ""
 
 #: find.c:925
 msgid "Secs"
-msgstr "秒"
+msgstr ""
 
 #: find.c:927
 msgid "Min"
-msgstr "分"
+msgstr ""
 
 #: find.c:927
 msgid "Mins"
-msgstr "分"
+msgstr ""
 
 #: find.c:929
 msgid "Hour"
-msgstr "小時"
+msgstr ""
 
 #: find.c:929
 msgid "Hours"
-msgstr "小時"
+msgstr ""
 
 #: find.c:931
 msgid "Day"
-msgstr "日"
+msgstr ""
 
 #: find.c:931
 msgid "Days"
-msgstr "日"
+msgstr ""
 
 #: find.c:933
 msgid "Week"
-msgstr "星期"
+msgstr ""
 
 #: find.c:933
 msgid "Weeks"
-msgstr "星期"
+msgstr ""
 
 #: find.c:935
 msgid "Year"
-msgstr "年"
+msgstr ""
 
 #: find.c:935
 msgid "Years"
-msgstr "年"
+msgstr ""
 
 #: find.c:944
 msgid "Ago"
-msgstr "之前"
+msgstr ""
 
 #: find.c:946
 msgid "Hence"
-msgstr "從此時"
+msgstr ""
 
 #: find.c:961
 msgid "atime"
@@ -1360,7 +1425,7 @@ msgstr ""
 
 #: find.c:967
 msgid "size"
-msgstr "大小"
+msgstr ""
 
 #: find.c:969
 msgid "inode"
@@ -1404,18 +1469,18 @@ msgstr ""
 "拖放該圖示至一個目錄檢視器內\n"
 "(或輸入一個完整路徑)"
 
-#: gui_support.c:329
+#: gui_support.c:330
 msgid ""
 "\n"
 "---\n"
 msgstr ""
 
-#: gui_support.c:398
+#: gui_support.c:399
 #, c-format
 msgid "Attempt to read an XML file as a text file. File '%s' may be corrupted."
 msgstr "嘗試以文字檔開啟XML文件。發現文件 '%s' 已損壞."
 
-#: gui_support.c:415
+#: gui_support.c:416
 #, c-format
 msgid ""
 "Error in '%s' file at line %d: \n"
@@ -1430,22 +1495,22 @@ msgstr ""
 "原因可能是從舊版本上升級 ROX-Filer. 請打開選項窗口並點選儲存確定.\n"
 "往後的錯誤會被忽略."
 
-#: gui_support.c:1007
+#: gui_support.c:1008
 msgid "Incorrect or missing line break in text/uri-list data"
 msgstr "開啟 文字/連結 檔時發生錯誤"
 
-#: gui_support.c:1339
+#: gui_support.c:1341
 #, c-format
 msgid "Failed to open file '%s': %s"
 msgstr "未能開啟檔案 '%s': %s"
 
-#: gui_support.c:1383
+#: gui_support.c:1385
 #, c-format
 msgid ""
 "Failed to load image '%s': reason not known, probably a corrupt image file"
 msgstr "未能載入影像 '%s': 原因不明，可能是檔案損毀"
 
-#: gui_support.c:1434
+#: gui_support.c:1450
 #, c-format
 msgid ""
 "This program (%s) cannot be run, as the 0launch command is not available. It "
@@ -1553,7 +1618,7 @@ msgstr "每個項目必先解除鎖定，才可把它移除"
 msgid "You must open the menu over an item"
 msgstr "請在項目上開啟選單"
 
-#: icon.c:712 menu.c:1281
+#: icon.c:712 menu.c:1285
 msgid "You can only set the run action for a regular file"
 msgstr "只可對常規檔案設定開啟的程式"
 
@@ -1808,7 +1873,15 @@ msgstr "%s 於 %d 項目"
 msgid "Item"
 msgstr "項目"
 
-#: main.c:94
+#: log.c:149
+msgid "Time"
+msgstr "時間"
+
+#: log.c:154
+msgid "Action"
+msgstr "動作"
+
+#: main.c:95
 msgid ""
 "Copyright (C) 2005 Thomas Leonard.\n"
 "ROX-Filer comes with ABSOLUTELY NO WARRANTY,\n"
@@ -1818,22 +1891,22 @@ msgid ""
 "For more information about these matters, see the file named COPYING.\n"
 msgstr ""
 
-#: main.c:103
+#: main.c:104
 msgid "Try `ROX-Filer/AppRun --help' for more information.\n"
 msgstr ""
 
-#: main.c:106
+#: main.c:107
 msgid "Try `ROX-Filer/AppRun -h' for more information.\n"
 msgstr ""
 
-#: main.c:108
+#: main.c:109
 msgid ""
 "NOTE: Your system does not support long options - \n"
 "you must use the short versions instead.\n"
 "\n"
 msgstr ""
 
-#: main.c:114
+#: main.c:115
 #, c-format
 msgid ""
 "Usage: ROX-Filer/AppRun [OPTION]... [FILE]...\n"
@@ -1864,7 +1937,7 @@ msgid ""
 "Home page (including updated versions): http://rox.sourceforge.net/\n"
 msgstr ""
 
-#: main.c:236
+#: main.c:237
 msgid ""
 "We got a BadWindow error from the X server. This might be due to this GTK "
 "bug (during drag-and-drop?):\n"
@@ -1872,61 +1945,65 @@ msgid ""
 "Trying to continue..."
 msgstr ""
 
-#: main.c:395
+#: main.c:400
 msgid ""
 "The -o argument is no longer used. You can turn on override redirect from "
 "the Options box instead."
 msgstr ""
 
-#: main.c:524
+#: main.c:529
 #, c-format
 msgid "Running as user '%s'"
 msgstr "執行用戶為 '%s'"
 
-#: main.c:685
+#: main.c:690
 #, c-format
 msgid "Compiled with GTK version %s\n"
 msgstr ""
 
-#: main.c:686
+#: main.c:691
 #, c-format
 msgid "Running with GTK version %d.%d.%d\n"
 msgstr ""
 
-#: main.c:690
+#: main.c:695
 msgid "features set at compile time"
 msgstr ""
 
-#: main.c:691
+#: main.c:696
 msgid "Large File Support"
 msgstr ""
 
-#: main.c:698
+#: main.c:703
+msgid "Inotify support"
+msgstr ""
+
+#: main.c:710
 msgid "Dnotify support"
 msgstr ""
 
-#: main.c:705
+#: main.c:717
 msgid "Binary compatibility"
 msgstr ""
 
-#: main.c:707
+#: main.c:719
 msgid "Yes (can run with older glibc versions)"
 msgstr ""
 
-#: main.c:709
+#: main.c:721
 msgid "No (apsymbols.h not found)"
 msgstr ""
 
-#: main.c:713
+#: main.c:725
 msgid "Extended attribute support"
 msgstr "伸延屬性支援"
 
-#: main.c:864
+#: main.c:876
 #, c-format
 msgid "Unable to read '%s': %s"
 msgstr "未能檢視 '%s': %s"
 
-#: main.c:900
+#: main.c:918
 #, c-format
 msgid ""
 "Left-click to run %s.\n"
@@ -2009,11 +2086,11 @@ msgstr "顯示隱藏檔"
 
 #: menu.c:207
 msgid "Filter Files..."
-msgstr "過濾檔案..."
+msgstr "檔案過濾..."
 
 #: menu.c:208
 msgid "Filter Directories With Files"
-msgstr "因應檔案以過濾目錄"
+msgstr "檔案過濾並忽略目錄"
 
 #: menu.c:209
 msgid "Show Thumbnails"
@@ -2073,7 +2150,7 @@ msgstr "以名稱選擇..."
 
 #: menu.c:234
 msgid "Select If..."
-msgstr "挑選..."
+msgstr "條件式選擇"
 
 #: menu.c:236
 msgid "New"
@@ -2083,7 +2160,7 @@ msgstr "新增"
 msgid "Blank file"
 msgstr "空檔案"
 
-#: menu.c:240 tasklist.c:306
+#: menu.c:240 tasklist.c:309
 msgid "Window"
 msgstr "窗口"
 
@@ -2105,7 +2182,7 @@ msgstr "顯示書簽"
 
 #: menu.c:246
 msgid "Show Log"
-msgstr "顯示訊息"
+msgstr "操作記錄"
 
 #: menu.c:247
 msgid "Follow Symbolic Links"
@@ -2180,11 +2257,11 @@ msgstr ""
 msgid "Setting type not supported for some of these files"
 msgstr "某些檔案不能以此類型設定"
 
-#: menu.c:1093
+#: menu.c:1095
 msgid "_Relative link"
-msgstr "相關連結(_R)"
+msgstr "相對路徑(_R)"
 
-#: menu.c:1099
+#: menu.c:1101
 msgid ""
 "If on, the symlink will store the path from the symlink to the target file. "
 "Use this if the symlink and the target will be moved together.\n"
@@ -2196,42 +2273,42 @@ msgstr ""
 "關閉時,連結會儲存從根目錄到目標的路徑，這選項適用於當連結移動，但目標不變的時"
 "侯."
 
-#: menu.c:1169
+#: menu.c:1171
 msgid "New pathname is not absolute"
 msgstr "新的路徑名稱屬不絕對"
 
-#: menu.c:1235
+#: menu.c:1239
 #, c-format
 msgid "Symlink from '%s' already exists. Replace it with a link to '%s'?"
 msgstr " '%' 的連結檔已存在，是否要替換？"
 
-#: menu.c:1241
+#: menu.c:1245
 msgid "_Replace"
 msgstr "替換(_R)"
 
-#: menu.c:1361 menu.c:1402 menu.c:1462
+#: menu.c:1365 menu.c:1406 menu.c:1468
 msgid "Create"
 msgstr "創建"
 
-#: menu.c:1362
+#: menu.c:1366
 msgid "NewDir"
 msgstr "新目錄"
 
-#: menu.c:1376 menu.c:1382
+#: menu.c:1380 menu.c:1386
 #, c-format
 msgid "Error creating '%s': %s"
 msgstr "錯誤創建 '%s': %s"
 
-#: menu.c:1403
+#: menu.c:1407
 msgid "NewFile"
 msgstr "新檔案"
 
-#: menu.c:1421
+#: menu.c:1425
 #, c-format
 msgid "Error creating file: could not find the template for %s"
 msgstr "錯誤創建檔案: 找不到樣板予 %s"
 
-#: menu.c:1492
+#: menu.c:1498
 #, c-format
 msgid ""
 "The `Send To' menu provides a quick way to send some files to an "
@@ -2257,17 +2334,17 @@ msgstr ""
 "您亦可建立子目錄 `.text_html', `.text'等等，該子目錄只會在開啟該類型檔案時出"
 "現。 `.group' 只會 在選擇多個檔案時出現."
 
-#: menu.c:1503
+#: menu.c:1509
 msgid ""
 "I'll show you your SendTo directory now; you should symlink (Ctrl+Shift "
 "drag) any applications you want into it."
 msgstr "請將適用的程式以符號連結 (Ctrl+Shift並 拖放)到'傳送至'的目錄內."
 
-#: menu.c:1506 menu.c:1546
+#: menu.c:1512 menu.c:1552
 msgid "Your CHOICESPATH variable setting prevents customisations - sorry."
 msgstr "不容許自定 CHOICE 路徑"
 
-#: menu.c:1539
+#: menu.c:1545
 #, c-format
 msgid ""
 "Any files placed in your Templates directories will appear on the `New' "
@@ -2286,21 +2363,21 @@ msgstr ""
 "%s\n"
 "%s\n"
 
-#: menu.c:1544
+#: menu.c:1550
 msgid ""
 "I'll show you your Templates directory now; you should place any template "
 "files you want inside it."
 msgstr "現在顯示您的樣板檔案目錄；您可放進任何需要的樣板檔案 ."
 
-#: menu.c:1661
+#: menu.c:1667
 msgid "Customise"
 msgstr "自定"
 
-#: menu.c:1734
+#: menu.c:1740
 msgid "This is already the canonical name for this directory."
 msgstr "此目錄已有規範性名稱"
 
-#: menu.c:1765
+#: menu.c:1771
 msgid ""
 "You can't open a second view onto this directory because the `Unique "
 "Windows' option is turned on in the Options window."
@@ -2308,71 +2385,71 @@ msgstr ""
 "你不能對此目錄開啟第二個窗口，因為你已在選項->Filer窗口內選了「唯一的窗口」的"
 "功能."
 
-#: menu.c:1891
+#: menu.c:1897
 msgid "Copy ... ?"
 msgstr "複製...？"
 
-#: menu.c:1894
+#: menu.c:1900
 msgid "Rename ... ?"
 msgstr "改名為...？"
 
-#: menu.c:1897
+#: menu.c:1903
 msgid "Symlink ... ?"
 msgstr "符號連結...？"
 
-#: menu.c:1900
+#: menu.c:1906
 msgid "Shift Open ... ?"
 msgstr "新窗口開啟...？"
 
-#: menu.c:1903
+#: menu.c:1909
 msgid "Properties of ... ?"
 msgstr "訊息...？"
 
-#: menu.c:1906
+#: menu.c:1912
 msgid "Set type of ... ?"
 msgstr "設定類型...？"
 
-#: menu.c:1909
+#: menu.c:1915
 msgid "Set run action for ... ?"
 msgstr "設定執行程式予... ？"
 
-#: menu.c:1912
+#: menu.c:1918
 msgid "Set icon for ... ?"
 msgstr "設定圖示予...？"
 
-#: menu.c:1915
+#: menu.c:1921
 msgid "Send ... to ... ?"
 msgstr "傳送...至...？"
 
-#: menu.c:1918
+#: menu.c:1924
 msgid "DELETE ... ?"
 msgstr "移除...？"
 
-#: menu.c:1921
+#: menu.c:1927
 msgid "Count the size of ... ?"
 msgstr "計算容量從 ...？"
 
-#: menu.c:1924
+#: menu.c:1930
 msgid "Set permissions on ... ?"
 msgstr "改變權限予...？"
 
-#: menu.c:1927
+#: menu.c:1933
 msgid "Search inside ... ?"
 msgstr "搜索內部...？"
 
-#: menu.c:1991
+#: menu.c:1997
 msgid "You cannot do this to more than one item at a time"
 msgstr "不可同時以此方式處理多個項目"
 
-#: menu.c:2023
+#: menu.c:2029
 msgid "Rename"
 msgstr "改名"
 
-#: menu.c:2028
+#: menu.c:2034
 msgid "Symlink"
 msgstr "符號連結"
 
-#: menu.c:2057
+#: menu.c:2063
 msgid ""
 "User-definable shortcuts are disabled by default in Gtk2, and you have not "
 "enabled them. You can turn this feature on by:\n"
@@ -2391,7 +2468,7 @@ msgstr ""
 "\tgtk-can-chang-accels = 1\n"
 "\t(只可在不用 XSETTINGS 的情況下)"
 
-#: menu.c:2068
+#: menu.c:2074
 msgid ""
 "To set a keyboard short-cut for a menu item:\n"
 "\n"
@@ -2411,7 +2488,7 @@ msgstr ""
 "對應的熱鍵會出現在選單的某個項目上，而日後你想開啟這項目，祗須按下熱鍵而不需"
 "先開啟選單."
 
-#: menu.c:2083
+#: menu.c:2089
 msgid "Set keyboard shortcuts"
 msgstr "設定熱鍵"
 
@@ -2425,7 +2502,7 @@ msgstr "執行："
 
 #: minibuffer.c:131
 msgid "Select If:"
-msgstr "挑選："
+msgstr "條件匹配："
 
 #: minibuffer.c:132
 msgid "Select Named:"
@@ -2533,40 +2610,40 @@ msgstr "錯誤儲存 %s: %s"
 msgid "Missing '='"
 msgstr "遺失 '='"
 
-#: panel.c:319
+#: panel.c:322
 #, c-format
 msgid "Unable to replace '%s'"
 msgstr "未能替代 '%s'"
 
-#: panel.c:323
+#: panel.c:326
 #, c-format
 msgid "Unable to save '%s'"
 msgstr "未能儲存 '%s'"
 
-#: panel.c:526
+#: panel.c:529
 msgid "Your old panel file has been converted to the new XML format."
 msgstr "你的舊面板資源檔案已轉為新的XML格式."
 
-#: panel.c:634
+#: panel.c:637
 msgid ""
 "You have tried to close a panel via the window manager - I usually find that "
 "this is accidental... really close?"
 msgstr "你要從Window Manger中關閉面板，確定要關閉？"
 
-#: panel.c:735
+#: panel.c:738
 msgid "Missing < or > in panel config file"
 msgstr "沒有 < 或 > 於面板的設定檔"
 
-#: panel.c:1618
+#: panel.c:1610
 #, c-format
 msgid "Error saving panel %s: %s"
 msgstr "錯誤儲存面板 %s: %s"
 
-#: panel.c:1934
+#: panel.c:1925
 msgid "Applet quit without ever creating a widget!"
 msgstr "程序被無故終止！"
 
-#: panel.c:2030
+#: panel.c:2021
 #, c-format
 msgid ""
 "Error running applet:\n"
@@ -2575,44 +2652,44 @@ msgstr ""
 "錯誤執行程序：\n"
 "%s"
 
-#: panel.c:2655
+#: panel.c:2646
 msgid "Are you sure you want to remove this panel from the desktop?"
 msgstr "您是否決定移除此面板？"
 
-#: panel.c:2658 panel.c:2685
+#: panel.c:2649 panel.c:2676
 msgid "Remove Panel"
 msgstr "移除面板"
 
-#: panel.c:2681
+#: panel.c:2672
 msgid "Panel Options..."
 msgstr "面板選項..."
 
-#: panel.c:2767
+#: panel.c:2757
 #, c-format
 msgid "Xinerama monitor %d unavailable"
 msgstr "多螢幕顯示器 %d 不存在"
 
-#: panel.c:2797
+#: panel.c:2787
 msgid "Top"
-msgstr ""
+msgstr "頂部"
 
-#: panel.c:2799
+#: panel.c:2789
 msgid "Bottom"
 msgstr "底部"
 
-#: panel.c:2801
+#: panel.c:2791
 msgid "Left"
 msgstr "左邊"
 
-#: panel.c:2803
+#: panel.c:2793
 msgid "Right"
 msgstr "右邊"
 
-#: panel.c:2805
+#: panel.c:2795
 msgid "Default"
 msgstr "預設"
 
-#: panel.c:2809
+#: panel.c:2799
 msgid "Unknown side"
 msgstr "不明位置"
 
@@ -2707,28 +2784,28 @@ msgid ""
 "image."
 msgstr "只有檔案(及某些應用程式)才可用作設定背景"
 
-#: pinboard.c:1570
+#: pinboard.c:1602
 msgid "Missing '>' in icon label"
 msgstr "沒有 '>' 在圖示標簽內"
 
-#: pinboard.c:1579
+#: pinboard.c:1611
 msgid "Missing ',' after icon label"
 msgstr "沒有 ',' 在圖示標簽後"
 
-#: pinboard.c:1667
+#: pinboard.c:1699
 #, c-format
 msgid "Error saving pinboard %s: %s"
 msgstr "錯誤儲存桌面 %s: %s"
 
-#: pinboard.c:2212
+#: pinboard.c:2244
 msgid "Backdrop..."
 msgstr "背景..."
 
-#: pinboard.c:2215
+#: pinboard.c:2247
 msgid "Add Panel"
 msgstr "增加面板"
 
-#: pinboard.c:2309
+#: pinboard.c:2341
 #, c-format
 msgid ""
 "Error loading backdrop image:\n"
@@ -2739,7 +2816,7 @@ msgstr ""
 "%s\n"
 "背景被移除."
 
-#: pixmaps.c:976
+#: pixmaps.c:969
 #, c-format
 msgid ""
 "Can't delete thumbnails in %s:\n"
@@ -2748,11 +2825,11 @@ msgstr ""
 "不能刪除縮圖於 %s:\n"
 "%s"
 
-#: pixmaps.c:997
+#: pixmaps.c:990
 msgid "There are no thumbnails to delete"
 msgstr "沒有縮圖可供移除"
 
-#: pixmaps.c:1010
+#: pixmaps.c:1003
 msgid "Purge thumbnails disk cache"
 msgstr "清除緩存區內的縮圖"
 
@@ -2858,7 +2935,7 @@ msgstr ""
 "\n"
 "注意：假如您想執行這個程式，可能須要在檔案選單內另行設定可執行的權限"
 
-#: run.c:746
+#: run.c:753
 #, c-format
 msgid ""
 "Executable '%s' is world-writeable! Refusing to run. Please change the "
@@ -2881,7 +2958,7 @@ msgstr ""
 "假如您認為其他用戶是可靠的，便無需理會這問題。否則，您便應該檢查或刪除所有這"
 "類檔案"
 
-#: run.c:759
+#: run.c:766
 msgid "go-w (Fix security problem)"
 msgstr "go-w (解決安全問題)"
 
@@ -2893,12 +2970,12 @@ msgstr "B"
 msgid "byte"
 msgstr "byte"
 
-#: support.c:1589 support.c:1643
+#: support.c:1596 support.c:1650
 #, c-format
 msgid "Failed to open and stat file '%s': %s"
 msgstr "未能開啟及描述檔案 '%s': %s"
 
-#: support.c:1600 support.c:1654
+#: support.c:1607 support.c:1661
 #, c-format
 msgid "Failed to mmap file '%s': %s"
 msgstr "未能繪制檔案 '%s': %s"
@@ -3078,7 +3155,7 @@ msgstr "入口"
 msgid "Unknown"
 msgstr "不明的"
 
-#: type.c:556
+#: type.c:554
 msgid ""
 "Enter a shell command which will load \"$@\" into a suitable program. Eg:\n"
 "\n"
@@ -3088,84 +3165,84 @@ msgstr ""
 "\n"
 "gimp \"$@\""
 
-#: type.c:737
+#: type.c:735
 msgid "This is not a program! Give me an application instead!"
 msgstr "這不是一個程式！請給予一個可執行的程式！"
 
-#: type.c:797
+#: type.c:795
 msgid "No run action defined"
 msgstr "沒有執行動作被定義"
 
-#: type.c:801
+#: type.c:799
 #, c-format
 msgid "Error in handler %s: %s"
 msgstr "錯誤於處理工具 %s: %s"
 
-#: type.c:816
+#: type.c:814
 #, c-format
 msgid "Invalid application %s (bad AppRun)"
 msgstr "非法的執行程式 %s (錯誤執行)"
 
-#: type.c:827
+#: type.c:825
 #, c-format
 msgid "Non-executable %s"
-msgstr "非執行性的 %s"
+msgstr "非可執行性的 %s"
 
-#: type.c:860
+#: type.c:858
 msgid "Set run action"
 msgstr "設定執行的動作"
 
-#: type.c:866
+#: type.c:864
 msgid ""
 "If a handler for the specific type isn't set up, use this as the default."
 msgstr "如這些特殊類型還未設立處理工具, 便以此為預設值."
 
-#: type.c:868
+#: type.c:866
 #, c-format
 msgid "Set default for all `%s/<anything>'"
 msgstr "設為預設值予全部的 `%s/<anything>'"
 
-#: type.c:872
+#: type.c:870
 msgid "Use this application for all files with this MIME type."
 msgstr "用這個程式來開啟屬於此 MIME 類型的檔案"
 
-#: type.c:874
+#: type.c:872
 #, c-format
 msgid "Only for the type `%s' (%s/%s)"
 msgstr "僅對應此類型 `%s' (%s/%s)"
 
-#: type.c:880
+#: type.c:878
 msgid "Drop a suitable application here"
 msgstr "請拖放一個合適的程式在此處"
 
-#: type.c:895
+#: type.c:893
 msgid "OR"
 msgstr "或"
 
-#: type.c:902
+#: type.c:900
 msgid "Enter a shell command:"
 msgstr "請輸入指令："
 
-#: type.c:931
+#: type.c:929
 msgid "_Use Command"
 msgstr "套用指令(_U)"
 
-#: type.c:961
+#: type.c:959
 msgid ""
 "A run action already exists and is quite a big program - are you sure you "
 "want to delete it?"
 msgstr "一個相同而頗大的程序正在執行中 - 你決定要刪除它？"
 
-#: type.c:972
+#: type.c:970
 #, c-format
 msgid "Can't remove %s: %s"
 msgstr "不能移除 %s: %s"
 
-#: type.c:1009
+#: type.c:1007
 msgid "Choices saving is disabled by CHOICESPATH variable"
 msgstr "'Choice' 路徑變數錯誤,儲存取消"
 
-#: type.c:1311
+#: type.c:1309
 #, c-format
 msgid ""
 "Failed to create symlink '%s':\n"
@@ -3474,7 +3551,7 @@ msgstr "顯示隱藏檔"
 msgid ""
 "If this is on then files whose names start with a dot are shown too, "
 "otherwise they are hidden."
-msgstr "如啟動此功能，會顥示所有點檔案；否之，點檔案會被隱藏."
+msgstr "如啟動此功能，會顯示所有點檔案；否之，點檔案會被隱藏."
 
 #: tips:42
 msgid "Show extended attribute indicator"
@@ -4368,19 +4445,34 @@ msgstr "面板是 'dock'"
 
 #: tips:260
 msgid ""
-"Disable this option if the panel stays above other windows against your "
-"wishes. Requires a restart to take effect."
-msgstr "假如您不想面板蓋在窗口的上層，請關閉選項，並重新啟動."
+"Makes sure panels stay against screen edges. Disable this option if the "
+"panel stays above other windows against your wishes. Requires a restart to "
+"take effect."
+msgstr ""
+"請先確定面板置放在螢幕的邊沿。假如您不想面板覆蓋在窗口上，關閉選項，並重新啟"
+"動。"
 
 #: tips:261
+msgid "Panel stays on top"
+msgstr "面板置上"
+
+#: tips:262
+msgid ""
+"Keeps the panel above other windows. Enable this option to make sure the "
+"dock option works correctly in some versions of compiz. May require a "
+"restart to take effect."
+msgstr ""
+"面板可覆蓋窗口，請注意有些 compiz 的版本未必可正確運行。或須要重新啟動。"
+
+#: tips:263
 msgid "Drag and drop"
 msgstr "滑鼠拖放"
 
-#: tips:262
+#: tips:264
 msgid "Don't use hostnames"
 msgstr "不用主機名稱"
 
-#: tips:263
+#: tips:265
 msgid ""
 "Some older applications don't support XDND fully and may need to have this "
 "option turned on. Use this if dragging files to an application shows a + "
@@ -4389,15 +4481,15 @@ msgstr ""
 "某些舊的應用程式不完全支援拖放來執行的功能，此選項便須要開啟，以達致將檔案拖"
 "到當鼠標出現 a + 符號的應用程式上."
 
-#: tips:264
+#: tips:266
 msgid "Extended attributes"
 msgstr "伸延屬性"
 
-#: tips:265
+#: tips:267
 msgid "Don't use extended attributes"
 msgstr "不用伸延屬性"
 
-#: tips:266
+#: tips:268
 msgid ""
 "This disables the use of extended attributes available in newer operating "
 "systems and file systems.  With this option set the 'Set Type' menu entry is "
@@ -4410,11 +4502,11 @@ msgstr ""
 
 #: ../Templates.glade:7
 msgid "ROX-Filer log viewer"
-msgstr "ROX-Filer 日誌瀏覽"
+msgstr "ROX-Filer 操作記錄"
 
 #: ../Templates.glade:22
 msgid "Recently performed actions..."
-msgstr "上次連用的程序..."
+msgstr "曾經執行過的操作..."
 
 #: ../Templates.glade:77
 msgid "Open Directory"
@@ -4481,7 +4573,7 @@ msgstr "<b>面板風格</b>"
 
 #: ../Templates.glade:331
 msgid ""
-"If you use multiple montors with Xinerama, use this option to confine the "
+"If you use multiple monitors with Xinerama, use this option to confine the "
 "panel to one monitor."
 msgstr ""
 "假如您在 Xorg 設定了 Xinerama(多螢幕功能)，便可在此區限面板被放到某個顯示器"
@@ -4520,138 +4612,6 @@ msgstr "頂部邊沿"
 #: ../Templates.glade:496
 msgid "<b>Position</b>"
 msgstr "<b>位置</b>"
-
-#~ msgid ""
-#~ "Failed to create symlink '%s':\n"
-#~ "%s\n"
-#~ "\n"
-#~ "(this may mean that %s already exists as a link to an invalid directory; "
-#~ "try deleting it)"
-#~ msgstr ""
-#~ "未能建立連結 '%s'：\n"
-#~ "%s\n"
-#~ "\n"
-#~ "(原因是 %s 已經存在並且連結至一個無效的目錄；請自行將其移除)"
-
-#~ msgid "Panel: %s"
-#~ msgstr "面板：%s"
-
-#~ msgid "Select the panel's position:"
-#~ msgstr "選擇面板位置："
-
-#~ msgid "Top-edge panel"
-#~ msgstr "面板置頂"
-
-#~ msgid "Bottom edge panel"
-#~ msgstr "面板置底"
-
-#~ msgid "Left edge panel"
-#~ msgstr "面板置左"
-
-#~ msgid "Right-edge panel"
-#~ msgstr "面板置右"
-
-#~ msgid "Invalid .gmo translation file (too short): %s"
-#~ msgstr "非法的 .gmo 翻譯檔 (過短): %s"
-
-#~ msgid "Invalid .gmo translation file (GNU magic number not found): %s"
-#~ msgstr "非法的 .gmo 翻譯檔 (GNU magic number 找不到): %s"
-
-#~ msgid ""
-#~ "Icon theme '%s' does not contain MIME icons. Using ROX default theme "
-#~ "instead."
-#~ msgstr "圖示主題 '%s' 沒有包含 MIME 圖示，將以 ROX 預設值代替 "
-
-#~ msgid "Translation"
-#~ msgstr "語言設定"
-
-#~ msgid "Language"
-#~ msgstr "語言"
-
-#~ msgid "Use the LANG environment variable"
-#~ msgstr "系統預設"
-
-#~ msgid "Basque"
-#~ msgstr "巴斯克文"
-
-#~ msgid "Chinese (traditional)"
-#~ msgstr "中文(繁體)"
-
-#~ msgid "Chinese (simplified)"
-#~ msgstr "中文(簡體)"
-
-#~ msgid "Czech"
-#~ msgstr "捷克"
-
-#~ msgid "Danish"
-#~ msgstr "丹麥"
-
-#~ msgid "Dutch"
-#~ msgstr "荷蘭"
-
-#~ msgid "English (no translation)"
-#~ msgstr "英文"
-
-#~ msgid "Estonian"
-#~ msgstr "愛沙尼亞"
-
-#~ msgid "Finnish"
-#~ msgstr "芬蘭"
-
-#~ msgid "French"
-#~ msgstr "法文"
-
-#~ msgid "German"
-#~ msgstr "德文"
-
-#~ msgid "Hungarian"
-#~ msgstr "匈牙利"
-
-#~ msgid "Japanese"
-#~ msgstr "日本"
-
-#~ msgid "Norwegian"
-#~ msgstr "挪威"
-
-#~ msgid "Italian"
-#~ msgstr "意大利"
-
-#~ msgid "Polish"
-#~ msgstr "波蘭"
-
-#~ msgid "Portuguese (Portugal)"
-#~ msgstr "葡萄牙 (葡文)"
-
-#~ msgid "Portuguese (Brasil)"
-#~ msgstr "葡萄牙 (巴西)"
-
-#~ msgid "Romanian"
-#~ msgstr "羅馬尼亞"
-
-#~ msgid "Russian"
-#~ msgstr "俄羅斯"
-
-#~ msgid "Spanish"
-#~ msgstr "西班牙"
-
-#~ msgid "Swedish"
-#~ msgstr "瑞典"
-
-#~ msgid "Ukrainian"
-#~ msgstr "烏克蘭"
-
-#~ msgid "Vietnamese"
-#~ msgstr "越南"
-
-#~ msgid "Panels"
-#~ msgstr "面板"
-
-#~ msgid ""
-#~ "Panels are bars of icons that run along the side of the screen. See the "
-#~ "manual for information about using panels."
-#~ msgstr ""
-#~ "面板是以多圖示連成的工具欄.\n"
-#~ "詳情請參閱說明."
 
 #~ msgid "(thick)"
 #~ msgstr "(厚)"
