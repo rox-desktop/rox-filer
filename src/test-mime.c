@@ -153,7 +153,7 @@ test_one_icon (const char *mimetype, const char *expected)
 
   actual = xdg_mime_get_icon (mimetype);
 
-  if (actual != expected && strcmp (actual, expected) != 0) 
+  if (actual != expected && (actual == NULL || strcmp (actual, expected) != 0)) 
     {
       printf ("Test Failed: icon of %s is %s, expected %s\n", 
              mimetype, actual, expected);

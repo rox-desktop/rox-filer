@@ -1,3 +1,9 @@
+2009-03-09  Bastien Nocera  <hadess@hadess.net>
+
+	* src/test-mime.c (test_one_icon): Fix possible
+	crash when xdg_mime_get_icon() returns NULL, spotted by
+	Sanel Zukan <sanelz@gmail.com> (Closes: #20555)
+
 2009-01-08  Bastien Nocera  <hadess@hadess.net>
 
 	* src/xdgmime.c (xdg_mime_shutdown): Patch from
