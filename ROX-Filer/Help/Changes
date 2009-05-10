@@ -6,6 +6,99 @@
 * log message with the commit and I'll update this file only when making a new
 * release.
 
+Release 2.9 (2009-05-10)
+
+- ROX-Filer didn't compile without inotify support. dnotify_fd_to_dir
+  got renamed in 71061457fee9e95d65c53f2bdcc400bc4ac502c0, but not
+  everywhere.
+
+- Removed separate source feed. For historical reasons, ROX-Filer had a
+  somewhat confused build system. The main feed claimed it to be a
+  binary that worked on any architecture (because it compiled itself if
+  the binary was missing), while a separate "source" feed provided the
+  build dependencies. Now it has just a single feed, asserting that
+  this is source code. Compiling it generates a binary release,
+  including a binary feed. Also, there is a new 0compile.properties
+  file so you can easily compile it with "0compile build". Clicking on
+  the source's AppRun when there is no binary compiles it as before
+  (without using Zero Install).
+
+- Don't use "cp -u" in build script; doesn't work on FreeBSD.
+
+- Updated Chinese translations (Babyfai Cheung)
+
+- Support back-references when bulk renaming (Rogutės). Back
+  references from \0 to \9 can be used in the "With:" field of the bulk
+  renaming dialog. Every back-reference is replaced by a captured
+  substring from the "Replace:" field. As a side effect, \0, \1, ..., \9
+  become special characters and they must be escaped with an additional
+  backslash (e.g. \\3).
+
+- Update panels correctly when the screen size changes (Tony Houghton)
+
+- Support "Show per workspace" pinboard option when the window manager
+  is using viewports instead of desktops. This is needed for things like
+  compiz (Stephen Watson).
+
+- Make more terms become translatable in log.c (Babyfai Cheung).
+
+- Fix detection of *BSD systems for large file support. Third attempt.
+  Instead of including huge autoconf files, restore the uname call that
+  was accidentally removed in 462ae76daefc4f536f474982b4452e640ea48350.
+
+- Use inotify to monitor directories when available, in preference to
+  dnotify (Stephen Watson).
+
+- Handle desktop files that have a blank Path (Stephen Watson).
+
+- Handle the case where there is nothing following the version number
+  when checking the gcc --version output (Stephen Watson).
+
+- Improve detection of GCC version (Stephen Watson).
+
+- Plug memory leak looking for local apps (Stephen Watson).
+
+- Fix getting $APPDIRPATH when finding apps (Stephen Watson).
+
+- Added Galician to AppInfo.xml (Maria).
+
+- Update Spanish translation and add new Galego translation (Maria).
+  This is from the GALPon MiniNo project, a Debian distribution for old
+  computers.
+
+- Don't lose selection when starting a drag with Ctrl. If we drag from
+  an unselected item, we normally unselect any other items. However, if
+  we're also holding down Ctrl it's probably unselected only because we
+  mis-interpreted the click as toggle-selected, so just re-select it in
+  that case (reported by Kacper Wysocki).
+
+- Launch buttons in the options dialog now look for a locally installed
+  app when 0launch isn't available (Stephen Watson).
+
+- Creating a new file from a template works when the template is a
+  symlink (Bernard Jungen). It now creates a copy of the symlink's
+  target, not a copy of the symlink. However, if the template target is
+  a directory containing symlinks, those are copied as they are.
+
+- Make the symlink box remember the "relative" setting between
+  invocations (Bernard Jungen).
+
+- Updated Japanese translation (TANAKA hiroaki).
+
+- Remove very old code for /uri filesystem.
+
+- Change the way emblems are drawn on icons (Stephen Watson). The
+  emblem images are no longer MaskedPixmaps but are fetched from stock
+  when needed. This allows the theming mechanism to work on them.
+  There may be an overhead due to repeated calls to
+  gtk_style_lookup_icon_set and gtk_icon_set_render_icon.
+
+- Updated Italian translation (Yuri Bongiorno)
+
+- Added missing release notes to Changes file. For versions 2.7.1 and
+  2.8.
+
+
 Release 2.8 (2008-05-17)
 
 - Add a "keep panel on top" option (Tony Houghton)
