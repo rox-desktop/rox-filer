@@ -548,7 +548,7 @@ void dnotify_wakeup(void)
 
 	dnotify_wakeup_flag = FALSE;
 
-	dir = g_hash_table_lookup(dnotify_fd_to_dir,
+	dir = g_hash_table_lookup(notify_fd_to_dir,
 				  GINT_TO_POINTER(dnotify_last_fd));
 
 	if (dir)
