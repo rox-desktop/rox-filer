@@ -161,6 +161,9 @@ static char *tip_from_desktop_file(const char *full_path);
 static GdkCursor *busy_cursor = NULL;
 static GdkCursor *crosshair = NULL;
 
+/* Keeps track of which mount points to open prompts for */
+static GHashTable *dont_ask_mounts = NULL;
+
 /* Indicates whether the filer's display is different to the machine it
  * is actually running on.
  */
@@ -209,8 +212,8 @@ void filer_init(void)
 
 	if (dpyhost[0] && strcmp(ohost, dpyhost) != 0)
 	{
-	        /* Try the cannonical name for dpyhost (see our_host_name()
-	         * in support.c).
+		/* Try the cannonical name for dpyhost (see our_host_name()
+		 * in support.c).
 		 */
 	        struct hostent *ent;
 		
@@ -508,6 +511,18 @@ static void umount_dialog_response(GtkWidget *dialog, int response, char *mount)
 {
 	GList *list;
 	
+	if (!dont_ask_mounts)
+	{
+		dont_ask_mounts = g_hash_table_new_full(g_str_hash, g_str_equal,
+				g_free, NULL);
+	}
+	g_hash_table_insert(dont_ask_mounts, g_strdup(mount),
+			GINT_TO_POINTER(
+					gtk_toggle_button_get_active(
+							g_object_get_data(G_OBJECT(dialog),
+									"dont_ask_button"))
+					+ 1));
+					
 	switch (response)
 	{
 	case GTK_RESPONSE_OK:
@@ -541,9 +556,10 @@ static void umount_dialog_response(GtkWidget *dialog, int response, char *mount)
  */
 static void may_offer_unmount(FilerWindow *filer_window, char *mount)
 {
-	GtkWidget *dialog, *button;
+	GtkWidget *dialog, *button, *dont_ask_button;
 	GList	*next;
 	int len;
+	gboolean dont_ask;
 	
 	len = strlen(mount);
 
@@ -570,12 +586,37 @@ static void may_offer_unmount(FilerWindow *filer_window, char *mount)
 		g_free(mount);
 		return;
 	}
+	
+	/* Does user not want us to ask about this mount point again? NB we
+	   use 1 and 2 instead of FALSE and TRUE so we can distinguish between
+	   explicit "no" and NULL (lookup failed) */
+	dont_ask = TRUE;
+	if (dont_ask_mounts)
+	{
+		int val = GPOINTER_TO_INT(g_hash_table_lookup(dont_ask_mounts, mount));
+        
+		if (val == 2)
+			return;
+		else if (val == 1)
+			dont_ask = FALSE;
+			/* If user has explictly asked to be prompted again
+		     * reflect this in toggle button's initial state
+			 */
+	}
 
 	dialog = gtk_message_dialog_new(NULL, 0, GTK_MESSAGE_QUESTION,
 			GTK_BUTTONS_NONE, 
 			_("Do you want to unmount this device?\n\n"
 			"Unmounting a device makes it safe to remove "
 			"the disk."));
+	
+	dont_ask_button = gtk_check_button_new_with_label(
+			_("Don't ask again about this mount point"));
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(dont_ask_button), dont_ask);
+	gtk_widget_show(dont_ask_button);
+	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), dont_ask_button,
+			FALSE, FALSE, 0);
+	g_object_set_data(G_OBJECT(dialog), "dont_ask_button", dont_ask_button);
 
 	button = button_new_mixed(ROX_STOCK_MOUNTED, _("No change"));
 	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
