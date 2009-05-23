@@ -120,6 +120,14 @@ enum settings_flags{
 	SET_FILTER=128,   /* filter_type, filter */
 };
 
+typedef enum {
+	Umount_Prompt_ASK = 0,
+	Umount_Prompt_NO_CHANGE,
+	Umount_Prompt_UNMOUNT,
+	Umount_Prompt_EJECT
+} umount_prompt_t;
+static GHashTable *umount_prompt_actions = NULL;
+
 /* Static prototypes */
 static void attach(FilerWindow *filer_window);
 static void detach(FilerWindow *filer_window);
@@ -160,9 +168,6 @@ static char *tip_from_desktop_file(const char *full_path);
 
 static GdkCursor *busy_cursor = NULL;
 static GdkCursor *crosshair = NULL;
-
-/* Keeps track of which mount points to open prompts for */
-static GHashTable *dont_ask_mounts = NULL;
 
 /* Indicates whether the filer's display is different to the machine it
  * is actually running on.
@@ -509,38 +514,42 @@ static char *get_ancestor_user_mount_point(const char *start)
 
 static void umount_dialog_response(GtkWidget *dialog, int response, char *mount)
 {
-	GList *list;
+	GList *list = NULL;
+	umount_prompt_t prompt_val = 0;
 	
-	if (!dont_ask_mounts)
-	{
-		dont_ask_mounts = g_hash_table_new_full(g_str_hash, g_str_equal,
-				g_free, NULL);
-	}
-	g_hash_table_insert(dont_ask_mounts, g_strdup(mount),
-			GINT_TO_POINTER(
-					gtk_toggle_button_get_active(
-							g_object_get_data(G_OBJECT(dialog),
-									"dont_ask_button"))
-					+ 1));
-					
 	switch (response)
 	{
 	case GTK_RESPONSE_OK:
 		list = g_list_prepend(NULL, mount);
 		action_mount(list, FALSE, FALSE, TRUE);
-		g_list_free(list);
+		prompt_val = Umount_Prompt_UNMOUNT;
 		break;
 
 	case ROX_RESPONSE_EJECT:
 		list = g_list_prepend(NULL, mount);
 		action_eject(list);
-		g_list_free(list);
+		prompt_val = Umount_Prompt_EJECT;
 		break;
 
 	default:
+		prompt_val = Umount_Prompt_NO_CHANGE;
 		break;
 	}
+	if (list)
+		g_list_free(list);
 
+	if (gtk_toggle_button_get_active(g_object_get_data(G_OBJECT(dialog),
+			"umount_mem_btn")))
+	{
+		if (!umount_prompt_actions)
+		{
+			umount_prompt_actions = g_hash_table_new_full(g_str_hash,
+					g_str_equal, g_free, NULL);
+		}
+		g_hash_table_insert(umount_prompt_actions, g_strdup(mount),
+				GINT_TO_POINTER(prompt_val));
+	}
+					
 	g_free(mount);
 
 	gtk_widget_destroy(dialog);
@@ -556,10 +565,9 @@ static void umount_dialog_response(GtkWidget *dialog, int response, char *mount)
  */
 static void may_offer_unmount(FilerWindow *filer_window, char *mount)
 {
-	GtkWidget *dialog, *button, *dont_ask_button;
+	GtkWidget *dialog, *button, *umount_mem_btn;
 	GList	*next;
 	int len;
-	gboolean dont_ask;
 	
 	len = strlen(mount);
 
@@ -587,21 +595,34 @@ static void may_offer_unmount(FilerWindow *filer_window, char *mount)
 		return;
 	}
 	
-	/* Does user not want us to ask about this mount point again? NB we
-	   use 1 and 2 instead of FALSE and TRUE so we can distinguish between
-	   explicit "no" and NULL (lookup failed) */
-	dont_ask = TRUE;
-	if (dont_ask_mounts)
+	if (umount_prompt_actions)
 	{
-		int val = GPOINTER_TO_INT(g_hash_table_lookup(dont_ask_mounts, mount));
-        
-		if (val == 2)
+		GList *list = NULL;
+		umount_prompt_t umount_val = GPOINTER_TO_INT( \
+				g_hash_table_lookup(umount_prompt_actions, mount));
+				
+		switch (umount_val)
+		{
+		case Umount_Prompt_UNMOUNT:
+			list = g_list_prepend(NULL, mount);
+			action_mount(list, FALSE, FALSE, TRUE);
+			break;
+		
+		case Umount_Prompt_EJECT:
+			list = g_list_prepend(NULL, mount);
+			action_eject(list);
+			break;
+		
+		default:
+			break;
+		}
+		if (list)
+			g_list_free(list);
+		if (umount_val)
+		{
+			g_free(mount);
 			return;
-		else if (val == 1)
-			dont_ask = FALSE;
-			/* If user has explictly asked to be prompted again
-		     * reflect this in toggle button's initial state
-			 */
+		}
 	}
 
 	dialog = gtk_message_dialog_new(NULL, 0, GTK_MESSAGE_QUESTION,
@@ -610,13 +631,13 @@ static void may_offer_unmount(FilerWindow *filer_window, char *mount)
 			"Unmounting a device makes it safe to remove "
 			"the disk."));
 	
-	dont_ask_button = gtk_check_button_new_with_label(
-			_("Don't ask again about this mount point"));
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(dont_ask_button), dont_ask);
-	gtk_widget_show(dont_ask_button);
-	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), dont_ask_button,
+	umount_mem_btn = gtk_check_button_new_with_label(
+			_("Perform the same action in future for this mount point"));
+	gtk_widget_show(umount_mem_btn);
+	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), umount_mem_btn,
 			FALSE, FALSE, 0);
-	g_object_set_data(G_OBJECT(dialog), "dont_ask_button", dont_ask_button);
+	g_object_set_data(G_OBJECT(dialog), "umount_mem_btn",
+			umount_mem_btn);
 
 	button = button_new_mixed(ROX_STOCK_MOUNTED, _("No change"));
 	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
