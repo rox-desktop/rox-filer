@@ -120,13 +120,7 @@ enum settings_flags{
 	SET_FILTER=128,   /* filter_type, filter */
 };
 
-typedef enum {
-	Umount_Prompt_ASK = 0,
-	Umount_Prompt_NO_CHANGE,
-	Umount_Prompt_UNMOUNT,
-	Umount_Prompt_EJECT
-} umount_prompt_t;
-static GHashTable *umount_prompt_actions = NULL;
+static GHashTable *unmount_prompt_actions = NULL;
 
 /* Static prototypes */
 static void attach(FilerWindow *filer_window);
@@ -515,38 +509,37 @@ static char *get_ancestor_user_mount_point(const char *start)
 	}
 }
 
-static void umount_dialog_response(GtkWidget *dialog, int response, char *mount)
+static void unmount_dialog_response(GtkWidget *dialog,
+        int response, char *mount)
 {
 	GList *list = NULL;
-	umount_prompt_t prompt_val = 0;
+	UnmountPrompt prompt_val = 0;
 	
 	switch (response)
 	{
 	case GTK_RESPONSE_OK:
 		list = g_list_prepend(NULL, mount);
 		action_mount(list, FALSE, FALSE, TRUE);
-		prompt_val = Umount_Prompt_UNMOUNT;
+		prompt_val = UNMOUNT_PROMPT_UNMOUNT;
 		break;
 
 	case ROX_RESPONSE_EJECT:
 		list = g_list_prepend(NULL, mount);
 		action_eject(list);
-		prompt_val = Umount_Prompt_EJECT;
+		prompt_val = UNMOUNT_PROMPT_EJECT;
 		break;
 
 	default:
-		prompt_val = Umount_Prompt_NO_CHANGE;
+		prompt_val = UNMOUNT_PROMPT_NO_CHANGE;
 		break;
 	}
 	if (list)
 		g_list_free(list);
 
 	if (gtk_toggle_button_get_active(g_object_get_data(G_OBJECT(dialog),
-			"umount_mem_btn")))
+			"unmount_mem_btn")))
 	{
-		g_hash_table_insert(umount_prompt_actions, g_strdup(mount),
-				GINT_TO_POINTER(prompt_val));
-		save_learnt_mounts();
+	    filer_set_unmount_action(mount, prompt_val);
 	}
 					
 	g_free(mount);
@@ -564,7 +557,7 @@ static void umount_dialog_response(GtkWidget *dialog, int response, char *mount)
  */
 static void may_offer_unmount(FilerWindow *filer_window, char *mount)
 {
-	GtkWidget *dialog, *button, *umount_mem_btn;
+	GtkWidget *dialog, *button, *unmount_mem_btn;
 	GList	*next;
 	int len;
 	
@@ -594,21 +587,19 @@ static void may_offer_unmount(FilerWindow *filer_window, char *mount)
 		return;
 	}
 	
-	if (umount_prompt_actions)
+	if (unmount_prompt_actions)
 	{
 		GList *list = NULL;
-		umount_prompt_t umount_val = GPOINTER_TO_INT( \
-				g_hash_table_lookup(umount_prompt_actions, mount));
+		UnmountPrompt unmount_val = filer_get_unmount_action(mount);
 				
-		fprintf(stderr, "umount_val for %s is %d\n", mount, umount_val);
-		switch (umount_val)
+		switch (unmount_val)
 		{
-		case Umount_Prompt_UNMOUNT:
+		case UNMOUNT_PROMPT_UNMOUNT:
 			list = g_list_prepend(NULL, mount);
 			action_mount(list, FALSE, FALSE, TRUE);
 			break;
 		
-		case Umount_Prompt_EJECT:
+		case UNMOUNT_PROMPT_EJECT:
 			list = g_list_prepend(NULL, mount);
 			action_eject(list);
 			break;
@@ -618,7 +609,7 @@ static void may_offer_unmount(FilerWindow *filer_window, char *mount)
 		}
 		if (list)
 			g_list_free(list);
-		if (umount_val)
+		if (unmount_val)
 		{
 			g_free(mount);
 			return;
@@ -631,13 +622,13 @@ static void may_offer_unmount(FilerWindow *filer_window, char *mount)
 			"Unmounting a device makes it safe to remove "
 			"the disk."));
 	
-	umount_mem_btn = gtk_check_button_new_with_label(
+	unmount_mem_btn = gtk_check_button_new_with_label(
 			_("Perform the same action in future for this mount point"));
-	gtk_widget_show(umount_mem_btn);
-	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), umount_mem_btn,
+	gtk_widget_show(unmount_mem_btn);
+	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), unmount_mem_btn,
 			FALSE, FALSE, 0);
-	g_object_set_data(G_OBJECT(dialog), "umount_mem_btn",
-			umount_mem_btn);
+	g_object_set_data(G_OBJECT(dialog), "unmount_mem_btn",
+			unmount_mem_btn);
 
 	button = button_new_mixed(ROX_STOCK_MOUNTED, _("No change"));
 	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
@@ -659,7 +650,7 @@ static void may_offer_unmount(FilerWindow *filer_window, char *mount)
 	gtk_widget_show(button);
 
 	g_signal_connect(G_OBJECT(dialog), "response",
-			G_CALLBACK(umount_dialog_response), mount);
+			G_CALLBACK(unmount_dialog_response), mount);
 
 	gtk_dialog_set_default_response(GTK_DIALOG(dialog),
 			GTK_RESPONSE_OK);
@@ -3035,7 +3026,8 @@ void filer_set_hidden(FilerWindow *filer_window, gboolean hidden)
 }
 
 /* Provided to hide the implementation */
-void filer_set_filter_directories(FilerWindow *filer_window, gboolean filter_directories)
+void filer_set_filter_directories(FilerWindow *filer_window,
+        gboolean filter_directories)
 {
 	filer_window->filter_directories=filter_directories;
 }
@@ -3189,7 +3181,7 @@ static void load_learnt_mounts(void)
 	gchar **entries;
 	int n;
 			
-	umount_prompt_actions = g_hash_table_new_full(g_str_hash,
+	unmount_prompt_actions = g_hash_table_new_full(g_str_hash,
 			g_str_equal, g_free, NULL);
 
 	path = choices_find_xdg_path_load("Mounts", PROJECT, SITE);
@@ -3220,7 +3212,7 @@ static void load_learnt_mounts(void)
 		if (len > 2)
 		{
 			buffer[len - 2] = 0;
-			g_hash_table_insert(umount_prompt_actions, g_strdup(buffer),
+			g_hash_table_insert(unmount_prompt_actions, g_strdup(buffer),
 				GINT_TO_POINTER(buffer[len - 1] - '0'));
 		}
 	}
@@ -3249,8 +3241,8 @@ static void save_learnt_mounts(void)
 	FILE *fp = NULL;
 	
 	/* A GHashTableIter would be easier, but it's a relatively new feature */
-	if (umount_prompt_actions)
-		g_hash_table_foreach(umount_prompt_actions, (GHFunc) save_mount, &fp);
+	if (unmount_prompt_actions)
+		g_hash_table_foreach(unmount_prompt_actions, (GHFunc) save_mount, &fp);
 	if (fp)
 		fclose(fp);
 }
@@ -3638,4 +3630,16 @@ err:
 		g_error_free(error);
 
 	return comment;
+}
+
+UnmountPrompt filer_get_unmount_action(const char *path)
+{
+	return GPOINTER_TO_INT(g_hash_table_lookup(unmount_prompt_actions, path));
+}
+
+void filer_set_unmount_action(const char *path, UnmountPrompt action)
+{
+    g_hash_table_insert(unmount_prompt_actions, g_strdup(path),
+            GINT_TO_POINTER(action));
+    save_learnt_mounts();
 }
