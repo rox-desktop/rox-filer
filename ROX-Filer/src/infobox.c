@@ -922,7 +922,7 @@ static GtkWidget *make_permissions(const gchar *path, DirItem *item)
 {
 	Permissions *perm;
 	GtkWidget *table;
-	GtkWidget *tick, *label;
+	GtkWidget *tick, *label, *align;
 	int i, x, y;
 
 	perm = g_new(Permissions, 1);
@@ -940,11 +940,17 @@ static GtkWidget *make_permissions(const gchar *path, DirItem *item)
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 3, 4);
 
 	label = gtk_label_new(_("Read"));
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 0, 1);
+	align = gtk_alignment_new(0, 0.5, 0, 1);
+	gtk_container_add(GTK_CONTAINER(align), label);
+	gtk_table_attach_defaults(GTK_TABLE(table), align, 1, 2, 0, 1);
 	label = gtk_label_new(_("Write"));
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 2, 3, 0, 1);
+	align = gtk_alignment_new(0, 0.5, 0, 1);
+	gtk_container_add(GTK_CONTAINER(align), label);
+	gtk_table_attach_defaults(GTK_TABLE(table), align, 2, 3, 0, 1);
 	label = gtk_label_new(_("Exec"));
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 3, 4, 0, 1);
+	align = gtk_alignment_new(0, 0.5, 0, 1);
+	gtk_container_add(GTK_CONTAINER(align), label);
+	gtk_table_attach_defaults(GTK_TABLE(table), align, 3, 4, 0, 1);
 
 	for (i = 0; i < 9; i++)
 	{
