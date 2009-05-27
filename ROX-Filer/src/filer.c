@@ -161,6 +161,8 @@ static gboolean drag_motion(GtkWidget		*widget,
                             guint		time,
 			    FilerWindow		*filer_window);
 
+static void load_learnt_mounts(void);
+static void save_learnt_mounts(void);
 static void load_settings(void);
 static void save_settings(void);
 static void check_settings(FilerWindow *filer_window);
@@ -230,6 +232,7 @@ void filer_init(void)
 	g_free(dpyhost);
 
 	load_settings();
+	load_learnt_mounts();
 }
 
 static gboolean if_deleted(gpointer item, gpointer removed)
@@ -541,13 +544,9 @@ static void umount_dialog_response(GtkWidget *dialog, int response, char *mount)
 	if (gtk_toggle_button_get_active(g_object_get_data(G_OBJECT(dialog),
 			"umount_mem_btn")))
 	{
-		if (!umount_prompt_actions)
-		{
-			umount_prompt_actions = g_hash_table_new_full(g_str_hash,
-					g_str_equal, g_free, NULL);
-		}
 		g_hash_table_insert(umount_prompt_actions, g_strdup(mount),
 				GINT_TO_POINTER(prompt_val));
+		save_learnt_mounts();
 	}
 					
 	g_free(mount);
@@ -601,6 +600,7 @@ static void may_offer_unmount(FilerWindow *filer_window, char *mount)
 		umount_prompt_t umount_val = GPOINTER_TO_INT( \
 				g_hash_table_lookup(umount_prompt_actions, mount));
 				
+		fprintf(stderr, "umount_val for %s is %d\n", mount, umount_val);
 		switch (umount_val)
 		{
 		case Umount_Prompt_UNMOUNT:
@@ -3179,6 +3179,80 @@ static void load_from_node(Settings *set, xmlDocPtr doc, xmlNodePtr node)
 	
 	if(str)
 		xmlFree(str);
+}
+
+static void load_learnt_mounts(void)
+{
+	gchar *path;
+	gchar *buffer = NULL;
+	gsize len = 0;
+	gchar **entries;
+	int n;
+			
+	umount_prompt_actions = g_hash_table_new_full(g_str_hash,
+			g_str_equal, g_free, NULL);
+
+	path = choices_find_xdg_path_load("Mounts", PROJECT, SITE);
+	if (!path)
+		return;
+	if (!g_file_get_contents(path, &buffer, &len, NULL))
+	{
+		g_free(path);
+		return;
+	}
+	g_free(path);
+	if (len)
+	{
+		buffer[len - 1] = 0;
+	}
+	else
+	{
+		g_free(buffer);
+		return;
+	}
+	
+	entries = g_strsplit(buffer, "\n", 0);
+	g_free(buffer);
+	for (n = 0; entries[n]; ++n)
+	{
+		buffer = entries[n];
+		len = strlen(buffer);
+		if (len > 2)
+		{
+			buffer[len - 2] = 0;
+			g_hash_table_insert(umount_prompt_actions, g_strdup(buffer),
+				GINT_TO_POINTER(buffer[len - 1] - '0'));
+		}
+	}
+	g_strfreev(entries);
+}
+
+static void save_mount(char *path, gpointer value, FILE **pfp)
+{
+	if (!*pfp)
+	{
+		gchar *spath = choices_find_xdg_path_save("Mounts",
+				PROJECT, SITE, TRUE);
+		
+		if (!spath)
+			return;
+		*pfp = fopen(spath, "w");
+		g_free(spath);
+		if (!*pfp)
+			return;
+	}
+	fprintf(*pfp, "%s %d\n", path, GPOINTER_TO_INT(value));
+}
+
+static void save_learnt_mounts(void)
+{
+	FILE *fp = NULL;
+	
+	/* A GHashTableIter would be easier, but it's a relatively new feature */
+	if (umount_prompt_actions)
+		g_hash_table_foreach(umount_prompt_actions, (GHFunc) save_mount, &fp);
+	if (fp)
+		fclose(fp);
 }
 
 static void load_settings(void)
