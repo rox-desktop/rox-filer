@@ -1044,13 +1044,13 @@ static GtkWidget *make_unmount_options(const char *path)
     
     hbox = gtk_hbox_new(TRUE, 4);
     radio = pack_unmount_radio(path, upval,
-            "No change", UNMOUNT_PROMPT_NO_CHANGE, NULL, hbox);
+            _("Do nothing"), UNMOUNT_PROMPT_NO_CHANGE, NULL, hbox);
     radio = pack_unmount_radio(path, upval,
-            "Unmount", UNMOUNT_PROMPT_UNMOUNT, radio, hbox);
+            _("Unmount"), UNMOUNT_PROMPT_UNMOUNT, radio, hbox);
     radio = pack_unmount_radio(path, upval,
-            "Eject", UNMOUNT_PROMPT_EJECT, radio, hbox);
+            _("Eject"), UNMOUNT_PROMPT_EJECT, radio, hbox);
     pack_unmount_radio(path, upval,
-            "Ask", UNMOUNT_PROMPT_ASK, radio, hbox);
+            _("Ask"), UNMOUNT_PROMPT_ASK, radio, hbox);
     return hbox;
 }
 

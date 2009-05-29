@@ -513,7 +513,7 @@ static void unmount_dialog_response(GtkWidget *dialog,
         int response, char *mount)
 {
 	GList *list = NULL;
-	UnmountPrompt prompt_val = 0;
+	UnmountPrompt prompt_val = UNMOUNT_PROMPT_ASK;
 	
 	switch (response)
 	{
@@ -609,7 +609,7 @@ static void may_offer_unmount(FilerWindow *filer_window, char *mount)
 		}
 		if (list)
 			g_list_free(list);
-		if (unmount_val)
+		if (unmount_val != UNMOUNT_PROMPT_ASK)
 		{
 			g_free(mount);
 			return;
@@ -3221,6 +3221,8 @@ static void load_learnt_mounts(void)
 
 static void save_mount(char *path, gpointer value, FILE **pfp)
 {
+	int v;
+
 	if (!*pfp)
 	{
 		gchar *spath = choices_find_xdg_path_save("Mounts",
@@ -3233,7 +3235,9 @@ static void save_mount(char *path, gpointer value, FILE **pfp)
 		if (!*pfp)
 			return;
 	}
-	fprintf(*pfp, "%s %d\n", path, GPOINTER_TO_INT(value));
+
+	if ((v = GPOINTER_TO_INT(value)) != UNMOUNT_PROMPT_ASK)
+		fprintf(*pfp, "%s %d\n", path, v);
 }
 
 static void save_learnt_mounts(void)

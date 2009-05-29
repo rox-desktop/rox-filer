@@ -45,7 +45,7 @@ typedef enum
 
 /* What to do when all a mount point's windows are closed */
 typedef enum {
-	UNMOUNT_PROMPT_ASK = 0,
+	UNMOUNT_PROMPT_ASK = GPOINTER_TO_INT(NULL),
 	UNMOUNT_PROMPT_NO_CHANGE,
 	UNMOUNT_PROMPT_UNMOUNT,
 	UNMOUNT_PROMPT_EJECT
