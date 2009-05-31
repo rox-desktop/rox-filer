@@ -3207,13 +3207,13 @@ static void load_learnt_mounts(void)
 	g_free(buffer);
 	for (n = 0; entries[n]; ++n)
 	{
+		gchar *p;
 		buffer = entries[n];
-		len = strlen(buffer);
-		if (len > 2)
-		{
-			buffer[len - 2] = 0;
+		p = strrchr(buffer, ' ');
+		if (p && p > buffer) {
+			*p = 0;
 			g_hash_table_insert(unmount_prompt_actions, g_strdup(buffer),
-				GINT_TO_POINTER(buffer[len - 1] - '0'));
+				GINT_TO_POINTER(atoi(p+1)));
 		}
 	}
 	g_strfreev(entries);
