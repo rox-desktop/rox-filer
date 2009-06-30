@@ -120,6 +120,8 @@ enum settings_flags{
 	SET_FILTER=128,   /* filter_type, filter */
 };
 
+static GHashTable *unmount_prompt_actions = NULL;
+
 /* Static prototypes */
 static void attach(FilerWindow *filer_window);
 static void detach(FilerWindow *filer_window);
@@ -153,6 +155,8 @@ static gboolean drag_motion(GtkWidget		*widget,
                             guint		time,
 			    FilerWindow		*filer_window);
 
+static void load_learnt_mounts(void);
+static void save_learnt_mounts(void);
 static void load_settings(void);
 static void save_settings(void);
 static void check_settings(FilerWindow *filer_window);
@@ -209,8 +213,8 @@ void filer_init(void)
 
 	if (dpyhost[0] && strcmp(ohost, dpyhost) != 0)
 	{
-	        /* Try the cannonical name for dpyhost (see our_host_name()
-	         * in support.c).
+		/* Try the cannonical name for dpyhost (see our_host_name()
+		 * in support.c).
 		 */
 	        struct hostent *ent;
 		
@@ -222,6 +226,7 @@ void filer_init(void)
 	g_free(dpyhost);
 
 	load_settings();
+	load_learnt_mounts();
 }
 
 static gboolean if_deleted(gpointer item, gpointer removed)
@@ -504,28 +509,39 @@ static char *get_ancestor_user_mount_point(const char *start)
 	}
 }
 
-static void umount_dialog_response(GtkWidget *dialog, int response, char *mount)
+static void unmount_dialog_response(GtkWidget *dialog,
+        int response, char *mount)
 {
-	GList *list;
+	GList *list = NULL;
+	UnmountPrompt prompt_val = UNMOUNT_PROMPT_ASK;
 	
 	switch (response)
 	{
 	case GTK_RESPONSE_OK:
 		list = g_list_prepend(NULL, mount);
 		action_mount(list, FALSE, FALSE, TRUE);
-		g_list_free(list);
+		prompt_val = UNMOUNT_PROMPT_UNMOUNT;
 		break;
 
 	case ROX_RESPONSE_EJECT:
 		list = g_list_prepend(NULL, mount);
 		action_eject(list);
-		g_list_free(list);
+		prompt_val = UNMOUNT_PROMPT_EJECT;
 		break;
 
 	default:
+		prompt_val = UNMOUNT_PROMPT_NO_CHANGE;
 		break;
 	}
+	if (list)
+		g_list_free(list);
 
+	if (gtk_toggle_button_get_active(g_object_get_data(G_OBJECT(dialog),
+			"unmount_mem_btn")))
+	{
+	    filer_set_unmount_action(mount, prompt_val);
+	}
+					
 	g_free(mount);
 
 	gtk_widget_destroy(dialog);
@@ -541,7 +557,7 @@ static void umount_dialog_response(GtkWidget *dialog, int response, char *mount)
  */
 static void may_offer_unmount(FilerWindow *filer_window, char *mount)
 {
-	GtkWidget *dialog, *button;
+	GtkWidget *dialog, *button, *unmount_mem_btn;
 	GList	*next;
 	int len;
 	
@@ -570,12 +586,49 @@ static void may_offer_unmount(FilerWindow *filer_window, char *mount)
 		g_free(mount);
 		return;
 	}
+	
+	if (unmount_prompt_actions)
+	{
+		GList *list = NULL;
+		UnmountPrompt unmount_val = filer_get_unmount_action(mount);
+				
+		switch (unmount_val)
+		{
+		case UNMOUNT_PROMPT_UNMOUNT:
+			list = g_list_prepend(NULL, mount);
+			action_mount(list, FALSE, FALSE, TRUE);
+			break;
+		
+		case UNMOUNT_PROMPT_EJECT:
+			list = g_list_prepend(NULL, mount);
+			action_eject(list);
+			break;
+		
+		default:
+			break;
+		}
+		if (list)
+			g_list_free(list);
+		if (unmount_val != UNMOUNT_PROMPT_ASK)
+		{
+			g_free(mount);
+			return;
+		}
+	}
 
 	dialog = gtk_message_dialog_new(NULL, 0, GTK_MESSAGE_QUESTION,
 			GTK_BUTTONS_NONE, 
 			_("Do you want to unmount this device?\n\n"
 			"Unmounting a device makes it safe to remove "
 			"the disk."));
+	
+	unmount_mem_btn = gtk_check_button_new_with_label(
+			_("Perform the same action in future for this mount point"));
+	gtk_widget_show(unmount_mem_btn);
+	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), unmount_mem_btn,
+			FALSE, FALSE, 0);
+	g_object_set_data(G_OBJECT(dialog), "unmount_mem_btn",
+			unmount_mem_btn);
 
 	button = button_new_mixed(ROX_STOCK_MOUNTED, _("No change"));
 	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
@@ -597,7 +650,7 @@ static void may_offer_unmount(FilerWindow *filer_window, char *mount)
 	gtk_widget_show(button);
 
 	g_signal_connect(G_OBJECT(dialog), "response",
-			G_CALLBACK(umount_dialog_response), mount);
+			G_CALLBACK(unmount_dialog_response), mount);
 
 	gtk_dialog_set_default_response(GTK_DIALOG(dialog),
 			GTK_RESPONSE_OK);
@@ -2973,7 +3026,8 @@ void filer_set_hidden(FilerWindow *filer_window, gboolean hidden)
 }
 
 /* Provided to hide the implementation */
-void filer_set_filter_directories(FilerWindow *filer_window, gboolean filter_directories)
+void filer_set_filter_directories(FilerWindow *filer_window,
+        gboolean filter_directories)
 {
 	filer_window->filter_directories=filter_directories;
 }
@@ -3117,6 +3171,84 @@ static void load_from_node(Settings *set, xmlDocPtr doc, xmlNodePtr node)
 	
 	if(str)
 		xmlFree(str);
+}
+
+static void load_learnt_mounts(void)
+{
+	gchar *path;
+	gchar *buffer = NULL;
+	gsize len = 0;
+	gchar **entries;
+	int n;
+			
+	unmount_prompt_actions = g_hash_table_new_full(g_str_hash,
+			g_str_equal, g_free, NULL);
+
+	path = choices_find_xdg_path_load("Mounts", PROJECT, SITE);
+	if (!path)
+		return;
+	if (!g_file_get_contents(path, &buffer, &len, NULL))
+	{
+		g_free(path);
+		return;
+	}
+	g_free(path);
+	if (len)
+	{
+		buffer[len - 1] = 0;
+	}
+	else
+	{
+		g_free(buffer);
+		return;
+	}
+	
+	entries = g_strsplit(buffer, "\n", 0);
+	g_free(buffer);
+	for (n = 0; entries[n]; ++n)
+	{
+		gchar *p;
+		buffer = entries[n];
+		p = strrchr(buffer, ' ');
+		if (p && p > buffer) {
+			*p = 0;
+			g_hash_table_insert(unmount_prompt_actions, g_strdup(buffer),
+				GINT_TO_POINTER(atoi(p+1)));
+		}
+	}
+	g_strfreev(entries);
+}
+
+static void save_mount(char *path, gpointer value, FILE **pfp)
+{
+	int v;
+
+	if (!*pfp)
+	{
+		gchar *spath = choices_find_xdg_path_save("Mounts",
+				PROJECT, SITE, TRUE);
+		
+		if (!spath)
+			return;
+		*pfp = fopen(spath, "w");
+		g_free(spath);
+		if (!*pfp)
+			return;
+	}
+
+	if ((v = GPOINTER_TO_INT(value)) != UNMOUNT_PROMPT_ASK)
+		fprintf(*pfp, "%s %d\n", path, v);
+}
+
+static void save_learnt_mounts(void)
+{
+	FILE *fp = NULL;
+	
+	/* A GHashTableIter would be easier, but it's a relatively new feature */
+	if (unmount_prompt_actions)
+		g_hash_table_foreach(unmount_prompt_actions, (GHFunc) save_mount, &fp);
+	if (fp)
+		fclose(fp);
 }
 
 static void load_settings(void)
@@ -3502,4 +3634,16 @@ err:
 		g_error_free(error);
 
 	return comment;
+}
+
+UnmountPrompt filer_get_unmount_action(const char *path)
+{
+	return GPOINTER_TO_INT(g_hash_table_lookup(unmount_prompt_actions, path));
+}
+
+void filer_set_unmount_action(const char *path, UnmountPrompt action)
+{
+    g_hash_table_insert(unmount_prompt_actions, g_strdup(path),
+            GINT_TO_POINTER(action));
+    save_learnt_mounts();
 }

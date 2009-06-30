@@ -43,6 +43,14 @@ typedef enum
 	FILER_SHOW_GLOB,          /* Show files that match a glob pattern */
 } FilterType;
 
+/* What to do when all a mount point's windows are closed */
+typedef enum {
+	UNMOUNT_PROMPT_ASK = GPOINTER_TO_INT(NULL),
+	UNMOUNT_PROMPT_NO_CHANGE,
+	UNMOUNT_PROMPT_UNMOUNT,
+	UNMOUNT_PROMPT_EJECT
+} UnmountPrompt;
+
 /* iter's next method has just returned the clicked item... */
 typedef void (*TargetFunc)(FilerWindow *filer_window,
 			   ViewIter *iter,
@@ -167,5 +175,8 @@ void filer_set_filter_directories(FilerWindow *fwin, gboolean filter_directories
 void filer_set_hidden(FilerWindow *fwin, gboolean hidden);
 void filer_next_selected(FilerWindow *filer_window, int dir);
 void filer_save_settings(FilerWindow *fwin);
+
+UnmountPrompt filer_get_unmount_action(const char *path);
+void filer_set_unmount_action(const char *path, UnmountPrompt action);
 
 #endif /* _FILER_H */

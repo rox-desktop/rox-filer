@@ -1,13 +1,13 @@
 # ROX-Filer-2.x Japanese Translation
-# Copyright (C) 2005 team OKATANA <mkato@par.odn.ne.jp, mosaicist@par.odn.ne.jp>
+# Copyright (C) 2005 - 2009 team OKATANA <mkato@par.odn.ne.jp, mosaicist@par.odn.ne.jp>
 # team OKATANA: KATO Masashi, TANAKA hiroaki
-# 
-# 
+#
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ROX-Filer 2.3\n"
+"Project-Id-Version: ROX-Filer 2.9\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-05-20 00:23+0900\n"
+"POT-Creation-Date: 2009-05-30 10:33+0900\n"
 "PO-Revision-Date: 2007-12-23 09:40+0900\n"
 "Last-Translator: team OKATANA<mkato@par.odn.ne.jp,mosaicist@par.odn.ne.jp>\n"
 "Language-Team: Japanese team OKATANA <mkato@par.odn.ne.jp, mosaicist@par.odn."
@@ -99,43 +99,52 @@ msgid ""
 "<b>prune</b> (false, and prevents searching the contents of a directory)."
 msgstr ""
 "<u>概略</u>\n"
-"検索する文字を''(シングルクォート)でくくってください:\n"
-"<b>'index.html'</b> (''無しでindex.htmlとだけ入力するとエラーになる)\n"
-"\n"
+"検索する文字(検索対象名)は ''(シングルクォート)でくくってください:\n"
+"<u><b>'index.html'</b> ('' 無しで index.html とだけ入力するとエラーになります)        </u>\n"
 "<u>例</u>\n"
-"<b>'*.htm', '*.html'</b> (拡張子がhtmとhtmlのファイルを探す)\n"
-"<b>IsDir 'lib'</b> (libというディレクトリをリストアップ[ls=list])\n"
-"<b>IsReg 'core'</b> (coreという一般[regular]ファイルをリストアップ)\n"
-"<b>! (IsDir, IsReg)</b> (ディレクトリと一般ファイルを除外する)\n"
-"<b>mtime after 1 day ago and size > 1Mb</b> (容量と変更日時を指定)\n"
-"<b>'CVS' prune, isreg</b> (CVS以外の一般ファイル)\n"
-"<b>IsReg system(grep -q fred \"%\")</b> (fredという文字を含む)\n"
-"\n"
-"<u>簡単なテスト</u>\n"
+"<b>'[ir]*.html'</b>        ('i' か 'r' で始まる名前の HTML ファイル)\n"
+"<b>'*.svg','*.png'</b>     (拡張子が 'svg' か 'png' の画像ファイル ※1)\n"
+"<b>IsDir 'lib'</b>         ('lib' というディレクトリ)\n"
+"<b>-d '*s*'</b>            (名前に 's' を含むディレクトリ)\n"
+"<b>not -r -f 's*'</b>      (名前が 's' から始まる読み込み属性のないファイル)\n"
+"<b>IsReg 'core'</b>        ('core' という名前の通常(IsReg)ファイル)\n"
+"<b>! (IsDir, IsReg)</b>    (ディレクトリと通常ファイル以外のファイル)\n"
+"<b>mtime after 1 day ago and size > 1Mb</b>\n"
+"                    (変更日時一日前以降、かつファイルサイズ 1MB 未満 ※2)\n"
+"<b>'CVS' prune, isreg</b>  ('CVS' ディレクトリ以外の通常ファイル ※3)\n"
+"<b>'b*' prune, '*.txt'</b> ('b' で始まる名前のディレクトリ以外の *.txt ※4)\n"
+"<b>IsReg system(grep -q fred \"%\")</b>\n"
+"<u>                    ('fred' という語句を含む通常ファイル ※5),              </u>\n"
+"<u>単純テスト</u>\n"
 "<b>IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket, IsDoor</"
 "b> (ファイルタイプ)\n"
 "<b>IsSUID, IsSGID, IsSticky, IsReadable, IsWriteable, IsExecutable</b> (パー"
 "ミッション)\n"
 "<b>IsEmpty, IsMine</b>\n"
-"シングルクォート中に書くべきパターンは、シェル形式ワイルドカード・パターンで"
-"す。\n"
-"パターンがスラッシュを含んでいる場合、フルパスに対応します。\n"
-"それ以外の場合、パターンはパス名を含まないアイテム(ファイル、ディレクトリ、パ"
-"イプ\n"
-"等)名に対応します。\n"
-"\n"
-"<u>比較</u>\n"
+"(シェルコマンドで使われる以下のテスト式も使用可能です。)\n"
+"    '-f' '-l' '-d' '-c' '-b' '-D' '-p' '-S' '-O'\n"
+"<u>    '-u' '-g' '-k' '-r' '-w' '-x' '-z' '-o'                               </u>\n"
+"シングルクォート内には、シェルのワイルドカードを含むパターンを書きます。\n"
+"パターンがスラッシュを含んでいる場合、フルパス以外には一致しません。\n"
+"<u>それ以外は、パス名を含まないパターンと見做されます。                         </u>\n"
+"<u>比較</u> → ※2\n"
 "<b>&lt;, &lt;=, =, !=, &gt;, &gt;=, After, Before</b> (二値の比較)\n"
 "<b>5 bytes, 1Kb, 2Mb, 3Gb</b> (ファイルサイズ)\n"
 "<b>2 secs|mins|hours|days|weeks|years  ago|hence</b> (日時)\n"
-"<b>atime, ctime, mtime, now, size, inode, nlinks, uid, gid, blocks</b> (値)\n"
-"\n"
+"<u><b>atime, ctime, mtime, now, size, inode, nlinks, uid, gid, blocks</b> (値)      </u>\n"
 "<u>特殊機能</u>\n"
-"<b>system(command)</b> ('command'が真の場合 ステータス 0 (ゼロ) を返して終了"
-"します。\n"
-"a % in 'command' は、カレントパスのアイテム(ファイル等)に置き換えられま"
-"す。)\n"
-"<b>prune</b> (偽を意味します。パターンを検索対象から除外します。)"
+"<b>system: syatem(commandline)</b>\n"
+"    (commandline の終了ステータスが 0 の場合、commandline に含まれる '%' は、\n"
+"    パターンにマッチしたファイル名に置き換えられます。→ ※5)\n"
+"<b>prune : 'DIR' prune, 'ptrn'</b>\n"
+"    ('DIR' にマッチするディレクトリ以外から 'ptrn' を検索します。→ ※3,4)\n"
+"<b>And</b> (検索式の AND 条件結合。 式1 and 式2 は、両式が共に成立する\n"
+"    検索対象のみに一致します → ※2\n"
+"<b>,</b>   (検索式の OR 条件結合。  式1,式2 は、両式いずれか、又は両方\n"
+"    が成立する検索対象に一致します → ※1\n"
+"<b>Not (又は !)</b> (直後の検索式の否定。 not 式 は、式の意味を反転します。"
+
+
 
 #: action.c:249
 msgid "Change permissions reference"
@@ -265,11 +274,11 @@ msgstr ""
 msgid "ERROR"
 msgstr "エラー"
 
-#: action.c:714 main.c:693 main.c:700 main.c:714
+#: action.c:714 main.c:698 main.c:705 main.c:712 main.c:726
 msgid "Yes"
 msgstr "はい"
 
-#: action.c:717 main.c:695 main.c:702 main.c:714
+#: action.c:717 main.c:700 main.c:707 main.c:714 main.c:726
 msgid "No"
 msgstr "いいえ"
 
@@ -664,7 +673,7 @@ msgstr "サブディレクトリ以下の内容も変更します"
 msgid "Type:"
 msgstr "種類:"
 
-#: action.c:2267 dnd.c:122 menu.c:2018 tips:167
+#: action.c:2267 dnd.c:122 menu.c:2024 tips:167
 msgid "Copy"
 msgstr "コピー"
 
@@ -742,7 +751,7 @@ msgstr "メニューをカスタマイズ..."
 msgid "Help"
 msgstr "ヘルプ"
 
-#: bookmarks.c:148
+#: bookmarks.c:148 log.c:160
 msgid "Path"
 msgstr "パス"
 
@@ -799,7 +808,7 @@ msgstr "戻す"
 
 #: bulk_rename.c:74
 msgid "Make the New column a copy of Old"
-msgstr "'新しい名前'欄を以前のものに戻します"
+msgstr "'新しい名前'欄を最初の状態に戻します"
 
 #: bulk_rename.c:79
 msgid "_Rename"
@@ -817,74 +826,103 @@ msgid ""
 "\\. matches a dot\n"
 "\\.htm$ matches the '.htm' in 'index.htm', etc"
 msgstr ""
-"この項にはリネーム対象に該当する正規化表現を記入して下さい。\n"
-"^ ファイル名の先頭に一致\n"
-"$ 末尾に一致\n"
-"\\. ドットに一致\n"
-"\\.htm$ 'index.html'の'.htm' に一致, 等"
+"各'新しい名前'中の、変更したい部分を指定します。\n"
+"(文字列パターンとして、正規表現も使用できます)\n"
+"以下のパターンの例は、'新しい名前' の該当部分を指定します。\n"
+"abc                文字列 abc\n"
+"^                  名前の先頭\n"
+"$                  名前の末尾\n"
+"\\.                 '.'(ドット)\n"
+"[0-9]              一桁の数字\n"
+"\\.html$            index.html、content.html などの末尾の '.html'\n"
+"[a-zA-Z]{2}_[0-9]  ab_01.txt の 'ab_0' や cde_5.jpg の 'de_5'\n"
+"(※正規表現に関しては、jman 7 regex などをご覧ください)"
 
 #: bulk_rename.c:107
 msgid "With:"
-msgstr "変更後"
+msgstr "置換文字列:"
 
 #: bulk_rename.c:114
 msgid ""
-"The first match in each filename will be replaced by this string. There are "
-"no special characters."
+"The first match in each filename will be replaced by this string. The only "
+"special characters are back-references from \\0 to \\9. To use them "
+"literally, they have to be escaped with a backslash."
 msgstr ""
-"各ファイル名のリネーム対象(パターン)に一致するものが、この文字列に置き換えら"
-"れます。特殊文字は使われません"
+"'リネーム対象' に一致する '新しい名前' の最初の該当箇所が、\n"
+"この欄の文字列に置き換えられます。\n"
+" (この欄では正規表現の \\0 〜 \\9 よる後方参照が可能です。\n"
+"  \\2 は 'リネーム対象'パターン中の、()によりグループ化され\n"
+"  た表現の、2番目のグループに一致する文字列を指定します)\n"
+"後方参照の例:\n"
+"1.リネーム対象: ([0-9])-([0-9])\n"
+"  置換文字列: DE\\2\\1 \n"
+"  適用結果: abc5-39.txt → abcDE359.txt\n"
+"'-' で区切られた二つの数字に、最初に一致する部分 →\n"
+"'-' を省き、数字の前後を入れ替え、'DE'を前に付加\n"
+"2.リネーム対象:\n"
+"    ([0-9][0-9])(_)([0-1][0-9])(_)([0-3][0-9])(\\.)(.+)\n"
+"  置換文字列: 平成21年\\3月\\5日\\6log\n"
+"  適用結果: 09_05_09.txt →  平成21年05月09日.log\n"
+"  西暦表記風の名前 → 元号表記風にし、拡張子を log に変更\n"
+"※先頭へのパスの付加で、同ファイルシステム内の移動も可能。"
 
-#: bulk_rename.c:118
+#: bulk_rename.c:120
 msgid "Apply"
 msgstr "適用"
 
-#: bulk_rename.c:121
+#: bulk_rename.c:123
 msgid ""
 "Do a search-and-replace in the New column. The files are not actually "
 "renamed until you click on the Rename button below."
 msgstr ""
-"検索と置き換えを'新しい名前'欄に適用します。リネームボタンを押すまでは実際の"
-"リネームは実行されません。"
+"'新しい名前' の、'リネーム対象' のパターンに一致する部分\n"
+"を、'置換文字列' に置き換えます\n"
+"'新しい名前' に一致する指定パターンが有る内は、何度でも\n"
+"[適用]を実行できます\n"
+"[リネーム]を押すまでは実際のリネームは実行されません。\n"
+"[戻す]を押せば、最初からやり直せます。\n"
+"[リネーム]を押すと '古い名前' の '新しい名前' へのリネー\n"
+"ムを実行し、このダイアログを閉じます。"
 
-#: bulk_rename.c:140
+#: bulk_rename.c:142
 msgid "Old name"
 msgstr "古い名前"
 
-#: bulk_rename.c:149
+#: bulk_rename.c:151
 msgid "New name"
 msgstr "新しい名前"
 
-#: bulk_rename.c:257
+#: bulk_rename.c:293
 msgid "No strings (in the New column) matched the given expression"
-msgstr "('新しい名前'欄には)与えられたパターン式に一致する名前は有りません"
+msgstr ""
+"('新しい名前'欄には)リネーム対象欄の正規表現にマッチする文字列はありません"
 
-#: bulk_rename.c:262
+#: bulk_rename.c:298
 msgid "One name matched, but the result was the same"
 msgstr "1 個のアイテムがパターンに一致しますが、変更の前後が同じです"
 
-#: bulk_rename.c:265
+#: bulk_rename.c:301
 #, c-format
 msgid "%d names matched, but the results were all the same"
 msgstr "%d 個のアイテムがパターンに一致しますが、変更の前後が同じです"
 
-#: bulk_rename.c:291
+#: bulk_rename.c:327
 msgid ""
 "Specify a regular expression to match, and a string to replace matches with."
 msgstr "変換対象に一致する正規表現と、置き換える文字列を指定して下さい"
 
-#: bulk_rename.c:308
+#: bulk_rename.c:344
 #, c-format
 msgid "%s (for '%s')"
-msgstr "%s ('%s' の為の)"
+msgstr "%s ('%s' において)"
 
-#: bulk_rename.c:341
+#: bulk_rename.c:377
 #, c-format
 msgid "A file called '%s' already exists. Aborting bulk rename."
 msgstr ""
-"'%s' という名前のファイルが既に存在します。複数ファイルリネームは中断します。"
+"'%s' という名前のファイルは既に存在します。複数ファイルリネームは中断します。"
 
-#: bulk_rename.c:346
+#: bulk_rename.c:382
 #, c-format
 msgid ""
 "Failed to rename '%s' as '%s':\n"
@@ -895,12 +933,12 @@ msgstr ""
 "%s\n"
 "複数ファイルリネームを中断します。"
 
-#: bulk_rename.c:408
+#: bulk_rename.c:444
 #, c-format
 msgid "A file called '%s' already exists"
 msgstr "'%s' は既に存在しています。"
 
-#: bulk_rename.c:419
+#: bulk_rename.c:455
 #, c-format
 msgid ""
 "Some of the New names contain / characters (eg '%s'). This will cause the "
@@ -909,7 +947,7 @@ msgstr ""
 "いくつかの'新しい名前'の中に / が含まれています (例えば  '%s')。これは、ファ"
 "イルが別のディレクトリに置かれることを意味しますが、処理を続けますか?"
 
-#: bulk_rename.c:434
+#: bulk_rename.c:470
 msgid "None of the names have changed. Nothing to do!"
 msgstr "いずれの名前も変更されませんでした。なにも行いませんでした。"
 
@@ -933,17 +971,17 @@ msgstr ""
 "に移動されました\n"
 "%s"
 
-#: dir.c:980
+#: dir.c:1041
 #, c-format
 msgid "Can't stat directory: %s"
 msgstr "ディレクトリの情報が得られません: %s"
 
-#: dir.c:989
+#: dir.c:1050
 #, c-format
 msgid "Can't open directory: %s"
 msgstr "ディレクトリを開けません: %s"
 
-#: display.c:629
+#: display.c:659
 #, c-format
 msgid "lstat(2) failed: %s"
 msgstr "lstat(2) 失敗: %s"
@@ -1202,51 +1240,51 @@ msgstr "シンボリックリンク -> "
 msgid "This filename is not valid UTF-8. You should rename it.\n"
 msgstr "不適切な UTF-8 のファイル名です。リネームしてください\n"
 
-#: filer.c:2684 menu.c:2008
+#: filer.c:2690 menu.c:2014
 msgid "Item no longer exists!"
 msgstr "アイテムは存在しません"
 
-#: filer.c:3411
+#: filer.c:3417
 msgid "Select display properties to save"
 msgstr "保存する表示属性の選択"
 
-#: filer.c:3415
+#: filer.c:3421
 msgid "<b>Save display settings for directory</b>"
 msgstr "<b>このディレクトリ表示設定の保存</b>"
 
-#: filer.c:3422
+#: filer.c:3428
 msgid "Select settings to save"
 msgstr "設定を保存する項目"
 
-#: filer.c:3429
+#: filer.c:3435
 msgid "Position"
 msgstr "位置"
 
-#: filer.c:3434 toolbar.c:133 toolbar.c:137 tips:39
+#: filer.c:3440 toolbar.c:133 toolbar.c:137 tips:39
 msgid "Size"
 msgstr "サイズ"
 
-#: filer.c:3439
+#: filer.c:3445
 msgid "Show hidden"
 msgstr "隠しファイルを表示"
 
-#: filer.c:3445
+#: filer.c:3451
 msgid "Display style"
 msgstr "表示スタイル"
 
-#: filer.c:3451
+#: filer.c:3457
 msgid "Sort type and order"
 msgstr "ソート方法と順序"
 
-#: filer.c:3456 toolbar.c:141
+#: filer.c:3462 toolbar.c:141
 msgid "Details"
 msgstr "詳細表示"
 
-#: filer.c:3461 tips:92 tips:93
+#: filer.c:3467 tips:92 tips:93
 msgid "Thumbnails"
 msgstr "サムネイル"
 
-#: filer.c:3467
+#: filer.c:3473
 msgid "Filter"
 msgstr "フィルタ"
 
@@ -1260,19 +1298,19 @@ msgstr "Not"
 
 #: find.c:552
 msgid "system"
-msgstr "システム"
+msgstr "system"
 
 #: find.c:560
 msgid "prune"
-msgstr "切り詰める"
+msgstr "prune"
 
 #: find.c:648
 msgid "After"
-msgstr "変更後"
+msgstr "After"
 
 #: find.c:650
 msgid "Before"
-msgstr "変更前"
+msgstr "Before"
 
 #: find.c:744
 msgid "IsReg"
@@ -1376,55 +1414,55 @@ msgstr "Gb"
 
 #: find.c:925
 msgid "Sec"
-msgstr "秒"
+msgstr "Sec"
 
 #: find.c:925
 msgid "Secs"
-msgstr "秒"
+msgstr "Secs"
 
 #: find.c:927
 msgid "Min"
-msgstr "分"
+msgstr "Min"
 
 #: find.c:927
 msgid "Mins"
-msgstr "分"
+msgstr "Mins"
 
 #: find.c:929
 msgid "Hour"
-msgstr "時"
+msgstr "Hour"
 
 #: find.c:929
 msgid "Hours"
-msgstr "時"
+msgstr "Hours"
 
 #: find.c:931
 msgid "Day"
-msgstr "日"
+msgstr "Day"
 
 #: find.c:931
 msgid "Days"
-msgstr "日"
+msgstr "Days"
 
 #: find.c:933
 msgid "Week"
-msgstr "週"
+msgstr "Week"
 
 #: find.c:933
 msgid "Weeks"
-msgstr "週"
+msgstr "Weeks"
 
 #: find.c:935
 msgid "Year"
-msgstr "年"
+msgstr "Year"
 
 #: find.c:935
 msgid "Years"
-msgstr "年"
+msgstr "Years"
 
 #: find.c:944
 msgid "Ago"
-msgstr "以前"
+msgstr "ago"
 
 #: find.c:946
 msgid "Hence"
@@ -1444,7 +1482,7 @@ msgstr "mtime"
 
 #: find.c:967
 msgid "size"
-msgstr "サイズ"
+msgstr "size"
 
 #: find.c:969
 msgid "inode"
@@ -1464,7 +1502,7 @@ msgstr "gid"
 
 #: find.c:977
 msgid "blocks"
-msgstr "ブロック"
+msgstr "blocks"
 
 #: gtksavebox.c:249
 msgid "Save As:"
@@ -1490,7 +1528,7 @@ msgstr ""
 "ディレクトリビューアにアイコンをドラッグ\n"
 "するか、フルパスを入力して下さい"
 
-#: gui_support.c:329
+#: gui_support.c:330
 msgid ""
 "\n"
 "---\n"
@@ -1498,14 +1536,14 @@ msgstr ""
 "\n"
 "---\n"
 
-#: gui_support.c:398
+#: gui_support.c:399
 #, c-format
 msgid "Attempt to read an XML file as a text file. File '%s' may be corrupted."
 msgstr ""
 "XML ファイルをテキストファイルとして読み込めません。ファイル '%s' は壊れてい"
 "ます。"
 
-#: gui_support.c:415
+#: gui_support.c:416
 #, c-format
 msgid ""
 "Error in '%s' file at line %d: \n"
@@ -1522,16 +1560,16 @@ msgstr ""
 "されるような操作を行う)。\n"
 "以降、エラーは無くなるでしょう。"
 
-#: gui_support.c:1007
+#: gui_support.c:1008
 msgid "Incorrect or missing line break in text/uri-list data"
 msgstr "text/uri-listデータの,不正又は不明な改行です"
 
-#: gui_support.c:1340
+#: gui_support.c:1341
 #, c-format
 msgid "Failed to open file '%s': %s"
 msgstr "'%s'のオープンに失敗しました : %s"
 
-#: gui_support.c:1384
+#: gui_support.c:1385
 #, c-format
 msgid ""
 "Failed to load image '%s': reason not known, probably a corrupt image file"
@@ -1539,7 +1577,7 @@ msgstr ""
 "イメージ '%s' を読み出せません:理由は不明ですが、恐らく壊れたファイルだと思わ"
 "れます。"
 
-#: gui_support.c:1435
+#: gui_support.c:1450
 #, c-format
 msgid ""
 "This program (%s) cannot be run, as the 0launch command is not available. It "
@@ -1652,7 +1690,7 @@ msgstr "削除出来るようにするには、先にアイテムをアンロッ
 msgid "You must open the menu over an item"
 msgstr "メニューはアイテムの上で開いてください"
 
-#: icon.c:712 menu.c:1281
+#: icon.c:712 menu.c:1285
 msgid "You can only set the run action for a regular file"
 msgstr "「対応アプリを設定」はファイルに対してのみ行えます"
 
@@ -1908,7 +1946,15 @@ msgstr "%s: %d 件"
 msgid "Item"
 msgstr "対象"
 
-#: main.c:94
+#: log.c:149
+msgid "Time"
+msgstr "日時"
+
+#: log.c:154
+msgid "Action"
+msgstr "操作"
+
+#: main.c:95
 msgid ""
 "Copyright (C) 2005 Thomas Leonard.\n"
 "ROX-Filer comes with ABSOLUTELY NO WARRANTY,\n"
@@ -1924,15 +1970,15 @@ msgstr ""
 "under the terms of the GNU General Public License.\n"
 "For more information about these matters, see the file named COPYING.\n"
 
-#: main.c:103
+#: main.c:104
 msgid "Try `ROX-Filer/AppRun --help' for more information.\n"
 msgstr "詳しくは `rox --help' で確認してください\n"
 
-#: main.c:106
+#: main.c:107
 msgid "Try `ROX-Filer/AppRun -h' for more information.\n"
 msgstr "詳しくは `rox -h' で確認してください\n"
 
-#: main.c:108
+#: main.c:109
 msgid ""
 "NOTE: Your system does not support long options - \n"
 "you must use the short versions instead.\n"
@@ -1942,7 +1988,7 @@ msgstr ""
 "ショートバージョンを使ってください\n"
 "\n"
 
-#: main.c:114
+#: main.c:115
 #, c-format
 msgid ""
 "Usage: ROX-Filer/AppRun [OPTION]... [FILE]...\n"
@@ -1999,7 +2045,7 @@ msgstr ""
 "バグ報告は %s まで.\n"
 "Home page (最新バージョンを置いてあります): http://rox.sourceforge.net/\n"
 
-#: main.c:236
+#: main.c:237
 msgid ""
 "We got a BadWindow error from the X server. This might be due to this GTK "
 "bug (during drag-and-drop?):\n"
@@ -2011,7 +2057,7 @@ msgstr ""
 "show_bug.cgi?id=152151\n"
 "再試行してみて下さい..."
 
-#: main.c:395
+#: main.c:400
 msgid ""
 "The -o argument is no longer used. You can turn on override redirect from "
 "the Options box instead."
@@ -2019,55 +2065,59 @@ msgstr ""
 " -o オプションは現在使われなくなりました(ウィンドウマネージャによるパネル制"
 "御)。  代わりにオプションボックスから設定可能です。"
 
-#: main.c:524
+#: main.c:529
 #, c-format
 msgid "Running as user '%s'"
 msgstr "ユーザ '%s' で実行"
 
-#: main.c:685
+#: main.c:690
 #, c-format
 msgid "Compiled with GTK version %s\n"
 msgstr "GTKバージョン %s でコンパイル\n"
 
-#: main.c:686
+#: main.c:691
 #, c-format
 msgid "Running with GTK version %d.%d.%d\n"
 msgstr "GTKバージョン %d.%d.%d で実行\n"
 
-#: main.c:690
+#: main.c:695
 msgid "features set at compile time"
 msgstr "機能はコンパイル時に設定します"
 
-#: main.c:691
+#: main.c:696
 msgid "Large File Support"
 msgstr "Large File サポート"
 
-#: main.c:698
+#: main.c:703
+msgid "Inotify support"
+msgstr "Inotify(ファイルシステム監視機能)サポート"
+
+#: main.c:710
 msgid "Dnotify support"
 msgstr "Dnotify(ディレクトリ通知機能)サポート"
 
-#: main.c:705
+#: main.c:717
 msgid "Binary compatibility"
 msgstr "バイナリ互換性"
 
-#: main.c:707
+#: main.c:719
 msgid "Yes (can run with older glibc versions)"
 msgstr "はい (より古いバージョンの glibc で実行可能)"
 
-#: main.c:709
+#: main.c:721
 msgid "No (apsymbols.h not found)"
 msgstr "いいえ (apsymbols.h がみつかりません)"
 
-#: main.c:713
+#: main.c:725
 msgid "Extended attribute support"
 msgstr "拡張属性サポート"
 
-#: main.c:864
+#: main.c:876
 #, c-format
 msgid "Unable to read '%s': %s"
 msgstr "'%s'を読み込めませんでした : %s"
 
-#: main.c:900
+#: main.c:918
 #, c-format
 msgid ""
 "Left-click to run %s.\n"
@@ -2224,7 +2274,7 @@ msgstr "新規作成"
 msgid "Blank file"
 msgstr "空のファイル"
 
-#: menu.c:240 tasklist.c:306
+#: menu.c:240 tasklist.c:309
 msgid "Window"
 msgstr "ウィンドウ"
 
@@ -2323,11 +2373,11 @@ msgstr ""
 msgid "Setting type not supported for some of these files"
 msgstr "設定されたタイプは選択されたファイル中の幾つかをサポートしていません。"
 
-#: menu.c:1093
+#: menu.c:1095
 msgid "_Relative link"
 msgstr "相対リンク(_R)"
 
-#: menu.c:1099
+#: menu.c:1101
 msgid ""
 "If on, the symlink will store the path from the symlink to the target file. "
 "Use this if the symlink and the target will be moved together.\n"
@@ -2339,42 +2389,42 @@ msgstr ""
 "'OFF'の場合,'/'からの絶対パスが保持されます。シンボリックリンクのみを\n"
 "移動し、ターゲットは移動しないような場合は'OFF'にして下さい。"
 
-#: menu.c:1169
+#: menu.c:1171
 msgid "New pathname is not absolute"
 msgstr "新パス名は絶対パスでは有りません"
 
-#: menu.c:1235
+#: menu.c:1239
 #, c-format
 msgid "Symlink from '%s' already exists. Replace it with a link to '%s'?"
 msgstr "'%s' のシンボリックリンクは既に存在します。置き換えますか?"
 
-#: menu.c:1241
+#: menu.c:1245
 msgid "_Replace"
 msgstr "置き換え(_R)"
 
-#: menu.c:1361 menu.c:1402 menu.c:1462
+#: menu.c:1365 menu.c:1406 menu.c:1468
 msgid "Create"
 msgstr "作成"
 
-#: menu.c:1362
+#: menu.c:1366
 msgid "NewDir"
 msgstr "新規ディレクトリ"
 
-#: menu.c:1376 menu.c:1382
+#: menu.c:1380 menu.c:1386
 #, c-format
 msgid "Error creating '%s': %s"
 msgstr "作成失敗 '%s': %s"
 
-#: menu.c:1403
+#: menu.c:1407
 msgid "NewFile"
 msgstr "新規ファイル"
 
-#: menu.c:1421
+#: menu.c:1425
 #, c-format
 msgid "Error creating file: could not find the template for %s"
 msgstr "ファイル作成失敗: %s 用のテンプレートが見つかりません。"
 
-#: menu.c:1492
+#: menu.c:1498
 #, c-format
 msgid ""
 "The `Send To' menu provides a quick way to send some files to an "
@@ -2404,7 +2454,7 @@ msgstr ""
 "と、その形式のファイルが選択されたときに表示されます。.group' は複数形式の"
 "ファイルが選択されたときに表示されます。"
 
-#: menu.c:1503
+#: menu.c:1509
 msgid ""
 "I'll show you your SendTo directory now; you should symlink (Ctrl+Shift "
 "drag) any applications you want into it."
@@ -2413,11 +2463,11 @@ msgstr ""
 "へ Ctrl+Shift+ ドラッグ & ドロップして下さい(シンボリックリンクを作成できま"
 "す)"
 
-#: menu.c:1506 menu.c:1546
+#: menu.c:1512 menu.c:1552
 msgid "Your CHOICESPATH variable setting prevents customisations - sorry."
 msgstr "環境変数 CHOICESPATH の設定がカスタマイズを妨げています．残念！"
 
-#: menu.c:1539
+#: menu.c:1545
 #, c-format
 msgid ""
 "Any files placed in your Templates directories will appear on the `New' "
@@ -2437,7 +2487,7 @@ msgstr ""
 "%s\n"
 "%s\n"
 
-#: menu.c:1544
+#: menu.c:1550
 msgid ""
 "I'll show you your Templates directory now; you should place any template "
 "files you want inside it."
@@ -2445,15 +2495,15 @@ msgstr ""
 "OK を押せばテンプレート・ディレクトリを開きます。登録したいテンプレートファイ"
 "ルをそこへコピーして下さい。"
 
-#: menu.c:1661
+#: menu.c:1667
 msgid "Customise"
 msgstr "カスタマイズ"
 
-#: menu.c:1734
+#: menu.c:1740
 msgid "This is already the canonical name for this directory."
 msgstr "これは、このディレクトリの規範的な名称です。"
 
-#: menu.c:1765
+#: menu.c:1771
 msgid ""
 "You can't open a second view onto this directory because the `Unique "
 "Windows' option is turned on in the Options window."
@@ -2461,71 +2511,71 @@ msgstr ""
 "このディレクトリのウィンドウをもうひとつ開くことはできません。オプション設定"
 "で `重複したウィンドウを開かない'オプションが有効になっています。"
 
-#: menu.c:1891
+#: menu.c:1897
 msgid "Copy ... ?"
 msgstr "どれをコピー?"
 
-#: menu.c:1894
+#: menu.c:1900
 msgid "Rename ... ?"
 msgstr "どれをリネーム?"
 
-#: menu.c:1897
+#: menu.c:1903
 msgid "Symlink ... ?"
 msgstr "どれをシンボリックリンク?"
 
-#: menu.c:1900
+#: menu.c:1906
 msgid "Shift Open ... ?"
 msgstr "どれを［Shift］+で開く?"
 
-#: menu.c:1903
+#: menu.c:1909
 msgid "Properties of ... ?"
 msgstr "どれのプロパティを...?"
 
-#: menu.c:1906
+#: menu.c:1912
 msgid "Set type of ... ?"
 msgstr "どれの MIME 形式を...?"
 
-#: menu.c:1909
+#: menu.c:1915
 msgid "Set run action for ... ?"
 msgstr "どれに対応アプリを設定...?"
 
-#: menu.c:1912
+#: menu.c:1918
 msgid "Set icon for ... ?"
 msgstr "どれにアイコンを設定?"
 
-#: menu.c:1915
+#: menu.c:1921
 msgid "Send ... to ... ?"
 msgstr "どれをアプリに送る?"
 
-#: menu.c:1918
+#: menu.c:1924
 msgid "DELETE ... ?"
 msgstr "どれを削除する?"
 
-#: menu.c:1921
+#: menu.c:1927
 msgid "Count the size of ... ?"
 msgstr "どれの容量を計算する?"
 
-#: menu.c:1924
+#: menu.c:1930
 msgid "Set permissions on ... ?"
 msgstr "どれのパーミッションを設定?"
 
-#: menu.c:1927
+#: menu.c:1933
 msgid "Search inside ... ?"
 msgstr "どれを検索?"
 
-#: menu.c:1991
+#: menu.c:1997
 msgid "You cannot do this to more than one item at a time"
 msgstr "複数アイテムに同時にこの処理を行うことはできません"
 
-#: menu.c:2023
+#: menu.c:2029
 msgid "Rename"
 msgstr "リネーム"
 
-#: menu.c:2028
+#: menu.c:2034
 msgid "Symlink"
 msgstr "シンボリックリンク"
 
-#: menu.c:2057
+#: menu.c:2063
 msgid ""
 "User-definable shortcuts are disabled by default in Gtk2, and you have not "
 "enabled them. You can turn this feature on by:\n"
@@ -2543,15 +2593,15 @@ msgstr ""
 "\n"
 "1) ROX-Session、gnome-settings-daemon などの XSettings manager を使用する\n"
 "\n"
-"あるいは\n"
+"あるいは (こちらがおすすめ)、\n"
 "\n"
-"2) ~/.gtkrc-2.0 に以下の記述を加える(無ければ作成する):\n"
+"2) ~/.gtkrc-2.0 (無ければ新規作成し) に以下の記述を加える:\n"
 " \tgtk-can-change-accels = 1\n"
 "\n"
 "※ ショートカット設定を有効にするには、上記の設定終了後 rox のウィンドウ、パネ"
 "ル、ピンボードを一旦すべて終了する必要が有ります"
 
-#: menu.c:2068
+#: menu.c:2074
 msgid ""
 "To set a keyboard short-cut for a menu item:\n"
 "\n"
@@ -2571,7 +2621,7 @@ msgstr ""
 "設定したショートカットはメニュー項目の横に表示され、以後はメニューを開かなく"
 "てもショートカットキーにより、その機能を呼び出せます。"
 
-#: menu.c:2083
+#: menu.c:2089
 msgid "Set keyboard shortcuts"
 msgstr "キーボードショートカットを設定"
 
@@ -2718,7 +2768,7 @@ msgstr "'%s' を保存できません"
 msgid "Your old panel file has been converted to the new XML format."
 msgstr "今までのパネル設定ファイルは新規 XML 形式に変換されました。"
 
-#: panel.c:636
+#: panel.c:637
 msgid ""
 "You have tried to close a panel via the window manager - I usually find that "
 "this is accidental... really close?"
@@ -2726,20 +2776,20 @@ msgstr ""
 "おそらく何かのアクシデントと思われますが、ウィンドウマネージャがパネルを閉じ"
 "ようとしています。 ...本当に閉じますか?"
 
-#: panel.c:737
+#: panel.c:738
 msgid "Missing < or > in panel config file"
 msgstr "パネル設定ファイル内で '<' 又は '>' が、欠けています"
 
-#: panel.c:1620
+#: panel.c:1610
 #, c-format
 msgid "Error saving panel %s: %s"
 msgstr "パネル %s を保存できません: %s"
 
-#: panel.c:1935
+#: panel.c:1925
 msgid "Applet quit without ever creating a widget!"
 msgstr "アプレットはウィジェットを作成せずに終了されました!"
 
-#: panel.c:2031
+#: panel.c:2021
 #, c-format
 msgid ""
 "Error running applet:\n"
@@ -2748,44 +2798,44 @@ msgstr ""
 "アプレットの実行エラー:\n"
 "%s"
 
-#: panel.c:2656
+#: panel.c:2646
 msgid "Are you sure you want to remove this panel from the desktop?"
 msgstr "本当にこのパネルをデスクトップから取り除きますか?"
 
-#: panel.c:2659 panel.c:2686
+#: panel.c:2649 panel.c:2676
 msgid "Remove Panel"
 msgstr "パネルを削除"
 
-#: panel.c:2682
+#: panel.c:2672
 msgid "Panel Options..."
 msgstr "パネル・オプション..."
 
-#: panel.c:2767
+#: panel.c:2757
 #, c-format
 msgid "Xinerama monitor %d unavailable"
 msgstr "Xinerama モニタ %d は利用できません"
 
-#: panel.c:2797
+#: panel.c:2787
 msgid "Top"
 msgstr "上端"
 
-#: panel.c:2799
+#: panel.c:2789
 msgid "Bottom"
 msgstr "下端"
 
-#: panel.c:2801
+#: panel.c:2791
 msgid "Left"
 msgstr "左端"
 
-#: panel.c:2803
+#: panel.c:2793
 msgid "Right"
 msgstr "右端"
 
-#: panel.c:2805
+#: panel.c:2795
 msgid "Default"
 msgstr "デフォルト"
 
-#: panel.c:2809
+#: panel.c:2799
 msgid "Unknown side"
 msgstr "不明な端部"
 
@@ -2897,28 +2947,28 @@ msgid ""
 msgstr ""
 "画像ファイル(または特定のアプリケーション)だけが背景に設定できます。 image."
 
-#: pinboard.c:1570
+#: pinboard.c:1602
 msgid "Missing '>' in icon label"
 msgstr "アイコン名に '>' が見つかりません"
 
-#: pinboard.c:1579
+#: pinboard.c:1611
 msgid "Missing ',' after icon label"
 msgstr "アイコン名の後に ',' が見つかりません"
 
-#: pinboard.c:1667
+#: pinboard.c:1699
 #, c-format
 msgid "Error saving pinboard %s: %s"
 msgstr "ピンボード %s の保存に失敗: %s"
 
-#: pinboard.c:2212
+#: pinboard.c:2244
 msgid "Backdrop..."
 msgstr "背景を設定"
 
-#: pinboard.c:2215
+#: pinboard.c:2247
 msgid "Add Panel"
 msgstr "パネルを追加"
 
-#: pinboard.c:2309
+#: pinboard.c:2341
 #, c-format
 msgid ""
 "Error loading backdrop image:\n"
@@ -2929,7 +2979,7 @@ msgstr ""
 "%s\n"
 "背景は削除されました。"
 
-#: pixmaps.c:976
+#: pixmaps.c:969
 #, c-format
 msgid ""
 "Can't delete thumbnails in %s:\n"
@@ -2938,11 +2988,11 @@ msgstr ""
 "%s のサムネイルを削除できません:\n"
 "%s"
 
-#: pixmaps.c:997
+#: pixmaps.c:990
 msgid "There are no thumbnails to delete"
 msgstr "削除するサムネイルはありません"
 
-#: pixmaps.c:1010
+#: pixmaps.c:1003
 msgid "Purge thumbnails disk cache"
 msgstr "サムネイルのキャッシュを削除"
 
@@ -4310,8 +4360,11 @@ msgstr "マウント コマンド"
 #: tips:188
 msgid "The command used to mount a filesystem. If unsure, use \"mount\"."
 msgstr ""
-"ファイルシステムのマウントを行うコマンドです。よく分からない場合は \"mount\" "
-"コマンドを利用してください。"
+"ファイルシステムのマウントを行うコマンドです。\n"
+"一般ユーザーでリムーバブルメディアを扱う時は、\n"
+"pmount がおすすめです。\n"
+"よく分からない場合は \"mount\" コマンドを利用\n"
+"してください。"
 
 #: tips:189
 msgid "Unmount command"
@@ -4322,8 +4375,11 @@ msgid ""
 "The command used to unmount a filesystem. If unsure, use \"umount\" (yes, "
 "without the first \"n\")."
 msgstr ""
-"ファイルシステムのアンマウントを行うコマンドです。よく分からない場合は "
-"\"umount\" コマンドを利用してください。(u \"n\" mount ではないですよ)。"
+"ファイルシステムのアンマウントを行うコマンドです。\n"
+"一般ユーザーでリムーバブルメディアを扱う時は、\n"
+"pumount がおすすめです。\n"
+"よく分からない場合は \"umount\" コマンドを利用して\n"
+"ください。(u \"n\" mount ではないですよ)。"
 
 #: tips:191
 msgid "Eject command"
@@ -4547,7 +4603,7 @@ msgstr "ディレクトリ:"
 
 #: tips:239
 msgid "Regular file:"
-msgstr "一般ファイル:"
+msgstr "通常ファイル:"
 
 #: tips:240
 msgid "Pipe:"
@@ -4663,9 +4719,9 @@ msgid ""
 "panel stays above other windows against your wishes. Requires a restart to "
 "take effect."
 msgstr ""
-"パネルを画面の縁に確実に密着させます。"
-"パネルに隠されウィンドウが操作できなくなるような事が有る場合は、このオプショ"
-"ンを'OFF'にして下さい。有効にするには再起動が必要です"
+"パネルを画面の縁に確実に密着させます。パネルに隠されウィンドウが操作できなく"
+"なるような事が有る場合は、このオプションを'OFF'にして下さい。有効にするには再"
+"起動が必要です"
 
 #: tips:261
 msgid "Panel stays on top"
@@ -4677,9 +4733,9 @@ msgid ""
 "dock option works correctly in some versions of compiz. May require a "
 "restart to take effect."
 msgstr ""
-"パネルが常にウィンドウより上に来るようにします。このオプションを 'ON' にする事で、"
-"compiz の幾つかのバージョンにおいても 'パネルを dock として扱う' オプションが正しく機能するように出来ます。"
-"有効にするには再起動が必要です"
+"パネルが常にウィンドウより上に来るようにします。このオプションを 'ON' にする"
+"事で、compiz の幾つかのバージョンにおいても 'パネルを dock として扱う' オプ"
+"ションが正しく機能するように出来ます。有効にするには再起動が必要です"
 
 #: tips:263
 msgid "Drag and drop"
@@ -4726,7 +4782,7 @@ msgstr "ROX-Filer ログビュワー"
 
 #: ../Templates.glade:22
 msgid "Recently performed actions..."
-msgstr "最近実行したアクション"
+msgstr "最近実行された操作"
 
 #: ../Templates.glade:77
 msgid "Open Directory"
@@ -4835,16 +4891,3 @@ msgstr "上端"
 #: ../Templates.glade:496
 msgid "<b>Position</b>"
 msgstr "<b>位置</b>"
-
-#~ msgid ""
-#~ "Failed to create symlink '%s':\n"
-#~ "%s\n"
-#~ "\n"
-#~ "(this may mean that %s already exists as a link to an invalid directory; "
-#~ "try deleting it)"
-#~ msgstr ""
-#~ "シンボリックリンク '%s' を作成できませんでした:\n"
-#~ "%s\n"
-#~ "\n"
-#~ "(%s が既に無効なディレクトリへのリンクとして存在しているのかもしれません; "
-#~ "- そうなら、削除後再試行して下さい。)"

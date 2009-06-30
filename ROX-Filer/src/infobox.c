@@ -45,6 +45,7 @@
 #include "mount.h"
 #include "pixmaps.h"
 #include "xtypes.h"
+#include "filer.h"
 
 typedef struct _FileStatus FileStatus;
 
@@ -83,6 +84,7 @@ static GtkWidget *make_about(const guchar *path, XMLwrapper *ai);
 static GtkWidget *make_about_desktop(const gchar *path);
 static GtkWidget *make_file_says(const guchar *path);
 static GtkWidget *make_permissions(const gchar *path, DirItem *item);
+static GtkWidget *make_unmount_options(const gchar *path);
 static void add_file_output(FileStatus *fs,
 			    gint source, GdkInputCondition condition);
 static const gchar *pretty_type(DirItem *file, const guchar *path);
@@ -302,6 +304,15 @@ static GtkWidget *make_vbox(const guchar *path, GObject *window)
 		gtk_box_pack_start(vbox, label, FALSE, TRUE, 2);
 
 		gtk_box_pack_start_defaults(vbox, make_file_says(path));
+	}
+	else if (item->flags & ITEM_FLAG_MOUNT_POINT)
+	{
+		label = gtk_label_new(NULL);
+		gtk_label_set_markup(GTK_LABEL(label),
+				     _("<b>When all directories are closed</b>"));
+		gtk_misc_set_alignment(GTK_MISC(label), 0, 1);
+		gtk_box_pack_start(vbox, label, FALSE, TRUE, 2);
+	    gtk_box_pack_start(vbox, make_unmount_options(path), FALSE, TRUE, 0);
 	}
 
 	if (ai)
@@ -950,10 +961,13 @@ static GtkWidget *make_permissions(const gchar *path, DirItem *item)
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 3, 4);
 
 	label = gtk_label_new(_("Read"));
+	gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 0, 1);
 	label = gtk_label_new(_("Write"));
+	gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 2, 3, 0, 1);
 	label = gtk_label_new(_("Exec"));
+	gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 3, 4, 0, 1);
 
 	for (i = 0; i < 9; i++)
@@ -996,6 +1010,58 @@ static GtkWidget *make_permissions(const gchar *path, DirItem *item)
 			
 	gtk_widget_show_all(table);
 	return table;
+}
+
+static void unmount_option_toggled(GtkToggleButton *toggle, const char *path)
+{
+    if (gtk_toggle_button_get_active(toggle))
+    {
+        filer_set_unmount_action(path,
+                GPOINTER_TO_INT(g_object_get_data(G_OBJECT(toggle),
+                        "unmount_action")));
+    }
+}
+
+static GtkWidget *pack_unmount_radio(const char *path,
+        UnmountPrompt path_value, const char *label,
+        UnmountPrompt btn_value, GtkWidget *group_owner, GtkWidget *hbox)
+{
+    GtkWidget *radio;
+    
+    if (group_owner)
+    {
+        radio = gtk_radio_button_new_with_label_from_widget(
+                GTK_RADIO_BUTTON(group_owner), label);
+    }
+    else
+    {
+        radio = gtk_radio_button_new_with_label(NULL, label);
+    }
+    if (path_value == btn_value)
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio), TRUE);
+    g_object_set_data(G_OBJECT(radio), "unmount_action",
+            GINT_TO_POINTER(btn_value));
+    g_signal_connect(radio, "toggled", G_CALLBACK(unmount_option_toggled),
+            (gpointer) path);
+    gtk_box_pack_start(GTK_BOX(hbox), radio, FALSE, FALSE, 0);
+    return radio;
+}
+
+static GtkWidget *make_unmount_options(const char *path)
+{
+    GtkWidget *hbox, *radio;
+    UnmountPrompt upval = filer_get_unmount_action(path);
+    
+    hbox = gtk_hbox_new(TRUE, 4);
+    radio = pack_unmount_radio(path, upval,
+            _("Do nothing"), UNMOUNT_PROMPT_NO_CHANGE, NULL, hbox);
+    radio = pack_unmount_radio(path, upval,
+            _("Unmount"), UNMOUNT_PROMPT_UNMOUNT, radio, hbox);
+    radio = pack_unmount_radio(path, upval,
+            _("Eject"), UNMOUNT_PROMPT_EJECT, radio, hbox);
+    pack_unmount_radio(path, upval,
+            _("Ask"), UNMOUNT_PROMPT_ASK, radio, hbox);
+    return hbox;
 }
 
 /* Don't g_free() the result */
