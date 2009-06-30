@@ -406,6 +406,83 @@ void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 	on_child_death(child, (CallbackFn) thumbnail_child_done, info);
 }
 
+/*
+ * Return the thumbnail for a file, only if available.  If the
+ * can_load flags is set this includes loading from the cache, otherwise
+ * only if already in memory
+ */
+MaskedPixmap *pixmap_try_thumb(const gchar *path, gboolean can_load)
+{
+	gboolean	found;
+	MaskedPixmap	*image;
+	GdkPixbuf	*pixbuf;
+  
+	image = g_fscache_lookup_full(pixmap_cache, path,
+					FSCACHE_LOOKUP_ONLY_NEW, &found);
+
+	if (found)
+	{
+		/* Thumbnail is known, or being created */
+		if (image)
+			return image;
+	}
+
+	if(!can_load)
+		return NULL;
+	
+	pixbuf = get_thumbnail_for(path);
+	
+	if (!pixbuf)
+	{
+		struct stat info1, info2;
+		char *dir;
+		
+		/* Skip zero-byte files. They're either empty, or
+		 * special (may cause us to hang, e.g. /proc/kmsg). */
+		if (mc_stat(path, &info1) == 0 && info1.st_size == 0) {
+			return NULL;
+		}
+
+		dir = g_path_get_dirname(path);
+		
+		/* If the image itself is in ~/.thumbnails, load it now
+		 * (ie, don't create thumbnails for thumbnails!).
+		 */
+		if (mc_stat(dir, &info1) != 0)
+		{
+			g_free(dir);
+			return NULL;
+		}
+		g_free(dir);
+
+		if (mc_stat(make_path(home_dir, ".thumbnails/normal"),
+			    &info2) == 0 &&
+			    info1.st_dev == info2.st_dev &&
+			    info1.st_ino == info2.st_ino)
+		{
+			pixbuf = rox_pixbuf_new_from_file_at_scale(path,
+					PIXMAP_THUMB_SIZE, PIXMAP_THUMB_SIZE,
+								   TRUE, NULL);
+			if (!pixbuf)
+			{
+				return NULL;
+			}
+		}
+	}
+		
+	if (pixbuf)
+	{
+		MaskedPixmap *image;
+
+		image = masked_pixmap_new(pixbuf);
+		gdk_pixbuf_unref(pixbuf);
+		g_fscache_insert(pixmap_cache, path, image, TRUE);
+		return image;
+	}
+
+	return NULL;
+}
+
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
