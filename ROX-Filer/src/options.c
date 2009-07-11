@@ -1554,7 +1554,7 @@ static GList *build_numentry(Option *option, xmlNode *node, guchar *label)
 	max = get_int(node, "max");
 	step = MAX(1, get_int(node, "step"));
 
-	adj = gtk_adjustment_new(min, min, max, step, step * 10, 1);
+	adj = gtk_adjustment_new(min, min, max, step, step * 10, 0);
 
 	return build_numentry_base(option, node, label, GTK_ADJUSTMENT(adj));
 }
