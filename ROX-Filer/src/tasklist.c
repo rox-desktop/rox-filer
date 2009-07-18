@@ -73,8 +73,6 @@ static GdkAtom xa__NET_CLIENT_LIST = GDK_NONE;
 static GdkAtom xa__NET_WM_ICON_GEOMETRY = GDK_NONE;
 static GdkAtom xa__NET_WM_STATE = GDK_NONE;
 static GdkAtom xa__NET_WM_STATE_HIDDEN = GDK_NONE;
-static GdkAtom xa__NET_WM_DESKTOP = GDK_NONE;
-static GdkAtom xa__NET_CURRENT_DESKTOP = GDK_NONE;
 static GdkAtom xa__NET_DESKTOP_GEOMETRY = GDK_NONE;
 static GdkAtom xa__NET_DESKTOP_VIEWPORT = GDK_NONE;
 
@@ -143,8 +141,6 @@ void tasklist_set_active(gboolean active)
 		xa__NET_WM_STATE = gdk_atom_intern("_NET_WM_STATE", FALSE);
 		xa__NET_WM_STATE_HIDDEN =
 			gdk_atom_intern("_NET_WM_STATE_HIDDEN", FALSE);
-		xa__NET_WM_DESKTOP = gdk_atom_intern("_NET_WM_DESKTOP", FALSE);
-		xa__NET_CURRENT_DESKTOP = gdk_atom_intern("_NET_CURRENT_DESKTOP", FALSE);
 		xa__NET_DESKTOP_GEOMETRY = gdk_atom_intern("_NET_DESKTOP_GEOMETRY", FALSE);
 		xa__NET_DESKTOP_VIEWPORT = gdk_atom_intern("_NET_DESKTOP_VIEWPORT", FALSE);
 

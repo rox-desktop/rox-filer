@@ -319,6 +319,7 @@ xterm -e wget $1</entry>
       <toggle name='blackbox_hack' label='Blackbox root menus hack'>Blackbox, Fluxbox and similar window managers do not yet work well with the ROX-Filer pinboard. This option enables some workarounds. These window managers are expected to change their behaviour in new versions so that this isn't necessary.</toggle>
       <toggle name='panel_is_dock' label="Panel is a 'dock'">Makes sure panels stay against screen edges. Disable this option if the panel stays above other windows against your wishes. Requires a restart to take effect.</toggle>
       <toggle name='panel_on_top' label="Panel stays on top">Keeps the panel above other windows. Enable this option to make sure the dock option works correctly in some versions of compiz. May require a restart to take effect.</toggle>
+      <toggle name='panel_obey_workarea' label="Panel confined to work area">Keeps the panel confined to the work area specified by the Extended Window Manager Specification. Applies to new panels.</toggle>
     </frame>
     <frame label='Drag and drop'>
       <toggle name='dnd_no_hostnames' label="Don't use hostnames">Some older applications don't support XDND fully and may need to have this option turned on. Use this if dragging files to an application shows a + sign on the pointer but the drop doesn't work.</toggle>

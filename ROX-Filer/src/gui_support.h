@@ -23,6 +23,12 @@ typedef struct _Radios Radios;
 extern GdkFont	   	*fixed_font;
 extern gint		screen_width, screen_height;
 
+/* Useful atoms (set by gui_support_init()) */ 
+extern GdkAtom xa__NET_WORKAREA;
+extern GdkAtom xa__NET_WM_DESKTOP;
+extern GdkAtom xa__NET_CURRENT_DESKTOP;
+extern GdkAtom xa__NET_NUMBER_OF_DESKTOPS;
+
 /* For Xinerama */
 extern gint		n_monitors;
 extern GdkRectangle	*monitor_geom;
@@ -45,6 +51,11 @@ int get_choice(const char *title,
 void report_error(const char *message, ...);
 void info_message(const char *message, ...);
 void set_cardinal_property(GdkWindow *window, GdkAtom prop, gulong value);
+gboolean get_cardinal_property(GdkWindow *window, GdkAtom prop, gulong length,
+                               gulong *data, gint *actual_length);
+int get_current_desktop(void);
+int get_number_of_desktops(void);
+void get_work_area(int *x, int *y, int *width, int *height); 
 void make_panel_window(GtkWidget *widget);
 void delayed_error(const char *error, ...);
 gboolean load_file(const char *pathname, char **data_out, long *length_out);
