@@ -6,6 +6,22 @@
 * log message with the commit and I'll update this file only when making a new
 * release.
 
+Release 2.10 (2009-07-18)
+
+- Added "Don't ask..." to may_offer_unmount() (Tony Houghton).
+
+- Update japanese trancslation (heroaki_TANAKA)
+
+- Applied Bernard Jungen's patch and suggestion (Tony Houghton):
+  - _() i18n wrappers for new infobox buttons.
+  - Don't save learnt mount points with default of "ASK".
+  - Use GPOINTER_TO_INT(NULL) instead of assuming 0.
+
+- New options in mount point Properties dialog (Tony Houghton):
+  What action to take when all a mount point's windows are closed.
+
+- Left align permissions labels in Properties (Tony Houghton).
+
 Release 2.9 (2009-05-10)
 
 - ROX-Filer didn't compile without inotify support. dnotify_fd_to_dir
