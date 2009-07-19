@@ -264,6 +264,7 @@ void pixmap_make_small(MaskedPixmap *mp)
  */
 void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 {
+	gboolean	found;
 	MaskedPixmap	*image;
 	pid_t		child;
 	ChildThumbnail	*info;
@@ -273,6 +274,17 @@ void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 	image = pixmap_try_thumb(path, TRUE);
 
 	if (image)
+	{
+		/* Thumbnail loaded */
+		callback(data, path);
+		return;
+	}
+
+	/* Is it currently being created? */
+	image = g_fscache_lookup_full(pixmap_cache, path,
+					FSCACHE_LOOKUP_ONLY_NEW, &found);
+
+	if (found)
 	{
 		/* Thumbnail is known, or being created */
 		if (image)
