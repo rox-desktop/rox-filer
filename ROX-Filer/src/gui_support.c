@@ -1130,9 +1130,13 @@ GList *uri_list_to_glist(const char *uri_list)
 
 		if (!linebreak || linebreak[1] != 10)
 		{
-			delayed_error("uri_list_to_glist: %s",
+			g_warning("uri_list_to_glist: %s",
 					_("Incorrect or missing line "
 					  "break in text/uri-list data"));
+			/* If this is the first, append it anyway (Firefox
+			 * 3.5) */
+			if (!list && uri_list[0] != '#')
+				list = g_list_append(list, g_strdup(uri_list));
 			return list;
 		}
 
