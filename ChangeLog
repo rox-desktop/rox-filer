@@ -1,5 +1,17 @@
 2009-10-02  Alexander Larsson  <alexl@redhat.com>
 
+	* src/xdgmimecache.c: (cache_glob_lookup_literal),
+	(cache_glob_lookup_fnmatch), (cache_glob_node_lookup_suffix),
+	(cache_glob_lookup_suffix), (ascii_tolower),
+	(cache_glob_lookup_file_name):
+	* src/xdgmimeglob.c: (_xdg_glob_list_append),
+	(_xdg_glob_hash_insert_ucs4), (_xdg_glob_hash_insert_text),
+	(_xdg_glob_hash_node_lookup_file_name), (ascii_tolower),
+	(_xdg_glob_hash_lookup_file_name), (_xdg_glob_hash_append_glob):
+	Support the case-sensitive attribute
+
+2009-10-02  Alexander Larsson  <alexl@redhat.com>
+
 	* src/xdgmimecache.c: (_xdg_mime_cache_new_from_file):
 	Support reading cache files with minor number 2
 
