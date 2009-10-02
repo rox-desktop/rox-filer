@@ -72,11 +72,13 @@
 #endif
 
 #define MAJOR_VERSION 1
-#define MINOR_VERSION 1
+#define MINOR_VERSION_MIN 1
+#define MINOR_VERSION_MAX 2
 
 struct _XdgMimeCache
 {
   int ref_count;
+  int minor;
 
   size_t  size;
   char   *buffer;
@@ -115,6 +117,7 @@ _xdg_mime_cache_new_from_file (const char *file_name)
   int fd = -1;
   struct stat st;
   char *buffer = NULL;
+  int minor;
 
   /* Open the file and map it into memory */
   fd = open (file_name, O_RDONLY|_O_BINARY, 0);
@@ -130,9 +133,11 @@ _xdg_mime_cache_new_from_file (const char *file_name)
   if (buffer == MAP_FAILED)
     goto done;
 
+  minor = GET_UINT16 (buffer, 2);
   /* Verify version */
   if (GET_UINT16 (buffer, 0) != MAJOR_VERSION ||
-      GET_UINT16 (buffer, 2) != MINOR_VERSION)
+      (minor < MINOR_VERSION_MIN ||
+       minor > MINOR_VERSION_MAX))
     {
       munmap (buffer, st.st_size);
 
@@ -140,6 +145,7 @@ _xdg_mime_cache_new_from_file (const char *file_name)
     }
   
   cache = (XdgMimeCache *) malloc (sizeof (XdgMimeCache));
+  cache->minor = minor;
   cache->ref_count = 1;
   cache->buffer = buffer;
   cache->size = st.st_size;
