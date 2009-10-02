@@ -1,5 +1,12 @@
 2009-10-02  Alexander Larsson  <alexl@redhat.com>
 
+	* src/xdgmime.c: (xdg_mime_get_icon):
+	* src/xdgmimecache.c: (_xdg_mime_cache_get_icon):
+	Fix mime lookup order, imported from glib copy.
+	Fixes gnome bug #555711
+
+2009-10-02  Alexander Larsson  <alexl@redhat.com>
+
 	* src/xdgmimecache.c: (cache_magic_matchlet_compare_to_data):
 	Use correct bounds check for magic ranges
 

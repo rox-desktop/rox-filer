@@ -906,19 +906,12 @@ xdg_mime_remove_callback (int callback_id)
 const char *
 xdg_mime_get_icon (const char *mime)
 {
-  const char *icon;
-
   xdg_mime_init ();
   
   if (_caches)
     return _xdg_mime_cache_get_icon (mime);
 
-  icon = _xdg_mime_icon_list_lookup (icon_list, mime);
-
-  if (!icon)
-    icon = xdg_mime_get_generic_icon (mime);
-
-  return icon;
+  return _xdg_mime_icon_list_lookup (icon_list, mime);
 }
 
 const char *
