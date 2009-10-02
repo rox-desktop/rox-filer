@@ -1,5 +1,10 @@
 2009-10-02  Alexander Larsson  <alexl@redhat.com>
 
+	* src/xdgmimecache.c: (cache_magic_matchlet_compare_to_data):
+	Use correct bounds check for magic ranges
+
+2009-10-02  Alexander Larsson  <alexl@redhat.com>
+
 	* src/xdgmimecache.c: (cache_glob_lookup_literal),
 	(cache_glob_lookup_fnmatch), (cache_glob_node_lookup_suffix),
 	(cache_glob_lookup_suffix), (ascii_tolower),
