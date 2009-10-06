@@ -412,7 +412,6 @@ _xdg_glob_hash_lookup_file_name (XdgGlobHash *glob_hash,
   int n_mimes = 10;
   int len;
   char *lower_case;
-  int try_lower_case;
 
   /* First, check the literals */
 
