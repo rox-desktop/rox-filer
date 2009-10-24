@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: rox-filer-2.9 galego\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-09-16 08:51+0200\n"
-"PO-Revision-Date: 2009-09-16 18:14+0100\n"
+"PO-Revision-Date: 2009-10-22 19:59+0100\n"
 "Last-Translator: Miguel Anxo Bouzada <mbouzada@gmail.com>\n"
 "Language-Team: Galician <proxecto@trasno.net>\n"
 "MIME-Version: 1.0\n"
@@ -53,7 +53,7 @@ msgstr "Vexa a páxina do manual fsattr(5) para máis detalles."
 
 #: action.c:61
 msgid "You do not appear to have OS support."
-msgstr "Parece que non ten soporte para S.O."
+msgstr "Parece que non ten compatibilidade para S.O."
 
 #: action.c:191
 msgid "Find expression reference"
@@ -156,23 +156,25 @@ msgid ""
 "\n"
 "See the chmod(1) man page for full details."
 msgstr ""
-"Normalmente debe seleccionar unha orde do menú (prema na frecha\n"
-"ao lado da caixa de ordenes),As veces pode precisar mais...\n"
+"Normalmente é abondo con seleccionar unha opción do menú despregable,\n"
+"pero as veces necesitase precisar un pouco máis...\n"
 "\n"
-"O formato dunha orde é <b>CHANGE,CHANGE,...</b>\n"
-"Cada <b>Change</b> é unha combinación de <b>u</b>, <b>g<b>, <b>o</b> que determina\n"
-"<b>+</b>,<b>-</b> ou <b>-</b> para engadir, quitar ou manter permisos.\n"
-"<b>PERMISOS</b> son combinacións das letras<rwxXstugo</b>\n"
+"O formato de unha orde é <b>CAMBIO,CAMBIO,...</b>\n"
+"Cada <b>CAMBIO</b> é: <b>QUEN COMO PERMISOS</b>\n"
+"<b>QUEN</b> é algunha combinación de <b>u</b>, <b>g</b>, <b>o</b> que determina se se van a\n"
+"cambiar os permisos para O Usuario (propietario), Grupo ou Outros.\n"
+"<b>COMO</b> é <b>+</b>,<b>-</b> o <b>-</b> para engadir, quitar ou manter permisos.\n"
+"<b>PERMISOS</b> son combinacións das letras <b>rwxXstugo</b>\n"
 "\n"
-"Ignoranse os textos en branco e os espazos\n"
+"Os textos entre parénteses e os espazos son ignorados\n"
 "<u>Exemplos</u>\n"
 "<b>u+rw</b>: concede permisos de lectura e escritura ao propietario\n"
-"<b>g=u</b>: os permisos para grupo son os mesmos que os de usuario's\n"
-"<b>o=u-w</b>: outros teñen os mesmos permisos que o propietario agás o de escritura\n"
-"<b>a+x</b>: <b>a</b>Permisos de aceso/execución - o mesmo que <b>ugo+x</b>\n"
-"<b>a+X</b>: os directorios fanse accesibles para todos; os ficheiros fanse executables por todos\n"
-"<b>u+rw, go+r</b>: duas ordenes a vez!\n"
-"<b>u+s</b>: poñer o bit  SetUID - normalmente non ten efecto en ficheiros de escritura\n"
+"<b>g=u</b>: os permisos para grupo son os mesmos que os de usuario(s)\n"
+"<b>o=u-w</b>: outros teñen os mesmos permisos que o propietario menos o de escritura\n"
+"<b>a+x</b>: <b>a</b>Permisos de acceso/execución - o mesmo que <b>ugo+x</b>\n"
+"<b>a+X</b>: os directorios fanse accesibles para todos; os ficheiros fanse executables para todos\n"
+"<b>u+rw, go+r</b>: duas ordes á vez!\n"
+"<b>u+s</b>: poñer o bit SetUID - normalmente non ten efeto en ficheiros de escritura\n"
 "<b>755</b>: configura permisos directamente\n"
 "\n"
 "Vexa a páxina de axuda (man) chmod(1) para ver máis detalles."
@@ -200,13 +202,13 @@ msgstr ""
 "buscando un patrón  no seu nome. Para cambiar o tipo do ficheiro\n"
 "ten que renomeá-lo.\n"
 "\n"
-"Algúns sistemas novos de ficheiros poden soportar algo chamado 'Atributos\n"
-"Estendidos' que poden ser usados para gardar datos adicionais de\n"
-"cada ficheiro como parámetros nomeados. «ROX-Filer» usa o atributo\n"
+"Algúns sistemas novos de ficheiros son compatibles con algo chamado\n"
+"'Atributos Estendidos' que poden ser usados para gardar datos adicionais\n"
+"de cada ficheiro como parámetros nomeados. «ROX-Filer» usa o atributo\n"
 "«user.mime_type» para gardar os tipos de ficheiro.\n"
 "\n"
-"Os tipos de ficheiro só son soportados para ficheiros regulares, e\n"
-"non para directorios, dispositivos, tuberias (pipes) ou «sockets», polotanto só\n"
+"Os tipos de ficheiro só son compatibles con ficheiros regulares, e non\n"
+"para directorios, dispositivos, tuberias (pipes) ou «sockets», polo tanto só\n"
 "en certos sistemas de ficheiros e cando o S.O. os implementa.\n"
 
 #: action.c:419
@@ -572,7 +574,7 @@ msgstr "Montar / Desmontar"
 
 #: action.c:2059
 msgid "ROX-Filer does not yet support mount points on your system. Sorry."
-msgstr "«ROX-Filer» ainda non soporta puntos de montaxe no seu sistema. Desculpe."
+msgstr "«ROX-Filer» ainda non é compatible con puntos de montaxe no seu sistema. Desculpe."
 
 #: action.c:2073
 #: menu.c:216
@@ -1001,7 +1003,7 @@ msgstr "Destino descoñecido"
 
 #: dnd.c:797
 msgid "Remote app can't or won't send me the data - sorry"
-msgstr "Desculpe - A aplicación remota non consigue ou non quere enviar os datos"
+msgstr "Desculpe - O aplicativo remoto non consigue ou non quere enviar os datos"
 
 #: dnd.c:810
 msgid "XDS protocol error: return code should be 'S', 'F' or 'E'\n"
@@ -1051,7 +1053,7 @@ msgstr "Amosar"
 
 #: dropbox.c:118
 msgid "Show the current choice in a filer window"
-msgstr "Amosar a selección actual nunha ventá do xestor"
+msgstr "Amosar a selección actual nunha fiestra do xestor"
 
 #: dropbox.c:172
 msgid "<nothing>"
@@ -1472,7 +1474,7 @@ msgstr "Sen nome"
 
 #: gtksavebox.c:471
 msgid "Remote application wants to use Direct Save, but I can't read the XdndDirectSave0 (type text/plain) property.\n"
-msgstr "A aplicación remota quere usar «Direct Save», pero non se pode ler a propriedade XdndDirectSave0 (type text/plain).\n"
+msgstr "O aplicativo remoto quere usar «Direct Save», pero non se pode ler a propriedade XdndDirectSave0 (type text/plain).\n"
 
 #: gtksavebox.c:596
 msgid ""
@@ -1505,7 +1507,7 @@ msgid ""
 msgstr ""
 "Atopouse un erro no ficheiro '%s' na liña %d: \n"
 "\"%s\"\n"
-"Isto pode ser debido a ter actualizado desde unha versión antiga do «ROX-Filer». Abra a ventá «Opcións» probe a cambiar cal queira cousa para darlle o valor desexado (para que o ficheiro volva a ser gardado).\n"
+"Isto pode ser debido a ter actualizado desde unha versión antiga do «ROX-Filer». Abra a fiestra «Opcións» probe a cambiar cal queira cousa para darlle o valor desexado (para que o ficheiro volva a ser gardado).\n"
 "Os próximos erros serán ignorados."
 
 #: gui_support.c:1008
@@ -1529,7 +1531,7 @@ msgid ""
 "\n"
 "http://0install.net/injector.html"
 msgstr ""
-"Esta aplicación (%s) non pode executarse, xa que a orde «0launch» non está dispoñible. Pode descargalo desta ligazón:\n"
+"Este aplicativo (%s) non pode executarse, xa que a orde «0launch» non está dispoñible. Pode descargalo desta ligazón:\n"
 "\n"
 "http://0install.net/injector.html"
 
@@ -1683,7 +1685,7 @@ msgstr "O bloqueo dun elemento impide que sexa eliminado accidentalmente"
 #: infobox.c:113
 #, c-format
 msgid "Are you sure you want to open %d windows?"
-msgstr "Quere confirmar a apertura de %d ventás?"
+msgstr "Quere confirmar a apertura de %d fiestras?"
 
 #: infobox.c:114
 msgid "Show Info"
@@ -1798,7 +1800,7 @@ msgstr "Ningún"
 
 #: infobox.c:648
 msgid "Not supported"
-msgstr "Non soportado"
+msgstr "Non compatible"
 
 #: infobox.c:660
 msgid "Link target:"
@@ -1885,7 +1887,7 @@ msgstr "Ligazón simbólica"
 
 #: infobox.c:1068
 msgid "ROX application"
-msgstr "Aplicación ROX"
+msgstr "Aplicativo ROX"
 
 #: infobox.c:1076
 msgid "mounted"
@@ -1956,7 +1958,7 @@ msgid ""
 "you must use the short versions instead.\n"
 "\n"
 msgstr ""
-"NOTA: O seu sistema non soporta opcións longas - \n"
+"NOTA: O seu sistema non é compatible con opcións longas - \n"
 "no seu lugar debe utilizar as versións curtas.\n"
 "\n"
 
@@ -1998,7 +2000,7 @@ msgstr ""
 "  -B, --bottom=PANEL\tabrir PANEL como un panel no bordo\n"
 "                                    \tinferior da pantalla\n"
 "  -c, --client-id=ID\tusado para a xestión da sesión\n"
-"  -d, --dir=DIR\t\tabrir DIR como un directorio (non como aplicación)\n"
+"  -d, --dir=DIR\t\tabrir DIR como un directorio (non como aplicativo)\n"
 "  -D, --close=DIR\tpechar DIR e os seus subdirectorios\n"
 "  -h, --help\t\tamosar esta axuda e sair\n"
 "  -l, --left=PAINEL\tabrir PANEL como un panel no bordo\n"
@@ -2013,7 +2015,7 @@ msgstr ""
 "  -S, --rox-session\tusar as opcións predeterminadas de panel e escritorio, e -n\n"
 "  -t, --top=PANEL\tabrir PANEL como un panel no bordol\n"
 "                            \tsuperior da pantalla\n"
-"  -u, --user\t\tamosar o nome de usuario en cada ventá \n"
+"  -u, --user\t\tamosar o nome de usuario en cada fiestra \n"
 "  -v, --version\t\tamosa información da versión e sae\n"
 "  -x, --examine=FILE\tFICHEIRO cambiou - volver a analisar\n"
 "\n"
@@ -2055,15 +2057,15 @@ msgstr "características definidas ao compilar"
 
 #: main.c:696
 msgid "Large File Support"
-msgstr "Soporte para ficheiros longos (LFS)"
+msgstr "Compatibilidade para ficheiros longos (LFS)"
 
 #: main.c:703
 msgid "Inotify support"
-msgstr "Soporte para «Inotify»"
+msgstr "Compatibilidade para «Inotify»"
 
 #: main.c:710
 msgid "Dnotify support"
-msgstr "Soporte para «dnotify»"
+msgstr "Compatibilidade para «dnotify»"
 
 #: main.c:717
 msgid "Binary compatibility"
@@ -2079,7 +2081,7 @@ msgstr "Non (non se atopa apsymbols.h)"
 
 #: main.c:725
 msgid "Extended attribute support"
-msgstr "Soporte para atributos estendidos"
+msgstr "Compatibilidade para atributos estendidos"
 
 #: main.c:876
 #, c-format
@@ -2255,19 +2257,19 @@ msgstr "Ficheiro en branco"
 #: menu.c:240
 #: tasklist.c:309
 msgid "Window"
-msgstr "Ventá"
+msgstr "Fiestra"
 
 #: menu.c:241
 msgid "Parent, New Window"
-msgstr "Directorio anterior, nova ventá"
+msgstr "Directorio anterior, nova fiestra"
 
 #: menu.c:242
 msgid "Parent, Same Window"
-msgstr "Directorio anterior, mesma ventá"
+msgstr "Directorio anterior, mesma fiestra"
 
 #: menu.c:243
 msgid "New Window"
-msgstr "Nova ventá"
+msgstr "Nova fiestra"
 
 #: menu.c:245
 msgid "Show Bookmarks"
@@ -2283,11 +2285,11 @@ msgstr "Seguir ligazóns simbólicas"
 
 #: menu.c:248
 msgid "Resize Window"
-msgstr "Redimensionar ventá"
+msgstr "Redimensionar fiestra"
 
 #: menu.c:251
 msgid "Close Window"
-msgstr "Pechar ventá"
+msgstr "Pechar fiestra"
 
 #: menu.c:253
 msgid "Enter Path..."
@@ -2339,12 +2341,12 @@ msgid ""
 "Extended attributes, used to store types, are not supported for this file or files.\n"
 "This may be due to lack of support from the filesystem or the C library, or it may simply be that the filesystem needs to be mounted with the right mount option ('user_xattr' on Linux)."
 msgstr ""
-"Os atributos estendidos, usados para gardar os tipos de ficheiro, non son soportados por este(s) ficheiro(s).\n"
-"Isto pode ser debido a falta de soporte por parte do sistema de ficheiros ou da biblioteca de C, ou pode simplemente ser necesario montar o sistema de ficheiros con as opcións de montaxe correctas ('user_xattr' en Linux)."
+"Os atributos estendidos, usados para gardar os tipos de ficheiro, non son compatibles con este(s) ficheiro(s).\n"
+"Isto pode ser debido a falta de compatibilidade por parte do sistema de ficheiros ou da biblioteca de C, ou pode simplemente ser necesario montar o sistema de ficheiros con as opcións de montaxe correctas ('user_xattr' en Linux)."
 
 #: menu.c:1058
 msgid "Setting type not supported for some of these files"
-msgstr "Definir o tipo non é soportado por algúns destes ficheiros"
+msgstr "Definir o tipo non é compatible con algúns destes ficheiros"
 
 #: menu.c:1095
 msgid "_Relative link"
@@ -2408,7 +2410,7 @@ msgid ""
 "Advanced use:\n"
 "You can also create subdirectories called `.text_html', `.text', etc which will only be shown for files of that type. `.group' is shown only when multiple files are selected."
 msgstr ""
-"O menu «Enviar a...» permite enviar facilmente ficheiros para unha aplicación. As aplicacións listadas son as dos seguintes directorios:\n"
+"O menu «Enviar a...» permite enviar facilmente ficheiros para un aplicativo. Os aplicativos listados son os dos seguintes directorios:\n"
 "\n"
 "%s\n"
 "%s\n"
@@ -2419,7 +2421,7 @@ msgstr ""
 
 #: menu.c:1509
 msgid "I'll show you your SendTo directory now; you should symlink (Ctrl+Shift drag) any applications you want into it."
-msgstr "Agora amosarase o directorio «Enviar a»; nel deberá crear ligazóns simbólicas (Ctrl+Mayús arrastar) para as aplicacións que queira."
+msgstr "Agora amosarase o directorio «Enviar a»; nel deberá crear ligazóns simbólicas (Ctrl+Mayús arrastar) para os aplicativos que queira."
 
 #: menu.c:1512
 #: menu.c:1552
@@ -2457,7 +2459,7 @@ msgstr "Este xá é o nome canónigo para este directorio."
 
 #: menu.c:1771
 msgid "You can't open a second view onto this directory because the `Unique Windows' option is turned on in the Options window."
-msgstr "Non é posible abrir unha segunda vista para este directorio porque a opción «ventás únicas» está activada na caixa Opcións."
+msgstr "Non é posible abrir unha segunda vista para este directorio porque a opción «fiestras únicas» está activada na caixa Opcións."
 
 #: menu.c:1897
 msgid "Copy ... ?"
@@ -2515,7 +2517,7 @@ msgstr "Buscar dentro de ... ?"
 msgid "You cannot do this to more than one item at a time"
 msgstr ""
 "Isto só é posible facelo con un elemento de cada vez.\n"
-"Rox ten unha política moi visual, arrastre directamente os elementos cara a ventá de destino."
+"Rox ten unha política moi visual, arrastre directamente os elementos cara a fiestra de destino."
 
 #: menu.c:2029
 msgid "Rename"
@@ -2555,7 +2557,7 @@ msgid ""
 msgstr ""
 "Para definir un atallo de teclado para un elemento do menu:\n"
 "\n"
-"- Abra o menú sobre unha ventá do xestor de ficheiros,\n"
+"- Abra o menú sobre unha fiestra do xestor de ficheiros,\n"
 "- Mova o punteiro sobre o elemento que quere usar,\n"
 "- Presione a tecla que quere asociar ao menú.\n"
 "\n"
@@ -2694,7 +2696,7 @@ msgstr "O antiguo ficheiro de panel foi convertido ao novo formato XML."
 
 #: panel.c:637
 msgid "You have tried to close a panel via the window manager - I usually find that this is accidental... really close?"
-msgstr "Tratou de pechar o panel dende o xestor de ventás - Normalmete eso é accidental... realmente quere pechalo?"
+msgstr "Tratou de pechar o panel dende o xestor de fiestras - Normalmete eso é accidental... realmente quere pechalo?"
 
 #: panel.c:738
 msgid "Missing < or > in panel config file"
@@ -2707,7 +2709,7 @@ msgstr "Produciuse un erro gardando o panel %s: %s"
 
 #: panel.c:1925
 msgid "Applet quit without ever creating a widget!"
-msgstr "A mini aplicación pechouse sen crear un «widget»!"
+msgstr "O miniaplicativo pechouse sen crear un «widget»!"
 
 #: panel.c:2021
 #, c-format
@@ -2715,7 +2717,7 @@ msgid ""
 "Error running applet:\n"
 "%s"
 msgstr ""
-"Produciuse un erro executando mini aplicación:\n"
+"Produciuse un erro executando o miniaplicativo:\n"
 "%sa "
 
 #: panel.c:2646
@@ -2766,7 +2768,7 @@ msgstr "O seu antigo taboleiro foi convertido ao novo formato XML"
 
 #: pinboard.c:711
 msgid "The backdrop handler must be an application directory. Drag an application directory into the Set Backdrop dialog box, or (for programmers) pass it to the SOAP SetBackdropApp method."
-msgstr "O xestor do fondo debe ser un directorio de aplicación. Arrastre unha aplicación do directorio á caixa de diálogo, ou (para programadores) asignalo a SetBackdropApp método SOAP."
+msgstr "O xestor do fondo debe ser un directorio de aplicativo. Arrastre un aplicativo do directorio á caixa de diálogo, ou (para programadores) asignalo a SetBackdropApp método SOAP."
 
 #: pinboard.c:730
 msgid ""
@@ -2776,7 +2778,7 @@ msgid ""
 msgstr ""
 "Só poderá crear un fondo con unha imaxen o un programa para que «ROX-Filer» saiba como manexala.\n"
 "\n"
-"Programadores: a aplicación AppInfo.xml debe conter o elemento CanSetBackdrop, tal como se describe no manual de «ROX-Filer»."
+"Programadores: o aplicativo AppInfo.xml debe conter o elemento CanSetBackdrop, tal como se describe no manual de «ROX-Filer»."
 
 #: pinboard.c:750
 msgid "Set backdrop"
@@ -2836,7 +2838,7 @@ msgstr "Non hai un taboleiro en uso... o taboleiro «Default» está seleccionad
 
 #: pinboard.c:945
 msgid "Only files (and certain applications) can be used to set the background image."
-msgstr "Só se poden utilizar ficheiros (e algunhas aplicacións) para fixar unha imaxe de fondo."
+msgstr "Só se poden utilizar ficheiros (e algúns aplicativos) para fixar unha imaxe de fondo."
 
 #: pinboard.c:1602
 msgid "Missing '>' in icon label"
@@ -2948,8 +2950,8 @@ msgid ""
 "Application:\n"
 "This is an application directory - you can run it as a program, or open it (hold down Shift while you open it). Most applications provide their own help here, but this one doesn't."
 msgstr ""
-"Aplicación:\n"
-"Tratase de un directorio de aplicación - pode executalo como un programa, ou abrilo (prema «Mayús» mentras o abre). A maioría das aplicacións fornecen a súa propia axuda aquí, pero esta non o fai."
+"Aplicativo:\n"
+"Tratase de un directorio de aplicativo - pode executalo como un programa, ou abrilo (prema «Maiús» mentres o abre). A maioría dos aplicativos fornecen a súa propia axuda aquí, pero este non o fai."
 
 #: run.c:478
 #, c-format
@@ -2969,7 +2971,7 @@ msgstr "Ligazón simbólica rota (ou vostede non ten permiso para usala): %s"
 #: run.c:573
 #, c-format
 msgid "No run action specified for files of this type (%s/%s) - you can set a run action by choosing `Set Run Action' from the File menu, or you can just drag the file to an application.%s"
-msgstr "Non se especificou ningunha acción para ficheiros de este tipo (%s/%s) - Defina a acción Executar No menú «Seguinte clic» ou arrastre este ficheiro á unha aplicación.%s"
+msgstr "Non se especificou ningunha acción para ficheiros de este tipo (%s/%s) - Defina a acción Executar no menú «Seguinte clic» ou arrastre este ficheiro á un aplicativo.%s"
 
 #: run.c:579
 msgid ""
@@ -2979,7 +2981,7 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"Nota: Se se trata de executar unha aplicación, necesita axustar o bit de execución no menú «Permisos»."
+"Nota: Se se trata de executar un aplicativo, necesita axustar o bit de execución no menú «Permisos»."
 
 #: run.c:753
 #, c-format
@@ -2992,7 +2994,7 @@ msgid ""
 msgstr ""
 "O executable '%s' é escribible por todos! Refusase a súa execución. Por favor cambie os permisos agora (este problema puido ser causado por un fallo nas versións  anteriores do xestor).\n"
 "\n"
-"Hai executables (non ligazóns simbólicas) escribibles por todos, eso significa que cal queira persoa que manexe a súa computadora pode substituír as súas aplicacións por outras con código malicioso.\n"
+"Hai executables (non ligazóns simbólicas) escribibles por todos, eso significa que cal queira persoa que manexe a súa computadora pode substituír oa seus aplicativos por outros con código malicioso.\n"
 "\n"
 "Si vostede confía en quen poida escribir nestos ficheiros non debe preocuparse. Senón, debería comprobar, ou suprimir, todos os permisos que afecten ficheiros executables."
 
@@ -3026,7 +3028,7 @@ msgstr "Pechar"
 
 #: toolbar.c:113
 msgid "Close filer window"
-msgstr "Pechar ventá do xestor"
+msgstr "Pechar fiestra do xestor"
 
 #: toolbar.c:117
 msgid "Up"
@@ -3166,7 +3168,7 @@ msgstr "Punto de montaxe"
 
 #: type.c:218
 msgid "App dir"
-msgstr "Directorio de aplicacións"
+msgstr "Directorio de aplicativos"
 
 #: type.c:225
 msgid "Dir"
@@ -3208,7 +3210,7 @@ msgstr ""
 
 #: type.c:735
 msgid "This is not a program! Give me an application instead!"
-msgstr "Non é unha aplicación ou ficheiro executable!"
+msgstr "Non é un aplicativo ou ficheiro executable!"
 
 #: type.c:795
 msgid "No run action defined"
@@ -3222,7 +3224,7 @@ msgstr "Produciuse un erro en: %s manexando %s"
 #: type.c:814
 #, c-format
 msgid "Invalid application %s (bad AppRun)"
-msgstr "A aplicación %s non é válida (AppRun defectuoso)"
+msgstr "O aplicativo %s non é válido (AppRun defectuoso)"
 
 #: type.c:825
 #, c-format
@@ -3244,7 +3246,7 @@ msgstr "Predeterminar para todos `%s/<cal queira>'"
 
 #: type.c:870
 msgid "Use this application for all files with this MIME type."
-msgstr "Utilizar esta aplicación para todos os ficheiros do mesmo tipo MIME"
+msgstr "Utilizar este aplicativo para todos os ficheiros do mesmo tipo MIME"
 
 #: type.c:872
 #, c-format
@@ -3253,7 +3255,7 @@ msgstr "Só para os do tipo `%s' (%s/%s)"
 
 #: type.c:878
 msgid "Drop a suitable application here"
-msgstr "Arrastre a aplicación axeitada aquí"
+msgstr "Arrastre o aplicativo axeitado aquí"
 
 #: type.c:893
 msgid "OR"
@@ -3410,11 +3412,11 @@ msgstr "Última _modificación"
 
 #: tips:1
 msgid "Filer windows"
-msgstr "Ventás do xestor"
+msgstr "Fiestras do xestor"
 
 #: tips:2
 msgid "Auto-resize filer windows"
-msgstr "Axustar automáticamente as ventás do xestor"
+msgstr "Axustar automaticamente as fiestras do xestor"
 
 #: tips:3
 msgid "Never automatically resize"
@@ -3422,15 +3424,15 @@ msgstr "Non axustar nunca automáticamente"
 
 #: tips:4
 msgid "You'll have to resize windows manually, using the window manager, the `Resize Window' menu entry or by double-clicking on the window background."
-msgstr "Terá que cambiar o tamaño das ventás manualmente, utilizando o xestor de ventás, na entrada do menú «Redimensionar ventá» ou facendo dobre clic no fondo da ventá."
+msgstr "Terá que cambiar o tamaño das fiestras manualmente, utilizando o xestor de fiestras, na entrada do menú «Redimensionar fiestra» ou facendo dobre clic no fondo da fiestra."
 
 #: tips:5
 msgid "Resize when changing the display style"
-msgstr "Redimensionar cando cambie o estilo de ventá"
+msgstr "Redimensionar cando cambie o estilo de fiestra"
 
 #: tips:6
 msgid "Changing the size of the icons or which details are displayed will resize the window for you."
-msgstr "Cambia o tamaño das iconas ou detalles que se amosan  cando redimensiona o tamaño da ventá."
+msgstr "Cambia o tamaño das iconas ou detalles que se amosan  cando redimensiona o tamaño da fiestra."
 
 #: tips:7
 msgid "Always resize"
@@ -3438,11 +3440,11 @@ msgstr "Redimensionar sempre"
 
 #: tips:8
 msgid "The filer will resize windows whenever it seems useful (that is, when changing directory or display style)."
-msgstr "O xestor redimensionará ventás sempre que pareza útil (é dicir cambiando o directorio ou o estilo de amosar)."
+msgstr "O xestor redimensionará fiestras sempre que pareza útil (é dicir cambiando o directorio ou o estilo de amosar)."
 
 #: tips:9
 msgid "Largest window size:"
-msgstr "Tamaño da ventá máis grande"
+msgstr "Tamaño da fiestra máis grande"
 
 #: tips:10
 msgid "%"
@@ -3450,11 +3452,11 @@ msgstr "%"
 
 #: tips:11
 msgid "The largest size, as a percentage of the screen size, that the auto-resizer will resize a window to."
-msgstr "Maior tamaño, como un porcentaxe do tamaño de pantalla, ao que se redimensionará automáticamente unha ventá."
+msgstr "Maior tamaño, como un porcentaxe do tamaño de pantalla, ao que se redimensionará automáticamente unha fiestra."
 
 #: tips:12
 msgid "Window behaviour"
-msgstr "Comportamento da ventá"
+msgstr "Comportamento da fiestra"
 
 #: tips:13
 msgid "Short titlebar flags"
@@ -3466,19 +3468,19 @@ msgstr "Emprego de marcas no lugar de palabras para exploración, indicadores de
 
 #: tips:15
 msgid "Unique windows"
-msgstr "Ventás únicas"
+msgstr "Fiestras únicas"
 
 #: tips:16
 msgid "If you open a directory and that directory is already displayed in another window, then this option causes the other window to be closed."
-msgstr "Se abre un directorio que xa está aberto noutra ventá, isto fará que a outra ventá sexa pechada."
+msgstr "Se abre un directorio que xa está aberto noutra fiestra, isto fará que a outra fiestra sexa pechada."
 
 #: tips:17
 msgid "New window on button 1"
-msgstr "Ventá nova en botón 1"
+msgstr "Fiestra nova en botón 1"
 
 #: tips:18
 msgid "Clicking with mouse button 1 (usually the left button) opens a directory in a new window with this turned on. Clicking with the button-2 (middle) will reuse the current window."
-msgstr "Activando esta opción ao facer clic no botón 1 (normalmente o esquerdo) abre o directorio nunha ventá nova. Facer clic co botón 2 (o do medio) fará que se abra na ventá actual."
+msgstr "Activando esta opción ao facer clic no botón 1 (normalmente o esquerdo) abre o directorio nunha fiestra nova. Facer clic co botón 2 (o do medio) fará que se abra na fiestra actual."
 
 #: tips:19
 msgid "Single-click navigation"
@@ -3495,7 +3497,7 @@ msgstr "Dobre clic sobre o fondo redimensiona"
 
 #: tips:22
 msgid "If on then double clicking on the window background resizes the window, just like clicking on the Automatic size mode button in the toolbar."
-msgstr "Si fai dobre clic sobre o fondo de ventá redimensiona a ventá, como se fixera clic na icona de tamaño automático na barra de tarefas."
+msgstr "Si fai dobre clic sobre o fondo de fiestra redimensiona a fiestra, como se fixera clic na icona de tamaño automático na barra de tarefas."
 
 #: tips:23
 msgid "Sorting"
@@ -3519,15 +3521,15 @@ msgstr "Activada esta opción os ficheiros cuxos nomes comezan con unha maiúscu
 
 #: tips:29
 msgid "Default settings for new windows"
-msgstr "Axustes predeterminados para ventás novas"
+msgstr "Axustes predeterminados para fiestras novas"
 
 #: tips:30
 msgid "Inherit options from source window"
-msgstr "Herdar opcións da ventá orixe"
+msgstr "Herdar opcións da fiestra orixe"
 
 #: tips:31
 msgid "If this is on then display options for a new window are inherited from the source window if possible, otherwise they are set to the defaults below."
-msgstr "Activando esta opción as ventás novas herdan os axuste da ventá orixe, se é posible, do contrario toman de xeito predeterminado o aquí definido ."
+msgstr "Activando esta opción as fiestras novas herdan os axuste da fiestra orixe, se é posible, do contrario toman de xeito predeterminado o aquí definido ."
 
 #: tips:32
 msgid "View type:"
@@ -3691,7 +3693,7 @@ msgstr "Amosa a totalidade dos elementos"
 
 #: tips:83
 msgid "Show the number of items displayed in a filer window, as well as the number of hidden items (if any). When there's a selection, show the number of selected items and their combined size."
-msgstr "Amosa o número de elementos que aparece nunha ventá do xestor, así como o número de elementos agochados (no seu caso). Cando hai una selección, amosa o número de elementos seleccionados e o  seu tamaño combinado."
+msgstr "Amosa o número de elementos que aparece nunha fiestra do xestor, así como o número de elementos agochados (no seu caso). Cando hai una selección, amosa o número de elementos seleccionados e o  seu tamaño combinado."
 
 #: tips:84
 msgid "Select the buttons you want on the bar:"
@@ -3699,11 +3701,11 @@ msgstr "Seleccione os botóns que desexe ter na barra"
 
 #: tips:85
 msgid "Width of toolbar sets minimum width of window"
-msgstr "A Largura da barra de ferramentas establece o ancho minimo da ventá"
+msgstr "A Largura da barra de ferramentas establece o ancho minimo da fiestra"
 
 #: tips:86
 msgid "Each filer window is constrained to be wide enough to show the whole of the toolbar"
-msgstr "As ventás son obligadas a ser o suficientemente amplas como para amosar a totalidade da barra de ferramentas"
+msgstr "As fiestras son obligadas a ser o suficientemente amplas como para amosar a totalidade da barra de ferramentas"
 
 #: tips:87
 msgid "Minibuffer"
@@ -3735,7 +3737,7 @@ msgstr "Amosar miniaturas"
 
 #: tips:96
 msgid "This is the default setting for new windows. Use the Display menu to turn thumbnails on and off for individual windows."
-msgstr "Esta é a configuración predeterminada para as ventás novas. Use o menú despregable para activar/desactivar as miniaturas nas ventás."
+msgstr "Esta é a configuración predeterminada para as fiestras novas. Use o menú despregable para activar/desactivar as miniaturas nas fiestras."
 
 #: tips:97
 msgid "Video thumbnails"
@@ -3760,7 +3762,7 @@ msgstr "Escritorio"
 
 #: tips:102
 msgid "When using a pinboard, you can drag files and applications onto the desktop background to create shortcuts to them."
-msgstr "Usando un taboleiro, vostede pode arrastrar ficheiros e aplicacións no fondo de escritorio para crear acesos rápidos."
+msgstr "Usando un taboleiro, vostede pode arrastrar ficheiros e aplicativos no fondo de escritorio para crear acesos rápidos."
 
 #: tips:103
 #: tips:213
@@ -3854,19 +3856,19 @@ msgstr "Usar rella de 32 píxeles para posicionar as iconas no escritorio"
 #: tips:126
 #: tips:128
 msgid "Iconified windows"
-msgstr "Ventás como iconas"
+msgstr "Fiestras como iconas"
 
 #: tips:127
 msgid "Most window managers provide a way to iconify (or 'minimise') windows, and various programs, including ROX-Filer, can be used to display the iconified windows."
-msgstr "A maioría de xestores de ventás proporcionan unha forma de «iconificar» (ou «minimizar»), as ventás, e diversos programas, entre eles «ROX-Filer», poden utilizar para amosar as ventás coma iconas."
+msgstr "A maioría de xestores de fiestras proporcionan unha forma de «iconificar» (ou «minimizar»), as fiestras, e diversos programas, entre eles «ROX-Filer», poden utilizar para amosar as fiestras coma iconas."
 
 #: tips:129
 msgid "Show iconified windows"
-msgstr "Amosar ventás como iconas"
+msgstr "Amosar fiestras como iconas"
 
 #: tips:130
 msgid "If this option is on, the filer will show each iconified window as a small button on the pinboard. Requires a compatible window manager, and the pinboard must be in use."
-msgstr "Activada esta opción, o xestor amosa cada ventá como un pequeno botón no taboleiro. Require un xestor de ventás compatible, e o taboleiro debe estar en uso."
+msgstr "Activada esta opción, o xestor amosa cada fiestra como un pequeno botón no taboleiro. Require un xestor de fiestras compatible, e o taboleiro debe estar en uso."
 
 #: tips:131
 msgid "Show per workspace"
@@ -3874,7 +3876,7 @@ msgstr "Amosar por espazo de traballo"
 
 #: tips:132
 msgid "If this option is on, the filer will only show iconified windows associated with the current workspace."
-msgstr "Activada esta opción, o xestor só amosará como iconas as ventás asociadas co actual espazo de traballo."
+msgstr "Activada esta opción, o xestor só amosará como iconas as fiestras asociadas co actual espazo de traballo."
 
 #: tips:133
 msgid "Iconify to the"
@@ -3910,7 +3912,7 @@ msgstr "vertical"
 
 #: tips:141
 msgid "Sometimes the filer doesn't know about your desktop furniture and puts iconified windows under (for example) the Gnome panel. You can define a top or bottom margin to avoid placing the icons there. The filer already knows about its own panel."
-msgstr "As veces o xestor non sabe dos seus obxectos no escritorio e pon ventás en miniatura baixo (por exemplo) o panel de Gnome. Vostede pode definir unha marxe inferior para evitar colocar as iconas alí. O xestor xa sabe así do seu propio panel."
+msgstr "As veces o xestor non sabe dos seus obxectos no escritorio e pon fiestras en miniatura baixo (por exemplo) o panel de Gnome. Vostede pode definir unha marxe inferior para evitar colocar as iconas alí. O xestor xa sabe así do seu propio panel."
 
 #: tips:142
 msgid "Top margin"
@@ -3998,7 +4000,7 @@ msgstr "O administrador de sesións activa estas opcións empregando «-S» ou �
 
 #: tips:164
 msgid "Action windows"
-msgstr "Accións nas ventás"
+msgstr "Accións nas fiestras"
 
 #: tips:165
 msgid ""
@@ -4088,11 +4090,11 @@ msgstr "Arrastrar á icona"
 
 #: tips:195
 msgid "Allow dragging to icons in filer windows"
-msgstr "Permite arrastar iconas a ventá do xestor"
+msgstr "Permite arrastar iconas a fiestra do xestor"
 
 #: tips:196
 msgid "When this is on you can drag a file over a sub-directory or program in a filer window. The item will highlight when you do this and dropping the file will put it into that directory, or load it into the program."
-msgstr "Con esta opción activada vostede pode arrastrar un ficheiro á ventá dun subdorectorio ou á un programa. O elemento porase en foco cando vostede fai iso e soltando nel o elemento deixalo ahí ou cargar/executar o programa."
+msgstr "Con esta opción activada vostede pode arrastrar un ficheiro á fiestra dun subdorectorio ou á un programa. O elemento porase en foco cando vostede fai iso e soltando nel o elemento deixalo ahí ou cargar/executar o programa."
 
 #: tips:197
 msgid "Directories spring open"
@@ -4169,7 +4171,7 @@ msgstr "Sen iconas"
 
 #: tips:218
 msgid "Same as current window"
-msgstr "Ventá actual"
+msgstr "Fiestra actual"
 
 #: tips:219
 msgid "Same as default"
@@ -4285,7 +4287,7 @@ msgstr "Ficheiro executable:"
 
 #: tips:249
 msgid "Application directory:"
-msgstr "Directorio de aplicación:"
+msgstr "Directorio de aplicativo:"
 
 #: tips:250
 msgid "Unknown type:"
@@ -4297,23 +4299,23 @@ msgstr "Compatibilidade"
 
 #: tips:252
 msgid "Window manager problems"
-msgstr "Problemas no xestor de ventás"
+msgstr "Problemas no xestor de fiestras"
 
 #: tips:253
 msgid "Override window manager control of the pinboard and panels"
-msgstr "Sobrescribir o xestor de ventás co control do taboleiro e do panel"
+msgstr "Sobrescribir o xestor de fiestras co control do taboleiro e do panel"
 
 #: tips:254
 msgid "Some window managers don't support the new Extended Window Manager Hints system, and so treat the pinboard and panels like normal windows. Turn this on to fix problems such as the pinboard coming to the front when you click on it, titlebars and other decorations appearing around windows, or having them appear in window-select lists."
-msgstr "Algúns xestores de ventás non soportan o novo sistema «Extended Window Manager Hints» e tratan os taboleiros e paneis como ventás normais. Active esta opción para solucionar problemas como que o taboleiro se veña a primeiro plano cando preme nel, barras de título e outras decoracións de ventás, ou que teñan que aparecer na lista de ventás."
+msgstr "Algúns xestores de fiestras non son compatibles co novo sistema «Extended Window Manager Hints» e tratan os taboleiros e paneis como fiestras normais. Active esta opción para solucionar problemas como que o taboleiro se veña a primeiro plano cando preme nel, barras de título e outras decoracións de fiestras, ou que teñan que aparecer na lista de fiestras."
 
 #: tips:255
 msgid "Pass all backdrop mouse clicks to window manager"
-msgstr "Enviar os clics do rato no escritorio á o xestor de ventás"
+msgstr "Enviar os clics do rato no escritorio á o xestor de fiestras"
 
 #: tips:256
 msgid "Normally, right clicking on the desktop background will open the pinboard menu and left clicking will clear the selection. Turn this on to forward the events to your window manager instead. Clicks on icons will not be forwarded."
-msgstr "Normalmente, facer click dereito no fondo de escritorio abre o menú e no esquerdo limpa a selección. Active esta opción se desexa enviar estos eventos ao xestor de ventás. Os clics nas iconas non van ser enviados."
+msgstr "Normalmente, facer click dereito no fondo de escritorio abre o menú e no esquerdo limpa a selección. Active esta opción se desexa enviar estos eventos ao xestor de fiestras. Os clics nas iconas non van ser enviados."
 
 #: tips:257
 msgid "Blackbox root menus hack"
@@ -4321,7 +4323,7 @@ msgstr "Menus de «Blackbox» cortados"
 
 #: tips:258
 msgid "Blackbox, Fluxbox and similar window managers do not yet work well with the ROX-Filer pinboard. This option enables some workarounds. These window managers are expected to change their behaviour in new versions so that this isn't necessary."
-msgstr "Blackbox, Fluxbox e xestores de ventás similares ainda non traballan ben co taboleiro de ROX-Filer. Esta opción soluciona algúns problemas. Agardamos que estos xestores de ventás muden o seu comportamento en novas versions de xeito que isto non sexa necesario."
+msgstr "Blackbox, Fluxbox e xestores de fiestras similares ainda non traballan ben co taboleiro de ROX-Filer. Esta opción soluciona algúns problemas. Agardamos que estos xestores de fiestras muden o seu comportamento en novas versions de xeito que isto non sexa necesario."
 
 #: tips:259
 msgid "Panel is a 'dock'"
@@ -4329,7 +4331,7 @@ msgstr "O panel é «ancorado»"
 
 #: tips:260
 msgid "Makes sure panels stay against screen edges. Disable this option if the panel stays above other windows against your wishes. Requires a restart to take effect."
-msgstr "Asegura que os paneles se manteñen nos bordos da pantalla. Desactive esta opción se o panel se manten por eriba de outras ventás en contra dos seus desexos. Require un reinicio para ter efecto."
+msgstr "Asegura que os paneles se manteñen nos bordos da pantalla. Desactive esta opción se o panel se manten por eriba de outras fiestras en contra dos seus desexos. Require un reinicio para ter efecto."
 
 #: tips:261
 msgid "Panel stays on top"
@@ -4337,7 +4339,7 @@ msgstr "O panel permanece en primeiro plano"
 
 #: tips:262
 msgid "Keeps the panel above other windows. Enable this option to make sure the dock option works correctly in some versions of compiz. May require a restart to take effect."
-msgstr "Manten o panel por enriba de outras ventás. Active esta opción para asegurarse de que a opción acoplar funciona correctamente en algunhas versións de compiz. Pode requerir un reinicio para ter efecto."
+msgstr "Manten o panel por enriba de outras fiestras. Active esta opción para asegurarse de que a opción acoplar funciona correctamente en algunhas versións de compiz. Pode requerir un reinicio para ter efecto."
 
 #: tips:263
 msgid "Drag and drop"
@@ -4349,7 +4351,7 @@ msgstr "Non usar nomes de host"
 
 #: tips:265
 msgid "Some older applications don't support XDND fully and may need to have this option turned on. Use this if dragging files to an application shows a + sign on the pointer but the drop doesn't work."
-msgstr "Algunhas aplicacións antigas non soportan «XDND» e poden precisar que esta opción esté activada. Use esta opción se ao arrastrar un ficheiro á aplicación amosa un «+» no punteiro pero non traballa."
+msgstr "Algúns aplicativos antigos non son compatibles con «XDND» e poden precisar que esta opción esté activada. Use esta opción se ao arrastrar un ficheiro ao aplicativo amosa un «+» no punteiro pero non traballa."
 
 #: tips:266
 msgid "Extended attributes"
@@ -4389,11 +4391,11 @@ msgstr "Imaxe e texto"
 
 #: ../Templates.glade:186
 msgid "Applications in this panel have just an image, everything else has both an image and text."
-msgstr "Só as aplicacións teñen imaxe, todo o demáis ten tanto imaxe como texto."
+msgstr "Só os aplicativos teñen imaxe, todo o demáis ten tanto imaxe como texto."
 
 #: ../Templates.glade:187
 msgid "Image only for applications"
-msgstr "Imaxe só para aplicacións"
+msgstr "Imaxe só para aplicativos"
 
 #: ../Templates.glade:205
 msgid "Only the image is shown for icons in this panel."
@@ -4417,7 +4419,7 @@ msgstr "px"
 
 #: ../Templates.glade:278
 msgid "Ask the window manager not to cover this panel when maximising windows, otherwise leave just 2 pixels at the edge of the screen to allow auto-raising. Some window managers may not honour this setting."
-msgstr "Indicarlle o xestor de ventás que non cubra este panel cando se máximizan ás ventás, do contrario, deixe a só 2 píxeles o bordo da pantalla para permitir o redimensionado. Algún xestor de ventás no poderá fornecer esta configuración."
+msgstr "Indicarlle o xestor de fiestras que non cubra este panel cando se máximizan ás fiestras, do contrario, deixe a só 2 píxeles o bordo da pantalla para permitir o redimensionado. Algún xestor de fiestras no poderá fornecer esta configuración."
 
 #: ../Templates.glade:279
 msgid "Do not cover panel"
