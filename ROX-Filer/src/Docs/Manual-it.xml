@@ -69,14 +69,14 @@
       <listitem><para>
         Un protocollo di drag-and-drop usato, per esempio, dal desktop GNOME
         <citation>GNOME</citation>. Permette di caricare i dati in un'applicazione
-        semplicemente trascinandoli dalla finestra del filer su un programma. Le 
+        semplicemente trascinandoli dalla finestra del filer su un programma. Le
         specifiche complete si trovano in <citation>DND</citation>.
      </para></listitem></varlistentry>
 
      <varlistentry><term>XDS</term>
       <listitem><para>
-        Un'estensione di XDND che permette alle applicazioni di salvare i dati 
-        trascinando un'icona dell'applicazione su una finestra del filer. Le 
+        Un'estensione di XDND che permette alle applicazioni di salvare i dati
+        trascinando un'icona dell'applicazione su una finestra del filer. Le
         specifiche complete si trovano in <citation>XDS</citation>.
      </para></listitem></varlistentry>
 
@@ -105,15 +105,15 @@
      <varlistentry><term>Database condiviso delle informazioni MIME</term>
       <listitem><para>
         In passato, ogni desktop aveva il suo database di regole per determinare il
-	tipo di file. Ora, il database condiviso delle informazioni MIME 
-        <citation>SharedMIME</citation>	ha unificato tutto in un unico sistema 
+	tipo di file. Ora, il database condiviso delle informazioni MIME
+        <citation>SharedMIME</citation>	ha unificato tutto in un unico sistema
         condiviso da tutti i desktop.
      </para></listitem></varlistentry>
 
     <varlistentry><term>Tema delle icone</term>
       <listitem><para>
 	Si possono installare (ad es. in <filename>~/.icons</filename>) varie raccolte
-	di icone, chiamate anche temi. Per cambiare tema, andare nella finestra 
+	di icone, chiamate anche temi. Per cambiare tema, andare nella finestra
 	«Opzioni». Si potranno condividere i temi con gli altri desktop, quando anche
 	questi ultimi ne attiveranno il supporto. Vedere <citation>IconTheme</citation> per i dettagli.
      </para></listitem></varlistentry>
@@ -151,10 +151,10 @@
 
    Il filer supporta diverse opzioni: usare <option>-h</option> per avere un elenco.
    Tutte le opzioni possono essere lunghe o corte (es. <option>-h</option> e
-   <option>--help</option>), anche se su alcuni sistemi è possibile usare solo quelle 
+   <option>--help</option>), anche se su alcuni sistemi è possibile usare solo quelle
    corte.
    </para><para>
-   Notare che se la stessa versione del filer è già in esecuzione sulla macchina, di norma, 
+   Notare che se la stessa versione del filer è già in esecuzione sulla macchina, di norma,
    per aprire le directory, viene usata quella già in esecuzione.
    </para><para>
    Per un elenco completo delle opzioni a riga di comando, vedere l'<xref linkend="manpage"/>
@@ -169,8 +169,8 @@
 
     <screen>$ rox --pinboard=MiaBacheca</screen>
 
-    Se si cambia qualcosa, per esempio se si rilascia un file sullo sfondo, la configurazione 
-    della bacheca viene salvata in 
+    Se si cambia qualcosa, per esempio se si rilascia un file sullo sfondo, la configurazione
+    della bacheca viene salvata in
     <filename>~/.config/rox.sourceforge.net/ROX-Filer/pb_MiaBacheca</filename>.
 	Si possono avere tutte le bacheche che si desiderano e per passare dall'una all'altra basta
 	eseguire di nuovo 	«rox», come ad esempio:
@@ -182,8 +182,8 @@
     <screen>$ rox --pinboard=</screen>
 
     Vedere le <xref linkend="winman"/> se ci sono problemi nel visualizzare correttamente
-    le icone. Si può anche attivare o disattivare la bacheca selezionando in una finestra del filer 
-    la directory applicativa <filename>ROX-Filer</filename> e scegliendo dal menù 
+    le icone. Si può anche attivare o disattivare la bacheca selezionando in una finestra del filer
+    la directory applicativa <filename>ROX-Filer</filename> e scegliendo dal menù
     <guimenuitem>Attiva la bacheca</guimenuitem> o <guimenuitem>Disattiva la bacheca
     </guimenuitem>.  </para>
   </sect1>
@@ -204,14 +204,14 @@
     Le modifiche al pannello sono automaticamente salvate in
     <filename>~/.config/rox.sourceforge.net/ROX-Filer/pan_MioPannello</filename>.
     Come per la bacheca, è possibile passare a diverse configurazioni eseguendo di nuovo
-    «rox» con un altro nome di pannello. 
+    «rox» con un altro nome di pannello.
 
     <screen>$ rox -b=AltroPannello</screen>
-    
+
     Con un menù a comparsa si può impostare su quale bordo dello schermo deve apparire
     il pannello, oppure si può specificare il nome del bordo al posto di -b (ad es. --bottom).
     Lasciare vuoto il campo del nome per rimuovere il pannello:
-    
+
     <screen>$ rox --bottom=</screen>
    </para>
   </sect1>
@@ -228,7 +228,7 @@
 
    <sect2><title>Sawfish / Sawmill</title>
     <para>
-     Sawfish all'avvio tenta di capire se si sta usando GNOME e, se è così, fornisce il 
+     Sawfish all'avvio tenta di capire se si sta usando GNOME e, se è così, fornisce il
      supporto necessario. Si deve quindi aggiungere la riga
      <programlisting>(require 'gnome)</programlisting>
      al file <filename>.sawfishrc</filename> (consultare il manuale di sawfish per ulteriori
@@ -290,16 +290,16 @@
 
       <step><para>
        Premere il pulsante <guibutton>Seleziona finestra</guibutton>.
-       Il cursore diventa una croce. Selezionare un'icona della bacheca di 
+       Il cursore diventa una croce. Selezionare un'icona della bacheca di
        <application>ROX-Filer</application>. I pulsanti radio della cornice
        <guilabel>Specifica classe finestra</guilabel> dovrebbero cambiare le loro etichette
-       per includere <userinput>ROX-Pinboard.ROX-Filer</userinput> come primo oggetto.
+       per includere <userinput>ROX-Pinboard.ROX-Filer</userinput> come primo elemento.
        Selezionare quel pulsante radio.
       </para></step>
 
       <step><para>
        Scegliere <guimenuitem>Attributi della finestra</guimenuitem> dal menù a tendina.
-       Nella cornice <guilabel>Attributi</guilabel>, selezionare le caratteristiche  
+       Nella cornice <guilabel>Attributi</guilabel>, selezionare le caratteristiche
        della bacheca; sono raccomandate le seguenti:
 	<itemizedlist>
 	 <listitem><para>Elimina la barra del titolo</para></listitem>
@@ -334,7 +334,7 @@
 
    <sect2><title>Altri</title>
     <para>
-     Se ancora non funzionano le cose, andare nella sezione «Compatibilità» della 
+     Se ancora non funzionano le cose, andare nella sezione «Compatibilità» della
      finestra «Opzioni».
     </para>
    </sect2>
@@ -349,15 +349,15 @@
     di modifica su ogni file del sistema, quindi bisogna stare molto attenti.
 
     Normalmente, si dovrebbe accedere al sistema come utente normale e passare a
-    «root» solo quando è assolutamente necessario. Se <command>sudo</command> 
-    è installato e configurato, allora si può avviare il filer in questo modo: 
+    «root» solo quando è assolutamente necessario. Se <command>sudo</command>
+    è installato e configurato, allora si può avviare il filer in questo modo:
 
     <screen>$ sudo rox</screen>
 
-    Attenzione: ogni operazione su file e ogni programma avviato da questa 
+    Attenzione: ogni operazione su file e ogni programma avviato da questa
     finestra viene eseguito come utente «root».
     </para><para>
-    Può accadere che il server X non permetta a «root» (o ad altri utenti) di 
+    Può accadere che il server X non permetta a «root» (o ad altri utenti) di
     connettersi. Leggere le pagine di manuale dei comandi <command>xauth</command> e
     <command>xhost</command> può aiutare a risolvere il problema, ma molte cose
     cambiano da sistema a sistema (ecco perché questa caratteristica non è stata
@@ -366,7 +366,7 @@
    </para>
    <para>
     Nota: <command>gnomesu</command> può essere usato per eseguire il filer come root,
-    ma è necessario usare <command>setsid</command> per eseguirlo in una nuova 
+    ma è necessario usare <command>setsid</command> per eseguirlo in una nuova
     sessione, altrimenti gnomesu termina senza aprire alcuna finestra. Per esempio:
     <screen>gnomesu -c 'setsid /usr/local/bin/rox /'</screen>
    </para>
@@ -379,10 +379,10 @@
 
   <itemizedlist><title>In breve:</title>
 
-   <listitem><para>Fare clic con il pulsante sinistro del mouse 
-     <footnote><para>In questo manuale c'è la seguente convenzione: il pulsante&ndash;1 
+   <listitem><para>Fare clic con il pulsante sinistro del mouse
+     <footnote><para>In questo manuale c'è la seguente convenzione: il pulsante&ndash;1
      è quello sinistro, il pulsante&ndash;2 è quello centrale e il pulsante&ndash;3 è quello
-     destro. Fanno ovviamente eccezione i mouse per mancini.</para></footnote> 
+     destro. Fanno ovviamente eccezione i mouse per mancini.</para></footnote>
      per aprire file e directory.</para></listitem>
 
    <listitem><para>
@@ -392,7 +392,7 @@
 
    <listitem><para>
      Trascinare i file tra le finestre con il pulsante sinistro per copiare, spostare o fare
-     collegamenti (si sceglie da un menù). Il collegamento è una scorciatoia verso il file 
+     collegamenti (si sceglie da un menù). Il collegamento è una scorciatoia verso il file
      originale.
    </para></listitem>
 
@@ -412,9 +412,9 @@
 
      <row><entry>Clic pulsante sinistro</entry><entry>
        Apre il file o la directory su cui si ha fatto clic. Tenere premuto <keycap>Control</keycap>
-       per selezionare gli oggetti invece di aprirli. Tenere premuto <keycap>Shift</keycap>
+       per selezionare gli elementi invece di aprirli. Tenere premuto <keycap>Shift</keycap>
        per guardare dentro i file (come se fossero di testo), per seguire i
-       collegamenti simbolici o per ottenere maggiore controllo sui punti di mount 
+       collegamenti simbolici o per ottenere maggiore controllo sui punti di mount
        (vedere <xref linkend="media"/>).
      </entry></row>
 
@@ -425,11 +425,11 @@
 
      <row><entry>Clic pulsante destro</entry><entry>
        Attiva il menù principale. Tenere premuto <keycap>Control</keycap> per andare direttamente
-       nel sottomenù degli oggetti selezionati. Tenere premuto <keycap>Shift</keycap> per
+       nel sottomenù degli elementi selezionati. Tenere premuto <keycap>Shift</keycap> per
        attivare il menù <guimenuitem>Invia a...</guimenuitem> (vedere la sezione <xref linkend="SendTo"/>.
      </entry></row>
 
-     <row><entry>Trascinare un oggetto (pulsante sinistro del mouse)</entry><entry>
+     <row><entry>Trascinare un elemento (pulsante sinistro del mouse)</entry><entry>
        Mostra un menù di azioni possibili. C'è la possibilità di disabilitare questo menù, in
        questo caso i file vengono copiati nella destinazione (un'applicazione o un'altra
        finestra del filer). Tenere premuto <keycap>Shift</keycap>
@@ -437,16 +437,16 @@
        collegamento simbolico, <keycap>Alt</keycap> per attivare un menù di azioni possibili.
      </entry></row>
 
-     <row><entry>Trascinare un oggetto (pulsante centrale del mouse)</entry><entry>
-       Quando si rilascia, mostra un menù di azioni possibili. C'è la possibilità di 
+     <row><entry>Trascinare un elemento (pulsante centrale del mouse)</entry><entry>
+       Quando si rilascia, mostra un menù di azioni possibili. C'è la possibilità di
        spostare i file invece di attivare il menù.
      </entry></row>
 
-     <row><entry>Trascinare (non sopra un oggetto)</entry><entry>
-       Seleziona un gruppo di oggetti. Col tasto sinistro del mouse, si selezionano solo gli
-       oggetti dentro la selezione, ma tenendo premuto anche il tasto <keycap>Control</keycap>
-       gli oggetti vengono aggiunti alla selezione precedente.
-       Usando il tasto centrale, gli oggetti passano dallo stato selezionato a quello 
+     <row><entry>Trascinare (non sopra un elemento)</entry><entry>
+       Seleziona un gruppo di elementi. Col tasto sinistro del mouse, si selezionano solo gli
+       elementi dentro la selezione, ma tenendo premuto anche il tasto <keycap>Control</keycap>
+       gli elementi vengono aggiunti alla selezione precedente.
+       Usando il tasto centrale, gli elementi passano dallo stato selezionato a quello
        deselezionato e viceversa.
      </entry></row>
 
@@ -473,21 +473,21 @@
 
      <row><entry><keycap>Invio</keycap></entry><entry>
        Agisce come se si facesse clic su un file. Tenere premuto «Shift» per ottenere altri
-       effetti, come quando si fa clic. Tenendo premuto «Alt» agisce come facendo clic 
+       effetti, come quando si fa clic. Tenendo premuto «Alt» agisce come facendo clic
        con il tasto centrale del mouse: le directory vengono aperte in una nuova
-       finestra e l'apertura dei file provoca contemporaneamente la chiusura 
+       finestra e l'apertura dei file provoca contemporaneamente la chiusura
        della finestra del filer.
      </entry></row>
 
      <row><entry><keycap>Barra spaziatrice</keycap></entry><entry>
-       Seleziona e deseleziona l'oggetto e si sposta su quello successivo.
+       Seleziona e deseleziona l'elemento e si sposta su quello successivo.
      </entry></row>
 
      <row><entry><keycap>Tab</keycap>, <keycap>Shift</keycap>+<keycap>Tab</keycap></entry><entry>
-       Sposta il cursore sul successivo/precedente oggetto selezionato.
+       Sposta il cursore sul successivo/precedente elemento selezionato.
      </entry></row>
 
-     <row><entry>Tenere il mouse su un oggetto</entry><entry>
+     <row><entry>Tenere il mouse su un elemento</entry><entry>
        Mostra un suggerimento: una breve descrizione (se disponibile) dell'applicazione,
        la destinazione di un collegamento simbolico e il nome completo di un file che è troppo
        lungo per essere visualizzato nella finestra principale.
@@ -500,7 +500,7 @@
    possono essere facilmente impostati attivando il menù, spostando il puntatore su
    una voce che si desidera usare e premendo un tasto. Quest'ultimo appare ora nel menù
    e può essere usato da qui in avanti. Le associazioni dei tasti sono automaticamente salvate
-   quando si chiude il filer. È possibile usare un gestore di XSettings, come ROX-Session, 
+   quando si chiude il filer. È possibile usare un gestore di XSettings, come ROX-Session,
    per attivare questa caratteristica su tutte le applicazioni Gtk+-2.0.
   </para>
  </chapter>
@@ -508,7 +508,7 @@
  <chapter id="selection">
   <title>La selezione</title>
   <para>
-   Quando si selezionano gli oggetti di una finestra di <application>ROX-Filer</application>,
+   Quando si selezionano gli elementi di una finestra di <application>ROX-Filer</application>,
    il filer memorizza la <emphasis>selezione primaria</emphasis>. È possibile quindi incollare
    in un'altra finestra il nome (e il percorso) del file selezionato.
   </para>
@@ -519,7 +519,7 @@
    <step><para>Aprire la finestra di dialogo «Apri» dell'applicazione.</para></step>
 
    <step><para>
-     Selezionare il file in una finestra di <application>ROX-Filer</application> usando 
+     Selezionare il file in una finestra di <application>ROX-Filer</application> usando
      <keycap>Control</keycap>+clic.</para></step>
 
    <step><para>
@@ -529,12 +529,12 @@
   </procedure>
 
   <para>
-   Notare che si può aprire il file selezionato facendo clic con il tasto centrale del mouse 
+   Notare che si può aprire il file selezionato facendo clic con il tasto centrale del mouse
    nell'area principale dei più comuni browser web.
    </para><para>
-   Se si seleziona qualcos'altro (es. qualche parola in un altro programma), il filer perde la 
-   selezione primaria e gli oggetti selezionati diventano ombreggiati. Per riprenderla,
-   fare clic su un oggetto ombreggiato.
+   Se si seleziona qualcos'altro (es. qualche parola in un altro programma), il filer perde la
+   selezione primaria e gli elementi selezionati diventano ombreggiati. Per riprenderla,
+   fare clic su un elemento ombreggiato.
   </para>
 
   <sect1><title>Salvare e ripristinare la selezione</title>
@@ -552,7 +552,7 @@
     <step><para>Spostarsi in un'altra directory o chiudere la finestra.</para></step>
     <step><para>In un'altra finestra del filer premere <keycap>1</keycap> per ritornare
     nella directory iniziale.</para></step> </procedure>
-   <para>I gruppi di selezione vengono salvati automaticamente e sono disponibili 
+   <para>I gruppi di selezione vengono salvati automaticamente e sono disponibili
    anche la prossima volta che si usa il filer.
   </para></sect1>
  </chapter>
@@ -562,9 +562,9 @@
   <para>
 
    Normalmente, ogni finestra ha in alto una barra degli strumenti. Con il menù «Opzioni»
-   è possibile disabilitarla, renderla più larga o più stretta selezionando quali strumenti 
-   far apparire. Di solito si fa clic su questi strumenti con il pulsante sinistro (1) 
-   del mouse, ma alcuni di questi hanno anche altre funzioni con il pulsante 
+   è possibile disabilitarla, renderla più larga o più stretta selezionando quali strumenti
+   far apparire. Di solito si fa clic su questi strumenti con il pulsante sinistro (1)
+   del mouse, ma alcuni di questi hanno anche altre funzioni con il pulsante
    centrale (2) o destro (3).
   </para>
 
@@ -635,13 +635,13 @@
   <para>
    <anchor id="newwin_fn" xreflabel="[1]"/>[1]
    Se è attivata l'opzione «Nuova finestra con il pulsante 1», il comportamento predefinito
-   è di aprire una nuova finestra, invece se si fa clic con l'altro pulsante viene usata la stessa 
+   è di aprire una nuova finestra, invece se si fa clic con l'altro pulsante viene usata la stessa
    finestra.
   </para>
 
   <para>
    Trascinare i file sull'icona «Su» o sull'icona «Casa» è equivalente a trascinarli
-   direttamente nelle directory a cui conducono. Trascinare una directory sul 
+   direttamente nelle directory a cui conducono. Trascinare una directory sul
    pulsante «Segnalibri» è equivalente ad aggiungerla come un nuovo segnalibro.
   </para>
   <para>
@@ -670,11 +670,11 @@
       </entry></row>
 
       <row><entry><guimenuitem>File</guimenuitem></entry><entry>
-        Operazioni sugli oggetti selezionati.
+        Operazioni sugli elementi selezionati.
       </entry></row>
 
       <row><entry><guimenuitem>Seleziona</guimenuitem></entry><entry>
-        Stabilisce quali oggetti selezionare.
+        Stabilisce quali elementi selezionare.
       </entry></row>
 
       <row><entry><guimenuitem>Opzioni</guimenuitem></entry><entry>
@@ -730,7 +730,7 @@
        </entry></row>
 
        <row><entry><guimenuitem>Automatico</guimenuitem></entry><entry>
-       Modalità automatica: seleziona automaticamente la dimensione delle icone 
+       Modalità automatica: seleziona automaticamente la dimensione delle icone
        (utile quando si cambia directory, ecc...).
        </entry></row>
 
@@ -765,7 +765,7 @@
        </entry></row>
 
        <row><entry><guimenuitem>Aggiorna</guimenuitem></entry><entry>
-       Rilegge il contenuto della directory e i dettagli di tutti i file presenti in essa. 
+       Rilegge il contenuto della directory e i dettagli di tutti i file presenti in essa.
        Da usare se il contenuto mostrato è obsoleto.
        </entry></row>
 
@@ -780,10 +780,10 @@
     </title>
     <para>
 
-     Il campo dei permessi è formato da quattro gruppi di tre flag. Ogni 
-     flag è visualizzato con una lettera o con un trattino (&ndash;). 
+     Il campo dei permessi è formato da quattro gruppi di tre flag. Ogni
+     flag è visualizzato con una lettera o con un trattino (&ndash;).
      Le prime tre lettere sono i permessi del «proprietario» del file, le successive tre
-     del «gruppo» del file e le altre tre degli «altri». Se uno di questi gruppi si 
+     del «gruppo» del file e le altre tre degli «altri». Se uno di questi gruppi si
      riferisce al processo stesso di <application>ROX-Filer</application>, allora viene
      mostrato sottolineato.
      Nel quarto gruppo ci sono alcuni flag speciali.
@@ -815,8 +815,8 @@
         </para></listitem>
 
       <listitem><para><computeroutput>T</computeroutput> &mdash;
-        Gli oggetti in questa directory possono essere modificati o rimossi solo dal 
-        proprietario dei file e da nessun altro, anche se si ha accesso in scrittura 
+        Gli elementi in questa directory possono essere modificati o rimossi solo dal
+        proprietario dei file e da nessun altro, anche se si ha accesso in scrittura
         alla directory in questione.
         </para></listitem>
 
@@ -824,12 +824,12 @@
      Per esempio,
      <programlisting>
       <emphasis role="underline">rwx</emphasis>,rwx,r-x/---</programlisting>
-     significa che il proprietario del file è lo stesso utente effettivo di 
-     <application>ROX-Filer</application>, il proprietario e i membri del gruppo 
+     significa che il proprietario del file è lo stesso utente effettivo di
+     <application>ROX-Filer</application>, il proprietario e i membri del gruppo
      del file hanno permessi in lettura, scrittura ed esecuzione, infine gli altri hanno
      solo i permessi in lettura ed esecuzione. Non ci sono flag speciali.
 
-     Le regole che determinano quali permessi applicare possono variare leggermente da un 
+     Le regole che determinano quali permessi applicare possono variare leggermente da un
      sistema operativo a un altro, ma in linea di massima:
 
      <itemizedlist>
@@ -844,8 +844,8 @@
         permessi del gruppo.
       </para></listitem>
 
-      <listitem><para>Per il resto, si applicano i permessi degli «altri». 
-        <emphasis>ID utente reale</emphasis> e <emphasis>ID gruppo reale</emphasis> 
+      <listitem><para>Per il resto, si applicano i permessi degli «altri».
+        <emphasis>ID utente reale</emphasis> e <emphasis>ID gruppo reale</emphasis>
         non hanno effetto (eccetto che un processo imposti il suo ID reale come il suo
         ID effettivo).
       </para></listitem>
@@ -859,14 +859,14 @@
   <sect1>
    <title>Il menù «File»</title>
    <para>
-    Tutti i menù funzionano in modo simile. Per esempio, attivando il menù su 
-    qualche oggetto selezionato, l'operazione si applica solo agli oggetti 
-    selezionati. Attivando invece il menù su un oggetto quando non c'è nessuna 
-    selezione, quell'oggetto viene selezionato momentaneamente.
+    Tutti i menù funzionano in modo simile. Per esempio, attivando il menù su
+    qualche elemento selezionato, l'operazione si applica solo agli elementi
+    selezionati. Attivando invece il menù su un elemento quando non c'è nessuna
+    selezione, quell'elemento viene selezionato momentaneamente.
     </para><para>
-    Attivando un menù né su un oggetto né su una selezione, la finestra va in
-    "modalità bersaglio": l'operazione viene eseguita sul prossimo oggetto  su cui
-    si fa clic. Si esce dalla modalità bersaglio premendo <keycap>Esc</keycap>, 
+    Attivando un menù né su un elemento né su una selezione, la finestra va in
+    "modalità bersaglio": l'operazione viene eseguita sul prossimo elemento su cui
+    si fa clic. Si esce dalla modalità bersaglio premendo <keycap>Esc</keycap>,
     facendo clic sullo sfondo della finestra o con il tasto destro del mouse. Questa modalità è
     utile con l'opzione <guilabel>Navigazione a singolo clic</guilabel>
     e con i tasti associati alle varie voci di menù. </para><para>
@@ -874,7 +874,7 @@
     sottomenù che si ottengono facendo clic sopra di esse. Vedere
     <xref linkend="AppDir"/> per ulteriori dettagli. In alto ci può essere un
     numero qualsiasi di azioni definite dall'utente, che dipendono dal tipo di file
-    su cui si fa clic. Per aggiungere dei programmi, selezionare la voce 
+    su cui si fa clic. Per aggiungere dei programmi, selezionare la voce
     <guimenuitem>Personalizza il menù...</guimenuitem>. Per esempio, è possibile far
     apparire come menù <application>Gimp</application> per le immagini e
     <application>FreeFS</application> per i punti di mount.
@@ -885,12 +885,12 @@
 
        <row><entry>
          <guimenuitem>Copia...</guimenuitem></entry><entry>
-         Fa una copia di questo oggetto.
+         Fa una copia di questo elemento.
        </entry></row>
 
        <row><entry>
          <guimenuitem>Rinomina...</guimenuitem></entry><entry>
-         Cambia il nome di questo oggetto o lo sposta in un'altra directory.
+         Cambia il nome di questo elemento o lo sposta in un'altra directory.
        	 Se sono selezionati più file, allora apre <xref linkend='bulkrename' />.
 
        </entry></row>
@@ -902,18 +902,18 @@
 
        <row><entry>
          <guimenuitem>Elimina</guimenuitem></entry><entry>
-         Rimuove dalla directory tutti gli oggetti selezionati. Se è una sottodirectory,
+         Rimuove dalla directory tutti gli elementi selezionati. Se è una sottodirectory,
          viene prima eliminato il suo contenuto. Se è un collegamento simbolico,
-         si elimina solo il collegamento, non l'oggetto a cui punta.
+         si elimina solo il collegamento, non l'elemento a cui punta.
        </entry></row>
 
        <row><entry>
          <guimenuitem>Apri con Shift</guimenuitem></entry><entry>
 	 Apre le applicazioni come se fossero directory, i file come se fossero di testo
-	 e per i collegamenti simbolici apre la directory che contiene l'oggetto a cui punta.
+	 e per i collegamenti simbolici apre la directory che contiene l'elemento a cui punta.
 	 Ha anche un comportamento particolare per i punti di mount (vedere <xref linkend="media"/>).
 	 Si ottiene lo stesso effetto quando si fa clic tenendo premuto il tasto
-         <keycap>Shift</keycap>. Il testo della voce di menù cambia per mostrare 
+         <keycap>Shift</keycap>. Il testo della voce di menù cambia per mostrare
          quale azione sta per essere eseguita.
        </entry></row>
 
@@ -937,17 +937,17 @@
 
        <row><entry>
          <guimenuitem>Proprietà</guimenuitem></entry><entry>
-         Mostra ulteriori informazioni dell'oggetto selezionato. Qui è anche possibile 
-         cambiare la destinazione di un collegamento simbolico e i permessi (ma il menù 
-         <guimenuitem>Permessi</guimenuitem> che è più in basso, permette di 
+         Mostra ulteriori informazioni dell'elemento selezionato. Qui è anche possibile
+         cambiare la destinazione di un collegamento simbolico e i permessi (ma il menù
+         <guimenuitem>Permessi</guimenuitem> che è più in basso, permette di
          cambiarli a più file contemporaneamente).
        </entry></row>
 
        <row><entry>
          <guimenuitem>Spazio usato</guimenuitem></entry><entry>
-         Calcola lo spazio usato dagli oggetti selezionati. Se è una directory, tiene
-         conto anche del suo contenuto. Se è un collegamento simbolico, non tiene conto 
-         dell'oggetto a cui punta.
+         Calcola lo spazio usato dagli elementi selezionati. Se è una directory, tiene
+         conto anche del suo contenuto. Se è un collegamento simbolico, non tiene conto
+         dell'elemento a cui punta.
        </entry></row>
 
        <row><entry>
@@ -959,7 +959,7 @@
        <row><entry>
          <guimenuitem>Permessi</guimenuitem></entry><entry>
          Permette di cambiare i permessi ai file selezionati. Se è selezionato solo un
-	 file, è meglio usare l'interfaccia più semplice del menù 
+	 file, è meglio usare l'interfaccia più semplice del menù
 	 <guimenuitem>Proprietà</guimenuitem>
        </entry></row>
 
@@ -976,15 +976,15 @@
     <para>
      un collegamento simbolico memorizza il <emphasis>percorso</emphasis>
      di un altro file. Eliminando questo collegamento, non si influenza l'altro
-     file. Eliminando invece l'altro file, il collegamento simbolico viene interrotto. 
+     file. Eliminando invece l'altro file, il collegamento simbolico viene interrotto.
      Ci sono due tipi di collegamento simbolico: assoluto e relativo. Un collegamento
      simbolico assoluto memorizza il percorso partendo dalla radice («/» o «root»),
      per esempio: <filename>/home/fred/MyFile</filename>.
 
      Un collegamento simbolico relativo memorizza il percorso partendo dal collegamento
      stesso, per esempio <filename>../fred/MyFile</filename>.
-     Se non si ha intenzione di spostare il file di destinazione, è meglio usare un 
-     collegamento assoluto, altrimenti uno relativo. 
+     Se non si ha intenzione di spostare il file di destinazione, è meglio usare un
+     collegamento assoluto, altrimenti uno relativo.
     </para>
    </formalpara>
   </sect1>
@@ -1000,11 +1000,11 @@
       <tbody>
        <row><entry>
          <guimenuitem>Seleziona tutto</guimenuitem></entry><entry>
-         Seleziona tutti gli oggetti della finestra.
+         Seleziona tutti gli elementi della finestra.
        </entry></row>
 
        <row><entry><guimenuitem>Annulla la selezione</guimenuitem></entry><entry>
-         Deseleziona tutti gli oggetti della finestra.
+         Deseleziona tutti gli elementi della finestra.
        </entry></row>
 
        <row><entry><guimenuitem>Inverti la selezione</guimenuitem></entry><entry>
@@ -1013,14 +1013,14 @@
 
        <row><entry>
          <guimenuitem>Seleziona per nome...</guimenuitem></entry><entry>
-         Seleziona solo i file che corrispondono a un dato modello. Non è flessibile 
-         come <guimenuitem>Seleziona se...</guimenuitem> (vedere 
-	 sotto), ma è più veloce da usare. Con questa opzione i file vengono anche selezionati. 
+         Seleziona solo i file che corrispondono a un dato modello. Non è flessibile
+         come <guimenuitem>Seleziona se...</guimenuitem> (vedere
+	 sotto), ma è più veloce da usare. Con questa opzione i file vengono anche selezionati.
 	 La scorciatoia da tastiera predefinita è <keycap>.</keycap>,
-	 quindi basta digitare per esempio <userinput>.png</userinput> per selezionare 
+	 quindi basta digitare per esempio <userinput>.png</userinput> per selezionare
 	 tutti i file <filename>.png</filename>.
        </entry></row>
-       
+
        <row><entry>
          <guimenuitem>Seleziona se...</guimenuitem></entry><entry>
          Seleziona solo quei file che soddisfano un dato modello di ricerca. Vedere
@@ -1036,7 +1036,7 @@
    <title>Il menù «Nuovo»</title>
    <para>
 
-    Ciascuna voce di questo menù apre una finestra per creare un nuovo file o una 
+    Ciascuna voce di questo menù apre una finestra per creare un nuovo file o una
     nuova directory. Ci sono due voci predefinite, le altre sono il contenuto della directory
     <filename>~/.config/rox.sourceforge.net/Templates</filename>, se esiste.
 
@@ -1047,7 +1047,7 @@
        <row><entry>Directory</entry><entry>
          Crea una nuova directory.
          </entry></row>
-         
+
          <row><entry>File</entry><entry>
          Crea un file vuoto.
          </entry></row>
@@ -1055,7 +1055,7 @@
          <row><entry>Personalizza</entry><entry>
          Apre la directory <filename>Templates</filename> per aggiungere altre voci al menù.
          </entry></row>
-         
+
          <row><entry>&lt;definiti dall'utente&gt;</entry><entry>
          Copia un file dalla directory «Templates».
        </entry></row>
@@ -1063,7 +1063,7 @@
 
 
     Per aggiungere nuove voci, scegliere <guimenuitem>Personalizza</guimenuitem>
-    e mettere i file lì dentro. I file di quella directory compaiono quindi nel menù  e vengono 
+    e mettere i file lì dentro. I file di quella directory compaiono quindi nel menù  e vengono
     usati per creare i nuovi file. Per esempio, se si desidera creare un file HTML vuoto:
 
     <programlisting>
@@ -1174,7 +1174,7 @@
       <tbody>
        <row><entry>
          <guimenuitem>Informazioni su ROX-Filer</guimenuitem></entry><entry>
-         Mostra le informazioni del filer. È equivalente a cercare «ROX-Filer» 
+         Mostra le informazioni del filer. È equivalente a cercare «ROX-Filer»
 	 in una finestra del filer e selezionare <guimenuitem>Proprietà</guimenuitem>
 	 dal menù.
        </entry></row>
@@ -1202,10 +1202,10 @@
 
     Il menù «Invia a...» fornisce un modo veloce per inviare file a un'applicazione.
     Il filer analizza tutte le directory <filename>SendTo</filename> nel
-    <envar>$XDG_CONFIG_DIRS/rox.sourceforge.net/SendTo</envar> 
+    <envar>$XDG_CONFIG_DIRS/rox.sourceforge.net/SendTo</envar>
     (vedere <citation>BaseDir</citation>) ed elenca il contenuto in questo menù.
     </para><para>
-    Per cambiare le applicazioni che appaiono, scegliere 
+    Per cambiare le applicazioni che appaiono, scegliere
     <guimenuitem>Personalizza</guimenuitem> in fondo al menù. Si apre quindi
     la directory <filename>SendTo</filename>. Si possono creare collegamenti simbolici
     alle applicazioni, trascinandole qui e scegliendo
@@ -1222,7 +1222,7 @@
      stata selezionata un'immagine. Per fare questo, si deve creare una directory
      nascosta dentro <filename>SendTo</filename> di nome <filename>.image</filename> (o
      di qualsiasi altro tipo di file si desidera). È anche possibile usare il tipo
-     completo, come ad esempio <filename>.image_png</filename>. Usare il menù 
+     completo, come ad esempio <filename>.image_png</filename>. Usare il menù
      <guimenuitem>Proprietà</guimenuitem> su un file per conoscere il tipo di MIME.
     </para>
     <para>
@@ -1236,11 +1236,11 @@
    <title><anchor id="bookmarks" xreflabel="menù segnalibri"/>Il «Menù segnalibri»</title>
    <para>
     Il menù segnalibri viene usato per memorizzare un elenco di directory usate frequentemente.
-    È possibile aprirlo anche dal menù principale (sottomenù 
+    È possibile aprirlo anche dal menù principale (sottomenù
     <guimenuitem>Finestra</guimenuitem>) e creare una scorciatoia associandolo a un
     tasto. Dal menù segnalibri è possibile aggiungere alla lista la directory attualmente
     visualizzata, spostarsi in una directory memorizzata, o aprire una finestra di dialogo
-    per modificare l'elenco. Se necessario, si possono rimuovere le voci, riordinarle 
+    per modificare l'elenco. Se necessario, si possono rimuovere le voci, riordinarle
     (usando le frecce o trascinandole) e modificare direttamente i percorsi.
    </para>
    <para>
@@ -1258,9 +1258,9 @@
 
    Le sezioni <xref linkend="run_pin"/> e <xref linkend="run_pan"/> spiegano come
    attivare la bacheca e i pannelli. Una volta attivi, è possibile rilasciare gli
-   oggetti da una finestra del filer per appenderli. È indifferente fare clic su un 
-   oggetto affisso sulla bacheca o fare clic nella finestra del filer. Le icone 
-   affisse si trascinano come quelle normali e si può attivare il loro menù  
+   elementi da una finestra del filer per appenderli. È indifferente fare clic su un
+   elemento affisso sulla bacheca o fare clic nella finestra del filer. Le icone
+   affisse si trascinano come quelle normali e si può attivare il loro menù
    con il tasto destro del mouse.
    </para><para>
    Per spostare le icone del pannello, trascinarle con il tasto centrale del mouse.
@@ -1279,10 +1279,10 @@
 
   <important><para>
     Trascinare un file sulla bacheca o sul pannello <emphasis>non</emphasis> significa
-    copiarlo: è solamente una scorciatoia al file. Questo comportamento è 
+    copiarlo: è solamente una scorciatoia al file. Questo comportamento è
     molto diverso da quello degli altri filer. Infatti se si elimina il file dalla
     bacheca, si elimina solo il collegamento al file originale; se si elimina il file
-    originale, sulla bacheca rimane solo un collegamento interrotto. 
+    originale, sulla bacheca rimane solo un collegamento interrotto.
   </para></important>
 
   <sect1>
@@ -1304,8 +1304,8 @@
        </entry></row>
 
        <row><entry>
-         <guimenuitem>Modifica oggetto</guimenuitem></entry><entry>
-         Cambia il nome visualizzato sotto l'icona o il percorso all'oggetto a
+         <guimenuitem>Modifica elemento</guimenuitem></entry><entry>
+         Cambia il nome visualizzato sotto l'icona o il percorso all'elemento a
          cui punta. Si può impostare una scorciatoia da tastiera per l'icona o
          bloccarla per impedirne la cancellazione accidentale.
 	 Inoltre, è possibile specificare gli argomenti aggiuntivi da passare ai programmi.
@@ -1317,13 +1317,13 @@
        </entry></row>
 
        <row><entry>
-         <guimenuitem>Rimuovi oggetto</guimenuitem></entry><entry>
-         Rimuove gli oggetti selezionati dalla bacheca o dal pannello.
+         <guimenuitem>Rimuovi elemento</guimenuitem></entry><entry>
+         Rimuove gli elementi selezionati dalla bacheca o dal pannello.
        </entry></row>
 
        <row><entry>
          <guimenuitem>Sfondo...</guimenuitem></entry><entry>
-	 Imposta l'immagine di sfondo (vedere più sotto). È disponibile 
+	 Imposta l'immagine di sfondo (vedere più sotto). È disponibile
 	 solo nel menù della bacheca.
        </entry></row>
 
@@ -1336,12 +1336,12 @@
     </tbody></tgroup></informaltable>
 
     </para><para>
-    Per creare le impostazioni predefinite per gli altri utenti come l'icona «Home» che 
+    Per creare le impostazioni predefinite per gli altri utenti come l'icona «Home» che
     punta alla directory dell'utente stesso, prima si deve creare una nuova icona,
-    poi si deve usare <guimenuitem>Modifica oggetto</guimenuitem> per cambiare il percorso 
+    poi si deve usare <guimenuitem>Modifica elemento</guimenuitem> per cambiare il percorso
     in <filename>~</filename> e infine rinominarlo «Home».
     </para><para>
-    Notare che facendo clic su certe applicazioni, queste possono aggiungere alcuni menù in 
+    Notare che facendo clic su certe applicazioni, queste possono aggiungere alcuni menù in
     cima al menù principale. Vedere <xref linkend="AppDir"/> per ulteriori dettagli.
    </para>
   </sect1>
@@ -1351,10 +1351,10 @@
    <para>
 
     <application>ROX-Filer</application> permette di eseguire dentro il pannello piccole
-    applicazioni di nome <emphasis>applet</emphasis>. Per eseguirne una, trascinarla nel 
+    applicazioni di nome <emphasis>applet</emphasis>. Per eseguirne una, trascinarla nel
     pannello dalla finestra del filer. La sua icona non viene visualizzata, ma l'applet
     viene eseguita.
-    
+
    </para>
 
    <procedure><title>Creare una applet (solo per programmatori):</title>
@@ -1364,7 +1364,7 @@
     </para></step>
 
     <step><para>
-      Usare il menù <guimenuitem>Imposta icona...</guimenuitem> per creare dentro 
+      Usare il menù <guimenuitem>Imposta icona...</guimenuitem> per creare dentro
       la directory un'icona di nome <filename>.DirIcon</filename>. La directory viene
       poi visualizzata con quest'icona.
     </para></step>
@@ -1376,9 +1376,9 @@
 
     <step><para>
       Creare un eseguibile di nome <filename>AppletRun</filename>. Questo
-      passa lo XID del socket del pannello quando la directory viene trascinata 
+      passa lo XID del socket del pannello quando la directory viene trascinata
       dentro il pannello. Usare questo per creare un widget GtkPlug. Un tutorial
-      è disponibile su 
+      è disponibile su
       <ulink url="http://rox.sourceforge.net/phpwiki/index.php/Tutorials/Applets"/>
     </para></step>
 
@@ -1391,7 +1391,7 @@
     Quando è attiva la bacheca, ROX-Filer può visualizzare le finestre ridotte a icona (o
     «minimizzate») mostrando un'opportuna icona sulla bacheca. Attivare questa funzione nella
     finestra «Opzioni». Le finestre ridotte a icona hanno uno sfondo semitrasparente e possono
-    essere spostate. Fare clic sopra per ripristinare la finestra. Alcuni vecchi window 
+    essere spostate. Fare clic sopra per ripristinare la finestra. Alcuni vecchi window
     manager non supportano questa funzione, quindi nessuna icona viene mostrata.
    </para>
   </sect1>
@@ -1421,7 +1421,7 @@
    </formalpara><para>
     Se eseguita senza argomenti, l'applicazione dovrebbe attivare il metodo SOAP
     <function>SetBackdropApp</function> (vedere <xref
-    linkend="soap"/>). Il filer quindi la riesegue immediatamente e, questa volta, 
+    linkend="soap"/>). Il filer quindi la riesegue immediatamente e, questa volta,
     con l'opzione <option>--backdrop</option>.
    </para><para>
     Se eseguita con <option>--backdrop</option>, il programma dovrebbe scrivere lo stile
@@ -1431,7 +1431,7 @@
     possibile. Il filer quindi carica l'immagine e la visualizza. L'applicazione non
     imposta lo sfondo, ma dice solamente al filer cosa visualizzare.
    </para><para>
-    Nel caso di uno sfondo con immagine casuale, il programma può terminare 
+    Nel caso di uno sfondo con immagine casuale, il programma può terminare
     immediatamente. Se l'applicazione ha creato un'immagine temporanea, dovrebbe leggere
     la riga "ok\n" dal suo standard input prima di cancellare l'immagine.
    </para><para>
@@ -1440,7 +1440,7 @@
     scrivere quel nome di file, e così via.
    </para><para>
     Chiudendo i due stream, il filer indica che il programma si deve fermare. A questo
-    punto il programma dovrebbe terminare.  Per eliminare qualunque file temporaneo, 
+    punto il programma dovrebbe terminare.  Per eliminare qualunque file temporaneo,
     assicurarsi di catturare SIGPIPE quando si scrive sullo standard output.
    </para><para>
     Per un esempio completo, vedere l'applicazione «Wallpaper» <citation>Wallpaper</citation>
@@ -1461,18 +1461,18 @@
   <para>
    Montare un device significa far apparire il suo contenuto nel file system. Normalmente,
    la directory <filename>/floppy</filename> è vuota, ma se si monta qui il dischetto,
-   il suo contenuto appare dentro la directory. Per esempio, un file di nome 
+   il suo contenuto appare dentro la directory. Per esempio, un file di nome
    <filename>Lettera</filename> nel dischetto appare come <filename>/floppy/Lettera</filename>.
   </para>
   <para>
    Prima di rimuovere un disco, il device deve essere smontato, così il sistema può scrivere
-   i dati che ha in buffer. Rimuovere un disco senza smontarlo può rovinare il suo contenuto. 
-   Fortunatamente i CD e gli Zip sono bloccati quando il device è montato, così non c'è 
+   i dati che ha in buffer. Rimuovere un disco senza smontarlo può rovinare il suo contenuto.
+   Fortunatamente i CD e gli Zip sono bloccati quando il device è montato, così non c'è
    pericolo di rimuoverli accidentalmente.
   </para>
   <para>
    Quando si vuole usare un disco, non c'è bisogno di specificare ogni volta quale device
-   usare e in quale punto del file system montarlo, perché nel file 
+   usare e in quale punto del file system montarlo, perché nel file
    <filename>/etc/fstab</filename> c'è un elenco preimpostato. ROX-Filer mostra i punti
    di mount (come il <filename>/floppy</filename>) che sono elencati ma non montati con
    un cerchio grigio semitrasparente sopra le loro icone.
@@ -1480,13 +1480,13 @@
   <para>
    Facendo clic su uno di questi punti di mount, il device viene montato e il cerchio diventa verde.
    <emphasis>Non</emphasis> rimuovere il dispositivo finché il cerchio è acceso. Per smontare
-   il device, fare clic su <filename>/floppy</filename> tenendo premuto il tasto 
+   il device, fare clic su <filename>/floppy</filename> tenendo premuto il tasto
    <keycap>Shift</keycap>.
   </para>
   <para>
    È anche possibile smontare un device chiudendo la finestra (per esempio quella
-   del <filename>/floppy</filename>) e scegliendo «Smonta» dalla finestra che appare. 
-   Il filer permette di smontare i device in questo modo solo se sono stati prima 
+   del <filename>/floppy</filename>) e scegliendo «Smonta» dalla finestra che appare.
+   Il filer permette di smontare i device in questo modo solo se sono stati prima
    montati dal filer stesso.
   </para>
   <para>
@@ -1502,7 +1502,7 @@
   <para>
     Se le miniature sono attive, il filer prova a caricare ogni file di
     immagine e usa quella stessa immagine come icona del file. Sono utili nelle
-    directory piene di foto.  Per attivarle in una sola directory, selezionare 
+    directory piene di foto.  Per attivarle in una sola directory, selezionare
     <guimenuitem>Mostra miniature</guimenuitem> dal menù <guimenuitem>Visualizza</guimenuitem>.
     Per averle sempre attive, andare nella finestra «Opzioni». In questo caso,
     sulla barra del titolo della finestra compare la scritta <guilabel>(Miniature)</guilabel>.
@@ -1510,7 +1510,7 @@
   <para>
     Le miniature vengono memorizzate in <filename>~/.thumbnails</filename>, per caricarle
     più velocemente la volta dopo. Durante il caricamento delle miniature, nella parte
-    inferiore della finestra compare una barra di avanzamento. Facendo clic sul pulsante  
+    inferiore della finestra compare una barra di avanzamento. Facendo clic sul pulsante
     <guibutton>Annulla</guibutton> che è accanto alla barra, viene interrotta la scansione.
     È anche possibile creare miniature di altri tipi di file, come ad esempio i video:
     basta visualizzare un frame usando un programma opportuno.
@@ -1522,12 +1522,12 @@
    file che scansiona. Se la miniatura esiste, la carica e continua con il file successivo.
   </para><para>
    Per generare la miniatura di un file di un certo tipo di «media/subtype», il filer
-   cerca un programma prima in 
+   cerca un programma prima in
    <filename>~/.config/rox.sourceforge.net/MIME-thumb/media_subtype</filename>
-   e poi in <filename>~/.config/rox.sourceforge.net/MIME-thumb/media</filename> 
+   e poi in <filename>~/.config/rox.sourceforge.net/MIME-thumb/media</filename>
    (come quando si visualizzano
-   applicazioni differenti per tipi di file differenti). Se non viene trovato 
-   niente e se il file è di tipo «image/*» allora vengono usate le routine interne. 
+   applicazioni differenti per tipi di file differenti). Se non viene trovato
+   niente e se il file è di tipo «image/*» allora vengono usate le routine interne.
    Se il file non è di tipo «image/*», non viene creata alcuna miniatura.
   </para><para>
    Se viene trovato il programma per generare le miniature, allora viene eseguito con i
@@ -1552,10 +1552,10 @@
   <para>
    Alcuni tipi di file possono essere rappresentati come directory. Un tipico esempio
    è il file zip, che contiene in forma compressa la struttura di una intera directory.
-   A volte è utile essere in grado di aprire questo tipo di file come se fosse una vera 
+   A volte è utile essere in grado di aprire questo tipo di file come se fosse una vera
    directory. Il VFS (Virtual File System) permette di farlo.
   </para><para>
-   Per usare questa funzionalità,  AVFS <citation>AVFS</citation> deve essere installato sul sistema 
+   Per usare questa funzionalità,  AVFS <citation>AVFS</citation> deve essere installato sul sistema
    in modo da permettere al kernel di supportare direttamente i vari tipi di file system virtuali.
   </para>
 
@@ -1580,7 +1580,7 @@
 
   <step>
     <para>
-      Per configurare ROX-Filer in modo da aprire le directory usando AVFS, cliccare su 
+      Per configurare ROX-Filer in modo da aprire le directory usando AVFS, cliccare su
       (<guimenuitem>Imposta azione...</guimenuitem>) per i file zip (ed gli altri tipi di archivi)
       ed inserire: </para>
     <screen>rox ~/.avfs-mount/"$1#"</screen>
@@ -1596,7 +1596,7 @@
 
   <para>
     Se non si desidera che AVFS sia l'azione predefinita di questi file, è possibile creare uno script
-    contenente il comando sopra descritto e aggiungerlo al menù 
+    contenente il comando sopra descritto e aggiungerlo al menù
     <guimenuitem>File</guimenuitem>, usando <guimenuitem>Personalizza il menù...</guimenuitem>.
   </para>
 
@@ -1606,7 +1606,7 @@
   <title><anchor id="mini" xreflabel="Minibuffer"/>Il minibuffer</title>
   <para>
 
-   Il minibuffer è una barra bianca che appare nella parte inferiore della finestra e 
+   Il minibuffer è una barra bianca che appare nella parte inferiore della finestra e
    che permette di inserire del testo. Per liberarsene, basta premere <keycap>Esc</keycap>.
    Può essere di vari tipi:
   </para>
@@ -1615,9 +1615,9 @@
    <title>«Inserisci percorso...»</title>
    <para>
 
-    Permette di inserire direttamente un percorso. Subito dopo averlo digitato la 
+    Permette di inserire direttamente un percorso. Subito dopo averlo digitato la
     finestra viene aggiornata. L'uso principale è quello di trovare velocemente un
-    file in una grande directory, ma lo si può usare anche per spostarsi tra le 
+    file in una grande directory, ma lo si può usare anche per spostarsi tra le
     directory, per selezionare un percorso completo da un'altra parte e incollarlo
     direttamente nella barra.
 
@@ -1628,7 +1628,7 @@
 
        <row><entry>
          <keycap>Invio</keycap></entry><entry>
-         Apre l'oggetto attualmente selezionato.
+         Apre l'elemento attualmente selezionato.
        </entry></row>
 
        <row><entry>
@@ -1645,20 +1645,20 @@
    </para>
 
    <para>
-    Inserendo un nome che inizia per «.», la funzione «Mostra file nascosti» è 
+    Inserendo un nome che inizia per «.», la funzione «Mostra file nascosti» è
     attivata momentaneamente e il file può essere mostrato.
    </para>
 
    <para>
     Il completamento automatico prova a ricostruire il nome con più caratteri
-    possibili. Per esempio, se nella directory ci sono due file di nome 
-    <filename>posta-salvata-nov-1999</filename> e 
-    <filename>posta-salvata-dic-1999</filename> allora digitando 
-    <userinput>posta</userinput> e premendo <keycap>Tab</keycap> si espande 
-    <userinput>posta</userinput> fino a <userinput>posta-salvata-</userinput> 
-    e viene emesso un beep per indicare che la corrispondenza non è completa. 
+    possibili. Per esempio, se nella directory ci sono due file di nome
+    <filename>posta-salvata-nov-1999</filename> e
+    <filename>posta-salvata-dic-1999</filename> allora digitando
+    <userinput>posta</userinput> e premendo <keycap>Tab</keycap> si espande
+    <userinput>posta</userinput> fino a <userinput>posta-salvata-</userinput>
+    e viene emesso un beep per indicare che la corrispondenza non è completa.
     Se il completamento automatico avviene su una directory ed è unico,
-    allora il filer entra automaticamente in quella directory. Questo 
+    allora il filer entra automaticamente in quella directory. Questo
     comportamento dovrebbe essere familiare agli utenti che usano una shell.
    </para>
 
@@ -1669,13 +1669,13 @@
      <orderedlist>
 
       <listitem><para>
-	Attivare il minibuffer scegliendo <guimenuitem>Inserisci 
-	percorso...</guimenuitem> dal menù <guimenuitem>Finestra</guimenuitem> o premere 
+	Attivare il minibuffer scegliendo <guimenuitem>Inserisci
+	percorso...</guimenuitem> dal menù <guimenuitem>Finestra</guimenuitem> o premere
     il tasto slash (<keycap>/</keycap>).
       </para></listitem>
 
       <listitem><para>
-	Premere <keycap>CTRL</keycap>+<keycap>A</keycap> per selezionare il 
+	Premere <keycap>CTRL</keycap>+<keycap>A</keycap> per selezionare il
 	contenuto presente.
       </para></listitem>
 
@@ -1703,8 +1703,8 @@
     Con le frecce <keycap>Su</keycap> e <keycap>Giù</keycap> ci si sposta tra i
     comandi precedentemente inseriti.
     Il tasto <keycap>Tab</keycap> è per il completamento automatico in stile shell.
-    Facendo clic su un oggetto si inserisce il suo nome nel minibuffer.
-    Se vengono selezionati alcuni oggetti, questi sono assegnati ai parametri
+    Facendo clic su un elemento si inserisce il suo nome nel minibuffer.
+    Se vengono selezionati alcuni elementi, questi sono assegnati ai parametri
     di posizione <userinput>$1</userinput>, <userinput>$2</userinput>, ecc...
     </para><para>
     Se si apre il minibuffer quando c'è una selezione, alla fine del comando viene
@@ -1716,7 +1716,7 @@
      <orderedlist><title>Per scompattare un archivio <filename>.tgz</filename>:</title>
 
       <listitem><para>
-        Attivare il minibuffer scegliendo dal menù <guimenuitem>Finestra</guimenuitem> 
+        Attivare il minibuffer scegliendo dal menù <guimenuitem>Finestra</guimenuitem>
         <guimenuitem>Comando shell...</guimenuitem>.
         Normalmente è associato al tasto del punto esclamativo (<keycap>!</keycap>).
       </para></listitem>
@@ -1751,14 +1751,14 @@
 
     <listitem><para>
       Attenzione: non viene mai chiesta la conferma.  In caso di dubbi, iniziare
-      il comando con <userinput>xmessage</userinput> così  viene visualizzato invece 
+      il comando con <userinput>xmessage</userinput> così  viene visualizzato invece
       che eseguito.
     </para></listitem>
 
     <listitem><para>
       <citerefentry><refentrytitle>sh</refentrytitle></citerefentry>
       è sempre usato come nome di shell da eseguire, perché
-      <citerefentry><refentrytitle>bash</refentrytitle></citerefentry> e 
+      <citerefentry><refentrytitle>bash</refentrytitle></citerefentry> e
       <citerefentry><refentrytitle>csh</refentrytitle></citerefentry> trattano
       i parametri di posizione in modo diverso.
       È comunque possibile usare un'altra shell, semplicemente rinominandola «sh» e
@@ -1792,9 +1792,9 @@
 
     </orderedlist>
 
-    Vengono quindi selezionati solo i file più grandi di 5 Mb. Le espressioni 
+    Vengono quindi selezionati solo i file più grandi di 5 Mb. Le espressioni
     da inserire sono simili a quelle descritte nella sezione
-    <xref linkend="Searching"/>, ad eccetto di 
+    <xref linkend="Searching"/>, ad eccetto di
     <userinput>prune</userinput> dal momento che il contenuto delle sottodirectory
     non è mai controllato. Premere <keycap>Tab</keycap>
     per passare su ciascun file selezionato.
@@ -1808,25 +1808,25 @@
    <anchor id="bulkrename" xreflabel="La finestra di rinominazione multipla dei file"/>Rinominazione multipla dei file
   </title>
   <para>
-   Se c'è un numero elevato di file da rinominare, è noioso rinominarli uno alla volta. È meglio aprire la finestra 
+   Se c'è un numero elevato di file da rinominare, è noioso rinominarli uno alla volta. È meglio aprire la finestra
    di rinominazione multipla, selezionando prima tutti i file da rinominare e poi scegliendo
    <guimenuitem>Rinomina...</guimenuitem> dal menù.
   </para>
 
   <para>
-   La finestra mostra una tabella con due colonne. La colonna <guilabel>Vecchio 
+   La finestra mostra una tabella con due colonne. La colonna <guilabel>Vecchio
    nome</guilabel> mostra il nome attuale di ciascun file selezionato, la colonna
    <guilabel>Nuovo nome</guilabel> mostra il nome nuovo, che inizialmente è identico.
   </para>
 
   <para>
    Ci sono due modi per cambiare i nomi: si possono modificarli direttamente nella tabella,
-   oppure si può usare la funzione "cerca e sostituisci" che si trova nella parte superiore della finestra. 
-   Qui si specifica un'espressione regolare per la ricerca e il testo da sostituire in caso di 
-   corrispondenza. Per esempio, se ci sono molti file i cui nomi terminano per 
+   oppure si può usare la funzione "cerca e sostituisci" che si trova nella parte superiore della finestra.
+   Qui si specifica un'espressione regolare per la ricerca e il testo da sostituire in caso di
+   corrispondenza. Per esempio, se ci sono molti file i cui nomi terminano per
    <filename>.htm</filename> e se si desidera cambiarli in
    <filename>.html</filename>, bisogna inserire <userinput>\.htm$</userinput> nel campo
-   <guilabel>Sostituisci:</guilabel> e <userinput>.html</userinput> nel campo 
+   <guilabel>Sostituisci:</guilabel> e <userinput>.html</userinput> nel campo
    <guilabel>con:</guilabel>. Cliccando su <guibutton>Applica</guibutton>, la tabella viene
    aggiornata e ora mostra i nuovi nomi proposti (ma non vengono ancora rinominati).
   </para>
@@ -1841,14 +1841,14 @@
   <title>Finestre d'azione</title>
   <para>
    Le finestre d'azione sono quelle finestre che appaiono quando inizia un'operazione
-   in background, come la copia o l'eliminazione dei file. La riga di stato nella 
-   parte superiore della finestra mostra la directory o l'oggetto attuale che la 
+   in background, come la copia o l'eliminazione dei file. La riga di stato nella
+   parte superiore della finestra mostra la directory o l'elemento attuale che la
    finestra sta elaborando.
    Sotto, nella parte che scorre, ci sono i log che mostrano tutto quello che è
    stato fatto. Qui vengono visualizzate le eventuali domande.
    </para><para>
    Sotto, ci sono quattro pulsanti e alcune opzioni. Tutte le finestre hanno l'opzione
-   <guilabel>Tutti</guilabel>. Quando questa è attiva, il filer chiede conferma solo 
+   <guilabel>Tutti</guilabel>. Quando questa è attiva, il filer chiede conferma solo
    per alcune operazioni, come l'eliminazione dei file di sola lettura. Altrimenti,
    per tutte le operazioni viene chiesta conferma.
    </para><para>
@@ -1875,7 +1875,7 @@
 
    </variablelist>
 
-   Nella finestra «Opzioni» è possibile stabilire quali operazioni devono iniziare 
+   Nella finestra «Opzioni» è possibile stabilire quali operazioni devono iniziare
    automaticamente (senza dover fare clic su <guibutton>Tutti</guibutton>).
   </para>
 
@@ -1889,7 +1889,7 @@
     <itemizedlist>
 
      <listitem><para>
-       <guilabel>Forza</guilabel> significa che il filer non considera speciali i 
+       <guilabel>Forza</guilabel> significa che il filer non considera speciali i
        file di sola lettura. Normalmente, chiede conferma dell'eliminazione anche
        se è stato premuto il pulsante <guibutton>Tutti</guibutton>.
        Notare che non è possibile rimuovere i file dalle directory di sola lettura
@@ -1907,7 +1907,7 @@
      </para></listitem>
 
      <listitem><para>
-       <guilabel>Più recente</guilabel> sovrascrive automaticamente un file se è più 
+       <guilabel>Più recente</guilabel> sovrascrive automaticamente un file se è più
        recente di quello che rimpiazza (cioè rispetto all'«Ultima modifica» o «mtime»).
      </para></listitem>
 
@@ -1922,16 +1922,16 @@
  <chapter id="searching">
   <title><anchor id="Searching" xreflabel="«Trova»"/>«Trova»</title>
   <para>
-   «Trova» cerca tra tutti i file, le directory e le sottodiretory 
-   selezionate, gli oggetti che corrispondono a una particolare espressione.
+   «Trova» cerca tra tutti i file, le directory e le sottodiretory
+   selezionate, gli elementi che corrispondono a una particolare espressione.
    </para><para>
    Attivare <guimenuitem>Trova</guimenuitem> dal sottomenù <guimenuitem>File</guimenuitem>
-   per cercare in tutti gli oggetti selezionati. Per selezionare i file di una directory
-   che soddisfano certi criteri, usare invece 
+   per cercare in tutti gli elementi selezionati. Per selezionare i file di una directory
+   che soddisfano certi criteri, usare invece
    <guimenuitem>Seleziona</guimenuitem> -> <guimenuitem>Seleziona se...</guimenuitem>.
    </para><para>
    Se si conosce il nome di un file, basta inserirlo nel campo «Espressione:», tra due apici
-   singoli. Per esempio, per trovare un file chiamato 
+   singoli. Per esempio, per trovare un file chiamato
    <filename>log</filename>, digitare <userinput>'log'</userinput>.
 
    Ricordarsi di usare l'accento acuto ('), non quello grave (`) o le virgolette alte (").
@@ -1957,14 +1957,14 @@
 
     </simplelist>
 
-    Vedere la pagina di manuale di 
+    Vedere la pagina di manuale di
     <citerefentry><refentrytitle>glob</refentrytitle>
      <manvolnum>7</manvolnum></citerefentry>
     per ulteriori informazioni sui metacaratteri.
     </para><para>
     Se il modello inserito contiene una barra («/»), la corrispondenza è
     sul percorso completo, altrimenti è solo sul nome. Per esempio:
-    <userinput>'*tmp*'</userinput> trova <filename>tmp</filename> e 
+    <userinput>'*tmp*'</userinput> trova <filename>tmp</filename> e
     <filename>tmpfile</filename> ma non <filename>/tmp/file</filename>;
     <userinput>'/*tmp*'</userinput> li trova tutti e tre.
    </para>
@@ -1974,12 +1974,12 @@
    <title>Condizioni semplici</title>
    <para>
     Oltre a cercare i file in base al loro nome, è possibile farlo in base ad altri
-    attributi. Notare che <emphasis>file</emphasis> è usato con il significato di 
+    attributi. Notare che <emphasis>file</emphasis> è usato con il significato di
     «qualunque cosa si trova dentro un file system»: sono incluse le directory, i
     device, ecc...
     </para><para>
     È possibile usare anche una forma breve per ciascuna condizione (sono mostrate tra
-    parentesi). Si possono combinare anche più condizioni: per esempio, 
+    parentesi). Si possono combinare anche più condizioni: per esempio,
     «<userinput>-rw</userinput>» sta per «<userinput>IsReadable and IsWriteable</userinput>».
    </para>
 
@@ -2020,7 +2020,7 @@
      <listitem><para>
        <userinput>IsDoor (-O)</userinput> trova le door (in Solaris).
      </para></listitem>
- 
+
    </itemizedlist>
 
    <itemizedlist><title>Questi riguardano i permessi sui file. Vedere la sezione
@@ -2069,12 +2069,12 @@
   <sect1>
    <title>Operatori logici</title>
    <para>
-    Per fare ricerche avanzate, si possono combinare in vari modi le condizioni semplici 
-    descritte sopra. Un'espressione è effettivamente composta da una lista di 
-    <emphasis>casi</emphasis>, separati da virgole. Il filer prova a cercare 
-    corrispondenze fino a trovarne una o fino all'esaurimento dei casi. 
+    Per fare ricerche avanzate, si possono combinare in vari modi le condizioni semplici
+    descritte sopra. Un'espressione è effettivamente composta da una lista di
+    <emphasis>casi</emphasis>, separati da virgole. Il filer prova a cercare
+    corrispondenze fino a trovarne una o fino all'esaurimento dei casi.
     Per esempio, per cercare file con diverse estensioni:
-    
+
     <screen>'*.gif', '*.htm', '*.html'</screen>
 
     Inoltre, ciascun caso è effettivamente una lista di condizioni. C'è corrispondenza
@@ -2084,7 +2084,7 @@
     <screen>IsDir 'lib', IsReg '*.so'</screen>
 
     Per negare una condizione, mettere davanti ad essa un <userinput>!</userinput>. Si può
-    considerare una condizione anche un'espressione raggruppata in parentesi tonde, 
+    considerare una condizione anche un'espressione raggruppata in parentesi tonde,
     come ad esempio:
 
     <screen>
@@ -2107,14 +2107,14 @@
     <userinput>&lt;=</userinput>,
     <userinput>=</userinput>,
     <userinput>!=</userinput>,
-    <userinput>&gt;</userinput>, 
+    <userinput>&gt;</userinput>,
     <userinput>&gt;=</userinput>
     (cioè minore-di, minore-o-uguale-a, uguale-a,
     diverso-da, maggiore-di, maggiore-o-uguale-a).
 
     Per confrontare due date, usare
     <userinput>after</userinput> e <userinput>before</userinput> invece di
-    <userinput>&gt;</userinput> e <userinput>&lt;</userinput> perché rendono 
+    <userinput>&gt;</userinput> e <userinput>&lt;</userinput> perché rendono
     più chiare le cose.
    </para>
 
@@ -2144,7 +2144,7 @@
 
     <listitem><para>
       <userinput>nlinks</userinput> Il numero di collegamenti al file. Cioè,
-      il numero di voci nella directory che si riferiscono a questo file. 
+      il numero di voci nella directory che si riferiscono a questo file.
       I collegamenti simbolici non contano.
     </para></listitem>
 
@@ -2225,7 +2225,7 @@
     Il secondo trova i file più grandi di 10 Mb. Il terzo trova i file regolari
     con più di una voce nella directory.
     </para><para>
-    Attenzione: il filer non controlla il contesto, quindi 
+    Attenzione: il filer non controlla il contesto, quindi
     <userinput>size &gt; 1 day ago</userinput> è permesso,
     sebbene non abbia molto senso.
 
@@ -2260,8 +2260,8 @@
      </para></listitem>
 
      <listitem><para>
-       <userinput>Prune</userinput> 
-       <footnote><para>Notare che è l'opposto del comando 
+       <userinput>Prune</userinput>
+       <footnote><para>Notare che è l'opposto del comando
          <citerefentry><refentrytitle>find</refentrytitle><manvolnum>1</manvolnum>
        </citerefentry>.</para></footnote>
 
@@ -2278,7 +2278,7 @@
 
      'src' prune, '*.c'</screen>
     Il primo elimina ogni file con estensione <filename>.old</filename>.
-    Il secondo cerca i file <filename>.c</filename>, ma non controlla 
+    Il secondo cerca i file <filename>.c</filename>, ma non controlla
     dentro le directory di nome <filename>src</filename>.
     L'espressione si legge così:
     </para><para>
@@ -2293,7 +2293,7 @@
   <title>Opzioni</title>
   <para>
 
-   Nella finestra «Opzioni», si possono configurare i vari aspetti di 
+   Nella finestra «Opzioni», si possono configurare i vari aspetti di
    <application>ROX-Filer</application>.
    Scegliere <guimenuitem>Opzioni</guimenuitem> dal menù del filer per aprirlo.
    L'elenco sulla sinistra mostra le varie sezioni, fare clic su una per vedere
@@ -2305,7 +2305,7 @@
 
     <listitem><para>
       <guibutton>OK</guibutton>
-      salva le attuali preferenze nella directory 
+      salva le attuali preferenze nella directory
       <filename>~/.config/rox.sourceforge.net/ROX-Filer</filename>, per caricarle
       la prossima volta che si avvia <application>ROX-Filer</application>.
       Il punto esatto in cui le preferenze vengono caricate e salvate è controllato dalla
@@ -2334,7 +2334,7 @@
   <title>Tipi di file</title>
   <para>
 
-   Tutti i file hanno un tipo di MIME della forma <emphasis>text/plain</emphasis>. 
+   Tutti i file hanno un tipo di MIME della forma <emphasis>text/plain</emphasis>.
    <emphasis>text</emphasis> è il <emphasis>media type</emphasis> e
    <emphasis>plain</emphasis> è il <emphasis>sub-type</emphasis>.
    </para><para>
@@ -2347,7 +2347,7 @@
     Imposta azione...
    </title>
    <para>
-    Scegliendo <guimenuitem>Imposta azione...</guimenuitem> dal menù «File», 
+    Scegliendo <guimenuitem>Imposta azione...</guimenuitem> dal menù «File»,
     appare la finestra usata per impostare quale applicazione caricare quando
     si fa clic su quel tipo di file.
     </para><para>
@@ -2383,7 +2383,7 @@
      dello stesso media-type che non hanno già una specifica azione.
      </para><para>
      Dal momento che Gimp può caricare molti tipi di immagine, ha senso selezionare l'opzione
-     <guilabel>Impostare come azione predefinita per tutti i file di tipo 
+     <guilabel>Impostare come azione predefinita per tutti i file di tipo
      «image/&lt;anything&gt;»</guilabel>, così non bisogna ripetere lo stesso procedimento
      per i file «image/jpeg» e così via. Comunque, questo influenza solo i tipi che non hanno
      già una specifica azione (cioè quelli per cui appare un errore se si prova ad aprirli).
@@ -2403,18 +2403,18 @@
     </para><para>
     Funziona come «Imposta azione...» descritto sopra, eccetto che si può specificare
     un'icona anche per un file singolo (dal nome) o per tutti i file di quel tipo.
-    Quando si imposta l'icona per un file singolo, il filer memorizza il nome del 
-    file e il nome dell'icona dentro la directory 
+    Quando si imposta l'icona per un file singolo, il filer memorizza il nome del
+    file e il nome dell'icona dentro la directory
     <filename>~/.config/rox.sourceforge.net/MIME-icons</filename>. Se uno dei
     due si sposta, l'icona non viene più visualizzata.
     </para><para>
     Quando si imposta l'icona per una directory, si può anche memorizzare l'immagine
     dentro la directory stessa come file nascosto. Il vantaggio è che anche gli
     altri utenti possono vedere l'icona e poi si può anche eliminare l'immagine originale
-    (notare che, se necessario, l'immagine viene ridimensionata e convertita nel 
+    (notare che, se necessario, l'immagine viene ridimensionata e convertita nel
     formato PNG).
     </para><para>
-    L'icona raffigurante una directory (che si trova dentro l'area  
+    L'icona raffigurante una directory (che si trova dentro l'area
     <guilabel>Trascinare qui un'icona</guilabel>) permette di andare velocemente nella
     directory in cui ci sono già una o più icone.
    </para>
@@ -2424,7 +2424,7 @@
    <title>Come i tipi di file sono memorizzati</title>
    <para>
 
-    <application>ROX-Filer</application> usa due sottodirectory della directory 
+    <application>ROX-Filer</application> usa due sottodirectory della directory
     <filename>~/.config/rox.sourceforge.net</filename> per i tipi di file:
 
     <variablelist>
@@ -2439,12 +2439,12 @@
 
         <orderedlist>
          <listitem><para>
-           Trovare l'applicazione «epiphany» e andare nel menù 
+           Trovare l'applicazione «epiphany» e andare nel menù
            <guimenuitem>Collegamento...</guimenuitem>.
          </para></listitem>
 
          <listitem><para>
-           Inserire <userinput>text_html</userinput> come nome per il collegamento e 
+           Inserire <userinput>text_html</userinput> come nome per il collegamento e
            trascinare l'icona dalla finestra «Collegamento» nella directory
            <filename>MIME-types</filename>.
          </para></listitem>
@@ -2464,8 +2464,8 @@
 
     </variablelist>
 
-    In <filename>MIME-types</filename> è possibile fornire le azioni predefinite per 
-    ciascun tipo di media. Per esempio, se non si trova <filename>text_html</filename>, 
+    In <filename>MIME-types</filename> è possibile fornire le azioni predefinite per
+    ciascun tipo di media. Per esempio, se non si trova <filename>text_html</filename>,
     il filer prova semplicemente a usare <filename>text</filename>.
 
    </para>
@@ -2474,13 +2474,13 @@
     <filename>globs</filename>. Vedere
     <citation>SharedMIME</citation> per ulteriori dettagli.</para>
   </sect1>
- 
+
   <sect1>
     <title>Come il filer determina il tipo di file</title>
     <para>
      The filer normalmente determina il tipo di file dal suo nome. Se fallisce, prova a
      supporlo dal contenuto del file. È possibile ignorare questa supposizione
-     impostando un attributo esteso sul file con il tipo corretto, usando il menù 
+     impostando un attributo esteso sul file con il tipo corretto, usando il menù
      <guimenuitem>Tipo di file...</guimenuitem>.
     </para>
   </sect1>
@@ -2500,7 +2500,7 @@
    e l'uso dei programmi.
    </para><para>
    Sono anche più sicure, perché si possono compilare come utente normale e poi copiare come root.
-   Dal momento che non bisogna eseguire uno script di installazione, non c'è il pericolo di 
+   Dal momento che non bisogna eseguire uno script di installazione, non c'è il pericolo di
    eseguire come root del codice maligno. Bisogna solo assicurarsi che non ci siano eseguibili
    con il bit setuid impostato.
    </para><para>
@@ -2534,18 +2534,18 @@
 
     <listitem><para>
       <filename>AppIcon.xpm</filename>
-      è usata se manca <filename>.DirIcon</filename> (è tenuta per compatibilità all'indietro, 
+      è usata se manca <filename>.DirIcon</filename> (è tenuta per compatibilità all'indietro,
       ma non è più usata).
     </para></listitem>
 
    </itemizedlist>
 
-   Dare un'occhiata alla directory applicativa <filename>ROX-Filer</filename> 
+   Dare un'occhiata alla directory applicativa <filename>ROX-Filer</filename>
    per avere un esempio completo.
 
   </para>
 
-  <note><para>Per ragioni di sicurezza, una directory applicativa deve avere lo 
+  <note><para>Per ragioni di sicurezza, una directory applicativa deve avere lo
     stesso proprietario del file <filename>AppRun</filename> in essa contenuto.</para></note>
 
   <sect1>
@@ -2599,7 +2599,7 @@
      <listitem><para>
        <userinput>About</userinput>
        contiene un elenco di campi che sono mostrati nel menù «Proprietà»
-       dell'applicazione (si può usare qualunque nome per l'elemento, ma sono consigliati 
+       dell'applicazione (si può usare qualunque nome per l'elemento, ma sono consigliati
        quelli mostrati sopra).
      </para></listitem>
 
@@ -2607,8 +2607,8 @@
        <userinput>AppMenu</userinput>
        è un elenco di menù aggiuntivi da visualizzare.
        Quando se ne sceglie uno, <filename>AppRun</filename> viene eseguito con
-       <userinput>option</userinput> come unico argomento. È possibile nidificare 
-       AppMenu dentro altri AppMenu per creare sottomenù, purché abbiano i 
+       <userinput>option</userinput> come unico argomento. È possibile nidificare
+       AppMenu dentro altri AppMenu per creare sottomenù, purché abbiano i
        &lt;Label&gt;. L'elemento <userinput>Item</userinput>può avere anche l'attributo
        <userinput>icon</userinput>, il nome di un'icona dell'attuale tema di icone per la voce di menù.
      </para></listitem>
@@ -2672,7 +2672,7 @@
 
      <listitem><para>Eseguire lo script <filename>make-mo</filename> per creare un file
        binario che serve a <application>ROX-Filer</application>.
-       Per fare questo è necessario avere il pacchetto GNU gettext. 
+       Per fare questo è necessario avere il pacchetto GNU gettext.
 
        <screen>
         $ cd ROX-Filer/src/po
@@ -2717,8 +2717,8 @@
 
      <listitem><para>Eseguire <command>make-mo</command> come prima.</para></listitem>
 
-     <listitem><para>Spedire il file aggiornato all'autore di <application>ROX-Filer</application>. 
-     (NdT: se avete trovato errori nella traduzione italiana, 
+     <listitem><para>Spedire il file aggiornato all'autore di <application>ROX-Filer</application>.
+     (NdT: se avete trovato errori nella traduzione italiana,
      segnalateli a <ulink url="http://yuri.bongiorno.googlepages.com">me</ulink>.)</para></listitem>
 
     </orderedlist>
@@ -2734,7 +2734,7 @@
   <title>Hacking</title>
   <para>
    Questa è una breve guida per chi vuole modificare il codice sorgente. Se le modifiche
-   sono utili, spedite le patch all'autore di <application>ROX-Filer</application> o alla 
+   sono utili, spedite le patch all'autore di <application>ROX-Filer</application> o alla
    mailing list. Ricordatevi di dire quale versione state usando.
   </para>
 
@@ -2769,7 +2769,7 @@
     </para><para>
     Per creare una patch bisogna prima avere l'ultima versione del filer dal CVS
     (le istruzioni su come usare CVS si trovano nel sito web).
-    Modificare quindi il programma come si desidera e poi, nella directory opportuna, 
+    Modificare quindi il programma come si desidera e poi, nella directory opportuna,
     creare la patch usando <command>cvs diff</command>:
 
     <screen>$ cvs diff -u &gt; mia_patch</screen>
@@ -2796,7 +2796,7 @@
   <sect1>
    <title>Autoconf</title>
    <para>
-    Ecco una breve spiegazione del sistema autoconf nel caso non lo si abbia mai 
+    Ecco una breve spiegazione del sistema autoconf nel caso non lo si abbia mai
     usato prima d'ora. Vedere <command>info autoconf</command> per ulteriori dettagli.
     </para><para>
     C'è un file di nome <filename>configure.in</filename> che contiene diversi test
@@ -2807,7 +2807,7 @@
     <filename>configure</filename> è solitamente distribuito con il programma perché non
     tutti hanno autoconf.
     </para><para>
-    Poi si esegue <filename>configure</filename> (infatti, lo script 
+    Poi si esegue <filename>configure</filename> (infatti, lo script
     <filename>AppRun</filename> lo fa e gli passa alcuni argomenti), che esegue tutti i
     test. Legge <filename>Makefile.in</filename> e <filename>config.h.in</filename>
     e riempie i valori mancanti con i risultati del test e produce
@@ -2832,8 +2832,8 @@
   <title>Compilazione</title>
   <para>
 
-   Dopo aver scaricato i sorgenti, per poter usare <application>ROX-Filer</application> 
-   è necessario compilarlo. Se invece è stato scaricato e installato il pacchetto dei binari o se 
+   Dopo aver scaricato i sorgenti, per poter usare <application>ROX-Filer</application>
+   è necessario compilarlo. Se invece è stato scaricato e installato il pacchetto dei binari o se
    <application>ROX-Filer</application> era già incluso nel sistema, si può saltare questa
    sezione.  Se si è arrivati qui facendo clic sul simbolo del salvagente da una finestra del
    filer, o se tutto funziona digitando <command>rox</command> in un prompt di shell,
@@ -2888,15 +2888,15 @@
    </para></step>
 
    <step><para>
-     Nella finestra fare clic col tasto destro del mouse sulla riga ROX-Filer e scegliere 
+     Nella finestra fare clic col tasto destro del mouse sulla riga ROX-Filer e scegliere
      <guimenuitem>Compile...</guimenuitem> dal menù.
    </para></step>
-     
+
    <step><para>
      Scegliere la versione di ROX-Filer da compilare e i file header richiesti.
      È possibile accettare i valori predefiniti e lasciare che vengano scaricati.
    </para></step>
-     
+
    <step><para>
      Scegliere una directory nella quale memorizzare il codice compilato e fare clic
      sul pulsante <guibutton>Build</guibutton> per compilare.
@@ -3016,7 +3016,7 @@
 
       <varlistentry><term><option>-n</option></term><term><option>--new</option></term>
       <listitem><para>avvia un nuovo filer, anche se ce n'è già uno in esecuzione.
-      Questo impedisce al filer di fare un fork (esecuzione in background). 
+      Questo impedisce al filer di fare un fork (esecuzione in background).
       Questa opzione è principalmente usata per il debug.
       </para></listitem></varlistentry>
 
@@ -3051,9 +3051,9 @@
       </para></listitem></varlistentry>
 
       <varlistentry><term><option>-U</option></term><term><option>--url=URI</option></term>
-       <listitem><para>esegue URI come un file o una directory. Se URI è un file: l'url 
-	si riferisce a un file sulla macchina locale e viene convertito in un nome di file locale:  «rox -U file:///tmp» 
-	è equilvalente a «rox /tmp».  Se URI è un altro schema, per eseguirlo viene consultata la configurazione 
+       <listitem><para>esegue URI come un file o una directory. Se URI è un file: l'url
+	si riferisce a un file sulla macchina locale e viene convertito in un nome di file locale:  «rox -U file:///tmp»
+	è equilvalente a «rox /tmp».  Se URI è un altro schema, per eseguirlo viene consultata la configurazione
 	condivisa dell'handler URI.
       </para></listitem></varlistentry>
 
@@ -3072,7 +3072,7 @@
    <refsect1><title>NOTE</title>
     <para>
      La documentazione principale di ROX-Filer è disponibile scegliendo
-     <guimenuitem>Mostra i file di aiuto</guimenuitem> dal menù o facendo clic sull'icona 
+     <guimenuitem>Mostra i file di aiuto</guimenuitem> dal menù o facendo clic sull'icona
      raffigurante un salvagente nella barra degli strumenti.
     </para>
    </refsect1>
@@ -3221,24 +3221,24 @@ EOF</screen>
      <parameter>Sort</parameter> può essere <userinput>Name</userinput>, <userinput>Type</userinput>, <userinput>Date</userinput>, <userinput>Size</userinput>,
 <userinput>Owner</userinput> o <userinput>Group</userinput>.
      Se manca una di queste tre opzioni, viene usato il parametro predefinito.
-     <parameter>Class</parameter> può essere usata per impostare la proprietà WM_CLASS sulla nuova finestra. 
+     <parameter>Class</parameter> può essere usata per impostare la proprietà WM_CLASS sulla nuova finestra.
      La si può usare per far sì che il proprio window manager tratti quella finestra in modo speciale.
-     <parameter>ID</parameter> è una stringa usata per identificare la finestra aperta. 
+     <parameter>ID</parameter> è una stringa usata per identificare la finestra aperta.
      Se esiste già una finestra con questo ID, questa viene cambiata nella directory data,
      altrimenti viene creata una nuova finestra con questo ID. Se usato da un programma,
      assicurarsi che l'ID sia unico, per esempio includendo nell'ID il nome del processo,
      il PID e il timestamp.
-     Se <parameter>Hidden</parameter> è <userinput>true</userinput>, vengono mostrati i file nascosti (quelli che iniziano 
+     Se <parameter>Hidden</parameter> è <userinput>true</userinput>, vengono mostrati i file nascosti (quelli che iniziano
      con un punto), se è <userinput>false</userinput> non vengono mostrati.  Se è omesso, viene usata l'impostazione configurata.
-     <parameter>Filter</parameter> può essere usato per filtrare per nome i file visualizzati. Per esempio, usando il filtro 
+     <parameter>Filter</parameter> può essere usato per filtrare per nome i file visualizzati. Per esempio, usando il filtro
      <userinput>*.c</userinput> vengono mostrati solo i file che terminano per «.c».
    </para></listitem>
 
    <listitem><para><function>Panel</function>([<parameter>Side</parameter>,
      <parameter>Name</parameter>])
-     Apre il pannello di nome <parameter>Name</parameter> sul lato 
+     Apre il pannello di nome <parameter>Name</parameter> sul lato
      <parameter>Side</parameter> (<userinput>Top</userinput>|<userinput>Bottom</userinput>|<userinput>Left</userinput>|<userinput>Right</userinput>) dello schermo.
-     <parameter>Name</parameter> può essere un nome in 
+     <parameter>Name</parameter> può essere un nome in
      <filename>~/.config/rox.sourceforge.net/ROX-Filer</filename> (es.
      <userinput>MioPannello</userinput>) o avere il percorso completo.
      Se non c'è alcun nome, il pannello su quel lato viene disattivato.
@@ -3248,7 +3248,7 @@ EOF</screen>
      <parameter>Path</parameter>, [<parameter>Label</parameter>,
      <parameter>After</parameter>, <parameter>Shortcut</parameter>, <parameter>Args</parameter>])
      Aggiunge <parameter>Path</parameter> al pannello sul lato <parameter>Side</parameter> dello schermo,
-     con etichetta <parameter>Label</parameter>. Se <parameter>After</parameter> è 
+     con etichetta <parameter>Label</parameter>. Se <parameter>After</parameter> è
      <userinput>true</userinput> l'icona va in basso a destra del pannello,
      altrimenti in altro a sinistra.  Se viene specificato <parameter>Shortcut</parameter>, allora questa è la
      scorciatoia da tastiera che lo attiva. Se viene specificato <parameter>Args</parameter>,  questo è l'argomento
@@ -3257,30 +3257,30 @@ EOF</screen>
 
    <listitem><para><function>PanelRemove</function>(<parameter>Side</parameter>,
      <parameter>Path</parameter>, [<parameter>Label</parameter>])
-     Rimuove un oggetto dal pannello sul lato <parameter>Side</parameter> dello schermo. 
+     Rimuove un elemento dal pannello sul lato <parameter>Side</parameter> dello schermo.
      Se non viene specificato <parameter>Path</parameter> o <parameter>Label</parameter>,
-     allora corrisponde ogni percorso o etichetta. 
-     Almeno uno deve essere specificato. 
-     Se più di un oggetto corrisponde, solo uno viene rimosso.
+     allora corrisponde ogni percorso o etichetta.
+     Almeno uno deve essere specificato.
+     Se più di un elemento corrisponde, solo uno viene rimosso.
    </para></listitem>
-   
+
    <listitem><para><function>Pinboard</function>([<parameter>Name</parameter>])
      Attiva la bacheca <parameter>Name</parameter>.
-     <parameter>Name</parameter> può essere un nome in 
+     <parameter>Name</parameter> può essere un nome in
      <filename>~/.config/rox.sourceforge.net/ROX-Filer</filename> (es.
      <userinput>MiaBacheca</userinput>) o avere un percorso completo.
      Se non c'è alcun nome, la bacheca viene disattivata.
    </para></listitem>
 
    <listitem><para><function>PinboardAdd</function>(<parameter>Path</parameter>,
-     <parameter>X</parameter>, <parameter>Y</parameter>, 
+     <parameter>X</parameter>, <parameter>Y</parameter>,
      [<parameter>Label</parameter>, <parameter>Shortcut</parameter>, <parameter>Args</parameter>, <parameter>Update</parameter>])
      Aggiunge <parameter>Path</parameter> alla bacheca con l'etichetta (opzionale) <parameter>Label</parameter>.
      Se X o Y sono negativi o non assegnati, l'icona è messa automaticamente. I parametri X e Y allora indicano
-     dove l'icona dovrebbe andare (X=-1: a sinistra, X=-2: a destra, Y=-1: in alto, Y=-2: in basso). 
-     Se X e Y sono assegnati, la loro posizione è (<parameter>X</parameter>, <parameter>Y</parameter>). 
-     Se <parameter>Shortcut</parameter> è assegnato, è la scorciatoia da tastiera che attiva questo oggetto.
-     Se <parameter>Args</parameter> è assegnato, è l'argomento stringa da attaccare all'oggetto quando eseguito
+     dove l'icona dovrebbe andare (X=-1: a sinistra, X=-2: a destra, Y=-1: in alto, Y=-2: in basso).
+     Se X e Y sono assegnati, la loro posizione è (<parameter>X</parameter>, <parameter>Y</parameter>).
+     Se <parameter>Shortcut</parameter> è assegnato, è la scorciatoia da tastiera che attiva questo elemento.
+     Se <parameter>Args</parameter> è assegnato, è l'argomento stringa da attaccare all'elemento quando eseguito
      (se è un programma). Se <parameter>Update</parameter> è <userinput>true</userinput> e se c'è già un'icona sulla
      bacheca per il percorso dato, allora verrà aggiornata con i nuovi valori invece che aggiungere una nuova icona.
    </para></listitem>
@@ -3288,7 +3288,7 @@ EOF</screen>
    <listitem><para><function>PinboardRemove</function>(<parameter>Path</parameter>, [<parameter>Label</parameter>])
      Rimuove <parameter>Path</parameter> dalla bacheca. Se viene specificato
       <parameter>Label</parameter>, allora questo deve corrispondere all'etichetta
-       dell'oggetto. Se corrisponde a più di un oggetto, ne viene rimosso solo uno.
+       dell'elemento. Se corrisponde a più di un elemento, ne viene rimosso solo uno.
    </para></listitem>
 
    <listitem><para><function>SetBackdropApp</function>(<parameter>App</parameter>)
@@ -3327,7 +3327,7 @@ EOF</screen>
 
    <listitem><para><function>Show</function>(<parameter>Directory</parameter>,
      <parameter>Leafname</parameter>)
-     Apre <parameter>Directory</parameter> e fa lampeggiare il file di nome 
+     Apre <parameter>Directory</parameter> e fa lampeggiare il file di nome
      <parameter>Leafname</parameter> che si trova dentro.
    </para></listitem>
 
@@ -3350,7 +3350,7 @@ EOF</screen>
   <para>
    Le seguenti chiamate possono essere usate per avviare azioni sui file.
    <parameter>Quiet</parameter> può essere <userinput>true</userinput> se l'operazione
-   inizia subito, senza aspettare la conferma dell'utente. Se è 
+   inizia subito, senza aspettare la conferma dell'utente. Se è
    <userinput>false</userinput>, l'utente deve confermare. Se non è definita, viene
    usata l'impostazione predefinita.
   </para>
@@ -3360,7 +3360,7 @@ EOF</screen>
      <parameter>To</parameter>, [<parameter>Leafname</parameter>,
      <parameter>Quiet</parameter>])
      Copia ogni file dall'array <parameter>From</parameter> alla directory
-     <parameter>To</parameter>. Se viene dato <parameter>Leafname</parameter>, 
+     <parameter>To</parameter>. Se viene dato <parameter>Leafname</parameter>,
      allora <parameter>From</parameter> deve contenere solo una voce;
      <parameter>Leafname </parameter> assegna il nuovo nome.
    </para></listitem>
@@ -3369,7 +3369,7 @@ EOF</screen>
      <parameter>To</parameter>, [<parameter>Leafname</parameter>,
      <parameter>Quiet</parameter>])
      Sposta ogni file dall'array <parameter>From</parameter> alla directory
-     <parameter>To</parameter>. Se viene dato <parameter>Leafname</parameter>, allora 
+     <parameter>To</parameter>. Se viene dato <parameter>Leafname</parameter>, allora
      <parameter>From</parameter> deve contenere solo una voce;
      <parameter>Leafname</parameter> assegna il nuovo nome.
    </para></listitem>
@@ -3384,7 +3384,7 @@ EOF</screen>
 
    <listitem><para><function>Mount</function>(<parameter>MountPoints</parameter>,
      [<parameter>OpenDir</parameter>, <parameter>Quiet</parameter>])
-     Monta ciascuna directory dell'elenco <parameter>MountPoints</parameter>. Se è 
+     Monta ciascuna directory dell'elenco <parameter>MountPoints</parameter>. Se è
      <userinput>true</userinput>, <parameter>OpenDir</parameter> apre la directory
      dopo averla montata.
    </para></listitem>
