@@ -30,6 +30,7 @@
 #include <sys/types.h>
 #include <signal.h>
 #include <string.h>
+#include <errno.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -73,6 +74,7 @@
 #include "minibuffer.h"
 #include "xtypes.h"
 #include "bulk_rename.h"
+#include "gtksavebox.h"
 
 int number_of_windows = 0;	/* Quit when this reaches 0 again... */
 int to_wakeup_pipe = -1;	/* Write here to get noticed */
@@ -201,6 +203,7 @@ static void wake_up_cb(gpointer data, gint source, GdkInputCondition condition);
 static void xrandr_size_change(GdkScreen *screen, gpointer user_data);
 static void add_default_panel_and_pinboard(xmlNodePtr body);
 static GList *build_launch(Option *option, xmlNode *node, guchar *label);
+static GList *build_make_script(Option *option, xmlNode *node, guchar *label);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -341,6 +344,7 @@ int main(int argc, char **argv)
 	option_add_string(&o_session_pinboard_name, "session_pinboard_name",
 			  "Default");
 	option_register_widget("launch", build_launch);
+	option_register_widget("make-script", build_make_script);
 
 #ifdef UNIT_TESTS
 	bulk_rename_tests();
@@ -948,6 +952,93 @@ static GList *build_launch(Option *option, xmlNode *node, guchar *label)
 	g_free(uri);
 	if(appname)
 	  g_free(appname);
+
+	return g_list_append(NULL, align);
+}
+
+static gint new_script_cb(GObject *savebox,
+			 const gchar *path, gpointer data)
+{
+       FILE *fp;
+
+       fp = fopen(path, "w");
+
+       if (fp == NULL)
+       {
+               report_error(_("Error creating '%s': %s"),
+                               path, g_strerror(errno));
+	       return GTK_XDS_SAVE_ERROR;
+        }
+
+       fprintf(fp, "#!/bin/sh\n");
+       fprintf(fp, "exec %s/AppRun \"$@\"\n", app_dir);
+
+       fclose(fp);
+       chmod(path, 0755);
+
+       dir_check_this(path);
+
+       if (window_with_focus && filer_exists(window_with_focus))
+       {
+               guchar  *leaf;
+               leaf = strrchr(path, '/');
+               if (leaf)
+                       display_set_autoselect(window_with_focus, leaf + 1);
+       }
+
+
+       return GTK_XDS_SAVED;
+}
+
+static void make_script_clicked(GtkWidget *button, gpointer udata)
+{
+	const gchar *filename;
+	const gchar *action;
+	GtkWidget   *savebox;
+	MaskedPixmap *image;
+	
+	if(window_with_focus)
+		filename=make_path(window_with_focus->sym_path, "rox");
+	else
+		filename="rox";
+	action = _("Start script");
+	image = type_to_icon(application_x_shellscript);
+		
+	savebox = gtk_savebox_new(_("Save"));
+	gtk_savebox_set_action(GTK_SAVEBOX(savebox), GDK_ACTION_COPY);
+	g_signal_connect(savebox, "save_to_file",
+				G_CALLBACK(new_script_cb), NULL);
+
+	gtk_window_set_title(GTK_WINDOW(savebox), _("Start script"));
+
+	gtk_savebox_set_pathname(GTK_SAVEBOX(savebox), filename);
+	gtk_savebox_set_icon(GTK_SAVEBOX(savebox), image->pixbuf);
+	g_object_unref(image);
+				
+	gtk_widget_show(savebox);
+}
+
+static GList *build_make_script(Option *option, xmlNode *node, guchar *label)
+{
+	GtkWidget *align;
+	GtkWidget *button;
+	gchar     *tip;
+
+	g_return_val_if_fail(option == NULL, NULL);
+	g_return_val_if_fail(label != NULL, NULL);
+
+	align = gtk_alignment_new(0, 0.5, 0, 0);
+
+	button = gtk_button_new_with_label(_(label));
+	g_signal_connect(button, "clicked", G_CALLBACK(make_script_clicked),
+			 NULL);
+	
+	tip = _("Click to save a script to run ROX-Filer.\n"
+		"If you are using Zero Install you should use 0alias "
+		"instead.");
+	gtk_tooltips_set_tip(tooltips, button, tip, NULL);
+
+	gtk_container_add(GTK_CONTAINER(align), button);
 
 	return g_list_append(NULL, align);
 }

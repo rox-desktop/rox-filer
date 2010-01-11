@@ -204,7 +204,8 @@ indicator'>If this is on then files which have one or more extended attributes s
     </frame>
 
     <label help='1'>Changes here take effect the next time the filer is run.</label>
-    <label help='1'>The session manager activates these options by using the -S or --rox-session argument to rox.</label>
+    <label help='1'>The session manager activates these options by
+using the -S or --rox-session argument to rox.</label>
   </section>
   
   <section title='Action windows'>
@@ -313,6 +314,9 @@ xterm -e wget $1</entry>
     </section>
   </section>
   <section title='Compatibility'>
+    <frame label='Command line program'>
+      <make-script label='Make script'/>
+    </frame>
     <frame label='Window manager problems'>
       <toggle name='override_redirect' label='Override window manager control of the pinboard and panels'>Some window managers don't support the new Extended Window Manager Hints system, and so treat the pinboard and panels like normal windows. Turn this on to fix problems such as the pinboard coming to the front when you click on it, titlebars and other decorations appearing around windows, or having them appear in window-select lists.</toggle>
       <toggle name='pinboard_forward_buttons_13' label='Pass all backdrop mouse clicks to window manager'>Normally, right clicking on the desktop background will open the pinboard menu and left clicking will clear the selection. Turn this on to forward the events to your window manager instead. Clicks on icons will not be forwarded.</toggle>
