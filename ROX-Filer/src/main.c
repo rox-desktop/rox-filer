@@ -956,6 +956,7 @@ static GList *build_launch(Option *option, xmlNode *node, guchar *label)
 	return g_list_append(NULL, align);
 }
 
+/* Call back from save box to create a rox script */
 static gint new_script_cb(GObject *savebox,
 			 const gchar *path, gpointer data)
 {
@@ -978,32 +979,26 @@ static gint new_script_cb(GObject *savebox,
 
        dir_check_this(path);
 
-       if (window_with_focus && filer_exists(window_with_focus))
-       {
-               guchar  *leaf;
-               leaf = strrchr(path, '/');
-               if (leaf)
-                       display_set_autoselect(window_with_focus, leaf + 1);
-       }
-
-
        return GTK_XDS_SAVED;
 }
 
+/* Option button to create the rox script clicked */
 static void make_script_clicked(GtkWidget *button, gpointer udata)
 {
 	const gchar *filename;
 	const gchar *action;
 	GtkWidget   *savebox;
 	MaskedPixmap *image;
-	
+
+	/* Default to saving in current filer window */
 	if(window_with_focus)
 		filename=make_path(window_with_focus->sym_path, "rox");
 	else
 		filename="rox";
 	action = _("Start script");
 	image = type_to_icon(application_x_shellscript);
-		
+
+	/* Create a save box to save the script */
 	savebox = gtk_savebox_new(_("Save"));
 	gtk_savebox_set_action(GTK_SAVEBOX(savebox), GDK_ACTION_COPY);
 	g_signal_connect(savebox, "save_to_file",
@@ -1018,6 +1013,7 @@ static void make_script_clicked(GtkWidget *button, gpointer udata)
 	gtk_widget_show(savebox);
 }
 
+/* Build option button to create rox script */
 static GList *build_make_script(Option *option, xmlNode *node, guchar *label)
 {
 	GtkWidget *align;
