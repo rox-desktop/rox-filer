@@ -216,6 +216,7 @@ static Option o_panel_monitor;
 static Option o_panel_avoid;
 static Option o_panel_is_dock;
 static Option o_panel_on_top;
+static Option o_panel_obey_workarea;
 
 static gint panel_monitor = -1;
 
@@ -236,6 +237,8 @@ void panel_init(void)
 	option_add_int(&o_panel_avoid, "panel_avoid", TRUE);
 	option_add_int(&o_panel_is_dock, "panel_is_dock", TRUE);
 	option_add_int(&o_panel_on_top, "panel_on_top", FALSE);
+
+	option_add_int(&o_panel_obey_workarea, "panel_obey_workarea", FALSE);
 
 	option_add_notify(panel_style_changed);
 
@@ -2762,11 +2765,16 @@ static void panel_update_geometry(Panel *panel)
 	{
 		panel->geometry = monitor_geom[panel->monitor];
 	}
-	else
+	else if (o_panel_obey_workarea.int_value)
+	{
+                get_work_area(&panel->geometry.x, &panel->geometry.y,
+                              &panel->geometry.width, &panel->geometry.height);
+	}
+        else
 	{
 		panel->geometry.x = panel->geometry.y = 0;
-		panel->geometry.width = screen_width;
-		panel->geometry.height = screen_height;
+                panel->geometry.width = screen_width;
+                panel->geometry.height = screen_height;
 	}
 }
 

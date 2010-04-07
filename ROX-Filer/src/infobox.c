@@ -210,6 +210,7 @@ static GtkWidget *make_vbox(const guchar *path, GObject *window)
 	xmlNode 	*about = NULL;
 	gchar		*help_dir;
 	GtkWidget	*hbox, *name, *label;
+	MaskedPixmap    *thumb;
 
 	g_return_val_if_fail(path[0] == '/', NULL);
 	
@@ -245,6 +246,15 @@ static GtkWidget *make_vbox(const guchar *path, GObject *window)
 	gtk_box_pack_start(GTK_BOX(hbox), name, FALSE, TRUE, 4);
 	
 	make_heading(name, PANGO_SCALE_X_LARGE);
+
+	thumb=pixmap_try_thumb(path, FALSE);
+	if(thumb)
+	{
+		gtk_box_pack_start(GTK_BOX(hbox),
+				   gtk_image_new_from_pixbuf(thumb->src_pixbuf),
+				   FALSE, FALSE, 4);
+		g_object_unref(thumb);
+	}
 
 	/* List of file attributes */
 	add_frame(vbox, make_details(path, item, window));

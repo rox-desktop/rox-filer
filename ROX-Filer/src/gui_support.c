@@ -53,6 +53,10 @@ gint		monitor_width, monitor_height;
 MonitorAdjacent *monitor_adjacent;
 
 static GdkAtom xa_cardinal;
+GdkAtom xa__NET_WORKAREA = GDK_NONE;
+GdkAtom xa__NET_WM_DESKTOP = GDK_NONE;
+GdkAtom xa__NET_CURRENT_DESKTOP = GDK_NONE;
+GdkAtom xa__NET_NUMBER_OF_DESKTOPS = GDK_NONE;
 
 static GtkWidget *current_dialog = NULL;
 
@@ -115,6 +119,12 @@ void gui_support_init()
 	gpointer klass;
 	
 	xa_cardinal = gdk_atom_intern("CARDINAL", FALSE);
+        xa__NET_WORKAREA = gdk_atom_intern("_NET_WORKAREA", FALSE);
+        xa__NET_WM_DESKTOP = gdk_atom_intern("_NET_WM_DESKTOP", FALSE);
+        xa__NET_CURRENT_DESKTOP = gdk_atom_intern("_NET_CURRENT_DESKTOP",
+                                                  FALSE);
+        xa__NET_NUMBER_OF_DESKTOPS = gdk_atom_intern("_NET_NUMBER_OF_DESKTOPS",
+                                                     FALSE);
 
 	gui_store_screen_geometry(gdk_screen_get_default());
 
@@ -219,6 +229,124 @@ void set_cardinal_property(GdkWindow *window, GdkAtom prop, gulong value)
 				GDK_PROP_MODE_REPLACE, (gchar *) &value, 1);
 }
 
+gboolean get_cardinal_property(GdkWindow *window, GdkAtom prop, gulong length,
+                               gulong *data, gint *actual_length)
+{
+        GdkAtom actual_type;
+        gint actual_format, act_length;
+        guchar *d;
+        gulong *p;
+        int i;
+        gboolean ok;
+
+        /* Cardinals are format=32 so the length in bytes is 4 * number of
+         * cardinals */
+        ok=gdk_property_get(window, prop, xa_cardinal,
+                                     0, length*4, FALSE,
+                                     &actual_type, &actual_format,
+                                     &act_length, &d);
+
+        if(!ok)
+                return FALSE;
+
+        /* Check correct format */
+        if(actual_format!=32)
+        {
+                g_free(d);
+                return FALSE;
+        }
+
+        /* Actual data for cardinals returned as longs, which may be 64 bit */
+        if(act_length/sizeof(gulong)>length)
+        {
+                g_free(d);
+                return FALSE;
+        }
+
+        /* Copy data into return array */
+        p=(gulong *) d;
+        for(i=0; i<act_length/sizeof(gulong); i++)
+                data[i]=p[i];
+        g_free(d);
+        *actual_length=act_length/sizeof(gulong);
+
+        return ok;
+}
+
+int get_current_desktop(void)
+{
+        gint act_len;
+        gulong current;
+        Window root=GDK_ROOT_WINDOW();
+        GdkWindow *gdk_root=gdk_window_foreign_new(root);
+        int desk=0;
+
+        if(get_cardinal_property(gdk_root, xa__NET_CURRENT_DESKTOP, 1,
+                                 &current, &act_len) && act_len==1)
+                desk=(int) current;
+
+        return desk;
+}
+
+int get_number_of_desktops(void)
+{
+        gint act_len;
+        gulong num;
+        Window root=GDK_ROOT_WINDOW();
+        GdkWindow *gdk_root=gdk_window_foreign_new(root);
+        int desks=1;
+
+        if(get_cardinal_property(gdk_root, xa__NET_NUMBER_OF_DESKTOPS, 1,
+                                 &num, &act_len) && act_len==1)
+                desks=(int) num;
+
+        return desks;
+}
+
+/* Get the working area for the desktop, excluding things like the Gnome
+ * panels. */
+void get_work_area(int *x, int *y, int *width, int *height)
+{
+        gint act_len;
+        gulong *work_area;
+        Window root=GDK_ROOT_WINDOW();
+        GdkWindow *gdk_root=gdk_window_foreign_new(root);
+        int x0, y0, w0, h0;
+        int idesk, ndesk, nval;
+
+        idesk=get_current_desktop();
+        ndesk=get_number_of_desktops();
+        nval=4*ndesk;
+        work_area=g_new(gulong, nval);
+                        
+        if(get_cardinal_property(gdk_root, xa__NET_WORKAREA, nval,
+                                         work_area, &act_len) &&
+           act_len==nval)
+        {
+                x0 = work_area[idesk*4+0];
+                y0 = work_area[idesk*4+1];
+                w0 = work_area[idesk*4+2];
+                h0 = work_area[idesk*4+3];
+        }
+        else
+        {
+                x0 = y0 = 0;
+                w0 = screen_width;
+                h0 = screen_height;
+        }
+
+        g_free(work_area);
+
+        if(x)
+                *x = x0;
+        if(y)
+                *y = y0;
+        if(width)
+                *width = w0;
+        if(height)
+                *height = h0;
+}
+
 /* NB: Also used for pinned icons.
  * TODO: Set the level here too.
  */
@@ -226,7 +354,6 @@ void make_panel_window(GtkWidget *widget)
 {
 	static gboolean need_init = TRUE;
 	static GdkAtom xa_state, xa_atom, xa_hints, xa_win_hints;
-	static GdkAtom xa_NET_WM_DESKTOP;
 	GdkWindow *window = widget->window;
 	long wm_hints_values[] = {1, False, 0, 0, 0, 0, 0, 0};
 	GdkAtom	wm_protocols[2];
@@ -245,7 +372,6 @@ void make_panel_window(GtkWidget *widget)
 		xa_state = gdk_atom_intern("_WIN_STATE", FALSE);
 		xa_atom = gdk_atom_intern("ATOM", FALSE);
 		xa_hints = gdk_atom_intern("WM_HINTS", FALSE);
-		xa_NET_WM_DESKTOP = gdk_atom_intern("_NET_WM_DESKTOP", FALSE);
 
 		need_init = FALSE;
 	}
@@ -266,7 +392,7 @@ void make_panel_window(GtkWidget *widget)
 			WIN_HINTS_SKIP_TASKBAR);
 
 	/* Appear on all workspaces */
-	set_cardinal_property(window, xa_NET_WM_DESKTOP, 0xffffffff);
+	set_cardinal_property(window, xa__NET_WM_DESKTOP, 0xffffffff);
 
 	gdk_property_change(window, xa_hints, xa_hints, 32,
 			GDK_PROP_MODE_REPLACE, (guchar *) wm_hints_values,
@@ -1004,9 +1130,13 @@ GList *uri_list_to_glist(const char *uri_list)
 
 		if (!linebreak || linebreak[1] != 10)
 		{
-			delayed_error("uri_list_to_glist: %s",
+			g_warning("uri_list_to_glist: %s",
 					_("Incorrect or missing line "
 					  "break in text/uri-list data"));
+			/* If this is the first, append it anyway (Firefox
+			 * 3.5) */
+			if (!list && uri_list[0] != '#')
+				list = g_list_append(list, g_strdup(uri_list));
 			return list;
 		}
 

@@ -760,7 +760,10 @@ _xdg_mime_magic_lookup_data (XdgMimeMagic *mime_magic,
 	      mime_type = match->mime_type;
 	      priority = match->priority;
 	    }
+	  /* Is this another match at same priority which is not the same
+	   * type again, or a sub-type */
 	  else if (had_match && match->priority == priority && mime_type &&
+		   strcmp(mime_type, match->mime_type)!=0 &&
 		   !_xdg_mime_mime_type_subclass (mime_type, match->mime_type))
 	    /* multiple unrelated patterns with the same priority matched,
 	     * so we can't tell what type this is. */

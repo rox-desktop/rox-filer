@@ -204,7 +204,8 @@ indicator'>If this is on then files which have one or more extended attributes s
     </frame>
 
     <label help='1'>Changes here take effect the next time the filer is run.</label>
-    <label help='1'>The session manager activates these options by using the -S or --rox-session argument to rox.</label>
+    <label help='1'>The session manager activates these options by
+using the -S or --rox-session argument to rox.</label>
   </section>
   
   <section title='Action windows'>
@@ -313,12 +314,16 @@ xterm -e wget $1</entry>
     </section>
   </section>
   <section title='Compatibility'>
+    <frame label='Command line program'>
+      <make-script label='Make script'/>
+    </frame>
     <frame label='Window manager problems'>
       <toggle name='override_redirect' label='Override window manager control of the pinboard and panels'>Some window managers don't support the new Extended Window Manager Hints system, and so treat the pinboard and panels like normal windows. Turn this on to fix problems such as the pinboard coming to the front when you click on it, titlebars and other decorations appearing around windows, or having them appear in window-select lists.</toggle>
       <toggle name='pinboard_forward_buttons_13' label='Pass all backdrop mouse clicks to window manager'>Normally, right clicking on the desktop background will open the pinboard menu and left clicking will clear the selection. Turn this on to forward the events to your window manager instead. Clicks on icons will not be forwarded.</toggle>
       <toggle name='blackbox_hack' label='Blackbox root menus hack'>Blackbox, Fluxbox and similar window managers do not yet work well with the ROX-Filer pinboard. This option enables some workarounds. These window managers are expected to change their behaviour in new versions so that this isn't necessary.</toggle>
       <toggle name='panel_is_dock' label="Panel is a 'dock'">Makes sure panels stay against screen edges. Disable this option if the panel stays above other windows against your wishes. Requires a restart to take effect.</toggle>
       <toggle name='panel_on_top' label="Panel stays on top">Keeps the panel above other windows. Enable this option to make sure the dock option works correctly in some versions of compiz. May require a restart to take effect.</toggle>
+      <toggle name='panel_obey_workarea' label="Panel confined to work area">Keeps the panel confined to the work area specified by the Extended Window Manager Specification. Applies to new panels.</toggle>
     </frame>
     <frame label='Drag and drop'>
       <toggle name='dnd_no_hostnames' label="Don't use hostnames">Some older applications don't support XDND fully and may need to have this option turned on. Use this if dragging files to an application shows a + sign on the pointer but the drop doesn't work.</toggle>
