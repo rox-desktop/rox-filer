@@ -322,9 +322,9 @@ gboolean ensure_filer_menu(void)
 	GET_SSMENU_ITEM(item, "filer", "Window", "New Window");
 	filer_new_window = GTK_BIN(item)->child;
 
-	g_signal_connect(filer_menu, "unmap_event",
+	g_signal_connect(filer_menu, "selection-done",
 			G_CALLBACK(menu_closed), NULL);
-	g_signal_connect(filer_file_menu, "unmap_event",
+	g_signal_connect(filer_file_menu, "selection-done",
 			G_CALLBACK(menu_closed), NULL);
 
 	g_signal_connect(filer_keys, "accel_changed",
