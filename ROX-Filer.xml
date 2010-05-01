@@ -15,7 +15,7 @@
     <release:action phase="commit-release">sed -i &quot;s/&lt;Version&gt;.*&lt;\/Version&gt;$/&lt;Version&gt;$RELEASE_VERSION&lt;\/Version&gt;/&quot; ROX-Filer/AppInfo.xml</release:action>
   </release:management>
 
-  <group arch="*-src" compile:binary-main="ROX-Filer/AppRun" compile:command="&quot;$SRCDIR/ROX-Filer/src/build&quot;" compile:min-version="0.12">
+  <group arch="*-src" compile:binary-main="ROX-Filer/AppRun" compile:command="&quot;$SRCDIR/ROX-Filer/src/build&quot;" compile:min-version="0.19.1">
     <requires interface="http://repo.roscidus.com/devel/pkg-config">
       <environment insert="bin" name="PATH"/>
     </requires>
