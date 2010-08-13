@@ -2360,6 +2360,7 @@ static GdkPixmap *load_backdrop(const gchar *path, BackdropStyle style)
 	{
 		GdkPixbuf *old = pixbuf;
 		int	  x, y, width, height;
+		int   offset_x, offset_y;
 		float	  scale;
 
 		width = gdk_pixbuf_get_width(pixbuf);
@@ -2391,14 +2392,27 @@ static GdkPixmap *load_backdrop(const gchar *path, BackdropStyle style)
 
 		x = (screen_width - width * scale) / 2;
 		y = (screen_height - height * scale) / 2;
-		x = MAX(x, 0);
-		y = MAX(y, 0);
+
+		if (style == BACKDROP_CENTRE)
+		{
+			offset_x = x;
+			offset_y = y;
+			x = MAX(x, 0);
+			y = MAX(y, 0);
+		}
+		else {
+			x = MAX(x, 0);
+			y = MAX(y, 0);
+			offset_x = x;
+			offset_y = y;
+		}
+
 
 		gdk_pixbuf_composite(old, pixbuf,
 				x, y,
 				MIN(screen_width, width * scale),
 				MIN(screen_height, height * scale),
-				x, y, scale, scale,
+				offset_x, offset_y, scale, scale,
 				o_pinboard_image_scaling.int_value?
 				     GDK_INTERP_BILINEAR: GDK_INTERP_HYPER,
 				255);
