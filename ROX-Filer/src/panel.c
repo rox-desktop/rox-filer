@@ -1666,6 +1666,16 @@ static gint panel_leave_event(GtkWidget *widget,
 	if (event->mode != GDK_CROSSING_NORMAL)
 		return FALSE;	/* Grab for menu, DnD, etc */
 
+	if (event->x >= 0 &&
+	    event->y >= 0 &&
+	    event->x < widget->allocation.width &&
+	    event->y < widget->allocation.height)
+	{
+		/* Still inside the panel's area.
+		 * Probably we've moved over a panel applet. */
+		return FALSE;
+	}
+
 	if (panel_keep_below(panel, TRUE))
 	{
 		/* Shouldn't need this as well as keep_below but some WMs don't
