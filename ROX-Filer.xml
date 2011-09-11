@@ -15,7 +15,14 @@
     <release:action phase="commit-release">sed -i &quot;s/&lt;Version&gt;.*&lt;\/Version&gt;$/&lt;Version&gt;$RELEASE_VERSION&lt;\/Version&gt;/&quot; ROX-Filer/AppInfo.xml</release:action>
   </release:management>
 
-  <group arch="*-src" compile:binary-main="ROX-Filer/AppRun" compile:command="&quot;$SRCDIR/ROX-Filer/src/build&quot;" compile:min-version="0.19.1">
+  <group arch="*-src" compile:binary-main="ROX-Filer/AppRun" compile:min-version="0.19.1">
+    <command name='compile' shell-command="&quot;$SRCDIR/ROX-Filer/src/build&quot;">
+      <compile:implementation>
+	<requires interface='http://repo.roscidus.com/lib/glade2'>
+	  <environment insert="lib" name="LD_LIBRARY_PATH"/>
+	</requires>
+      </compile:implementation>
+    </command>
     <requires interface="http://repo.roscidus.com/devel/pkg-config">
       <environment insert="bin" name="PATH"/>
     </requires>
