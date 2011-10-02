@@ -16,33 +16,22 @@
   </release:management>
 
   <group arch="*-src" compile:binary-main="ROX-Filer/AppRun" compile:min-version="0.19.1">
-    <command name='compile' shell-command="&quot;$SRCDIR/ROX-Filer/src/build&quot;">
-      <compile:implementation>
-	<requires interface='http://repo.roscidus.com/lib/glade2'>
-	  <environment insert="lib" name="LD_LIBRARY_PATH"/>
-	</requires>
-      </compile:implementation>
-    </command>
+    <command name='compile' shell-command="&quot;$SRCDIR/ROX-Filer/src/build&quot;"/>
     <requires interface="http://repo.roscidus.com/devel/pkg-config">
       <environment insert="bin" name="PATH"/>
     </requires>
     <requires interface="http://0install.net/2006/interfaces/GTK-dev">
-      <version before="2.5" not-before="2.4"/>
+      <version before="3" not-before="2.12"/>
       <environment insert="lib/pkgconfig" name="PKG_CONFIG_PATH"/>
     </requires>
     <requires interface="http://0install.net/2006/interfaces/GLib-dev">
-      <version before="2.5" not-before="2.4"/>
+      <version before="3" not-before="2.12"/>
       <environment insert="lib/pkgconfig" name="PKG_CONFIG_PATH"/>
     </requires>
     <requires interface="http://0install.net/2006/interfaces/ATK-dev">
-      <version before="1.9"/>
       <environment insert="lib/pkgconfig" name="PKG_CONFIG_PATH"/>
     </requires>
     <requires interface="http://0install.net/2006/interfaces/Pango-dev">
-      <version before="1.5"/>
-      <environment insert="lib/pkgconfig" name="PKG_CONFIG_PATH"/>
-    </requires>
-    <requires interface="http://0install.net/2008/interfaces/libglade-dev.xml">
       <environment insert="lib/pkgconfig" name="PKG_CONFIG_PATH"/>
     </requires>
     <requires interface="http://0install.net/2008/interfaces/libxml2-dev.xml">

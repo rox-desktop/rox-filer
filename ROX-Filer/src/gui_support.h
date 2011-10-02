@@ -7,7 +7,6 @@
 #define _GUI_SUPPORT_H
 
 #include <gtk/gtk.h>
-#include <glade/glade.h>
 
 #define WIN_STATE_STICKY          (1<<0) /* Fixed relative to screen */
 #define WIN_STATE_HIDDEN          (1<<4) /* Not on taskbar but window visible */
@@ -100,7 +99,7 @@ void launch_uri(GObject *button, const char *uri);
 void allow_right_click(GtkWidget *button);
 gint current_event_button(void);
 GdkPixbuf *create_spotlight_pixbuf(GdkPixbuf *src, GdkColor *color);
-GladeXML *get_glade_xml(const char *component);
+GtkBuilder *get_gtk_builder(gchar **ids);
 void add_stock_to_menu_item(GtkWidget *item, const char *stock);
 
 #endif /* _GUI_SUPPORT_H */

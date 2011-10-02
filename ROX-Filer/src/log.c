@@ -25,7 +25,6 @@
 #include <string.h>
 #include <time.h>
 #include <gtk/gtk.h>
-#include <glade/glade.h>
 
 #include "global.h"
 
@@ -134,14 +133,16 @@ void log_info_paths(const gchar *message, GList *paths, const gchar *path)
 /* Open the log window. */
 void log_show_window()
 {
-	GladeXML *glade;
+	GtkWidget *dialog;
+	GtkBuilder *builder;
 	GtkTreeView *tv;
 	GtkTreeViewColumn *column;
 	GtkCellRenderer *renderer;
+	gchar *ids[] = {"Log viewer", NULL};
 
-	glade = get_glade_xml("Log viewer");
+	builder = get_gtk_builder(&ids);
 
-	tv = GTK_TREE_VIEW(glade_xml_get_widget(glade, "log_list"));
+	tv = GTK_TREE_VIEW(gtk_builder_get_object(builder, "log_list"));
 	gtk_tree_view_set_model(tv, GTK_TREE_MODEL(log));
 
 	renderer = gtk_cell_renderer_text_new();
@@ -162,8 +163,12 @@ void log_show_window()
 							   NULL);
 	gtk_tree_view_append_column(tv, column);
 
-	g_signal_connect(G_OBJECT(glade_xml_get_widget(glade, "Log viewer")),
+	dialog = gtk_builder_get_object(builder, "Log viewer");
+	g_signal_connect(G_OBJECT(dialog),
 			 "response", (GCallback) log_dialog_response, NULL);
+
+	gtk_widget_show(dialog);
+	g_object_unref(builder);
 }
 	
 /****************************************************************

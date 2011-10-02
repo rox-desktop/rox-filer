@@ -1718,24 +1718,27 @@ error:
 	return src;
 }
 
-/* Load the Templates.glade file and build a component.
- * Note that libglade caches the XML itself.
- */
-GladeXML *get_glade_xml(const char *component)
+/* Load the Templates.ui file and build a component. */
+GtkBuilder *get_gtk_builder(gchar **ids)
 {
-	GladeXML *widgets;
+	GError	*error = NULL;
 	char *path;
-
-	path = g_build_filename(app_dir, "Templates.glade", NULL);
-	widgets = glade_xml_new(path, component, "ROX-Filer");
-
-	if (widgets == NULL)
-		g_warning("Failed to load widget '%s' from '%s'",
-				component, path);
+	GtkBuilder *builder = NULL;
 	
+	builder = gtk_builder_new();
+	gtk_builder_set_translation_domain(builder, "ROX-Filer");
+
+	path = g_build_filename(app_dir, "Templates.ui", NULL);
+	if (!gtk_builder_add_objects_from_file(builder, path, ids, &error))
+	{
+		g_warning("Failed to load builder file %s: %s",
+				path, error->message);
+		g_error_free(error);
+	}
+
 	g_free(path);
 
-	return widgets;
+	return builder;
 }
 
 void add_stock_to_menu_item(GtkWidget *item, const char *stock)

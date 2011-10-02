@@ -2355,10 +2355,10 @@ static gboolean panel_want_show_text(PanelIcon *pi)
 	return TRUE;
 }
 
-static void xinerama_sensitive(GladeXML *glade, gboolean sensitive)
+static void xinerama_sensitive(GtkBuilder *builder, gboolean sensitive)
 {
 	gtk_widget_set_sensitive(
-			glade_xml_get_widget(glade, "panel_xinerama_monitor"),
+			GTK_WIDGET(gtk_builder_get_object(builder, "panel_xinerama_monitor")),
 			sensitive);
 }
 
@@ -2460,13 +2460,13 @@ static void panel_avoid_toggled_cb(GtkToggleButton *widget)
 	}
 }
 
-static void panel_xinerama_confine_toggled_cb(GtkWidget *widget)
+static void panel_xinerama_confine_toggled_cb(GtkWidget *widget, GtkWidget *spinner)
 {
 	Panel *panel = panel_from_opts_widget(widget);
 	gboolean xinerama = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
 
-	xinerama_sensitive(glade_get_widget_tree(gtk_widget_get_toplevel(widget)),
-			xinerama);
+	gtk_widget_set_sensitive(spinner, xinerama);
+
 	if (xinerama != panel->xinerama)
 	{
 		panel->xinerama = xinerama;
@@ -2506,50 +2506,78 @@ static void panel_pos_right_toggled_cb(GtkWidget *widget)
 	panel_side_radio_toggled(widget, PANEL_RIGHT);
 }
 
-#define CONNECT_GLADE_CB(glade, handler) \
-	glade_xml_signal_connect(glade, #handler, G_CALLBACK(handler))
-
-static void panel_connect_dialog_signal_handlers(GladeXML *glade)
+static void panel_connect_dialog_signal_handlers(GtkBuilder *builder,
+						 GObject *object,
+						 const gchar *signal_name,
+						 const gchar *handler_name,
+						 GObject *connect_object,
+						 GConnectFlags flags,
+						 gpointer user_data)
 {
-	CONNECT_GLADE_CB(glade, gtk_widget_destroy);
-	CONNECT_GLADE_CB(glade, panel_style_radio_0_toggled_cb);
-	CONNECT_GLADE_CB(glade, panel_style_radio_1_toggled_cb);
-	CONNECT_GLADE_CB(glade, panel_style_radio_2_toggled_cb);
-	CONNECT_GLADE_CB(glade, panel_width_changed_cb);
-	CONNECT_GLADE_CB(glade, panel_avoid_toggled_cb);
-	CONNECT_GLADE_CB(glade, panel_xinerama_confine_toggled_cb);
-	CONNECT_GLADE_CB(glade, panel_xinerama_monitor_changed_cb);
-	CONNECT_GLADE_CB(glade, panel_pos_top_toggled_cb);
-	CONNECT_GLADE_CB(glade, panel_pos_bottom_toggled_cb);
-	CONNECT_GLADE_CB(glade, panel_pos_left_toggled_cb);
-	CONNECT_GLADE_CB(glade, panel_pos_right_toggled_cb);
+	void *fn = NULL;
+
+	if (strcmp(handler_name, "gtk_widget_destroy") == 0)
+		fn = gtk_widget_destroy;
+	else if (strcmp(handler_name, "panel_style_radio_0_toggled_cb") == 0)
+		fn = panel_style_radio_0_toggled_cb;
+	else if (strcmp(handler_name, "panel_style_radio_0_toggled_cb") == 0)
+		fn = panel_style_radio_0_toggled_cb;
+	else if (strcmp(handler_name, "panel_style_radio_1_toggled_cb") == 0)
+		fn = panel_style_radio_1_toggled_cb;
+	else if (strcmp(handler_name, "panel_style_radio_2_toggled_cb") == 0)
+		fn = panel_style_radio_2_toggled_cb;
+	else if (strcmp(handler_name, "panel_width_changed_cb") == 0)
+		fn = panel_width_changed_cb;
+	else if (strcmp(handler_name, "panel_avoid_toggled_cb") == 0)
+		fn = panel_avoid_toggled_cb;
+	else if (strcmp(handler_name, "panel_xinerama_confine_toggled_cb") == 0)
+		fn = panel_xinerama_confine_toggled_cb;
+	else if (strcmp(handler_name, "panel_xinerama_monitor_changed_cb") == 0)
+		fn = panel_xinerama_monitor_changed_cb;
+	else if (strcmp(handler_name, "panel_pos_top_toggled_cb") == 0)
+		fn = panel_pos_top_toggled_cb;
+	else if (strcmp(handler_name, "panel_pos_bottom_toggled_cb") == 0)
+		fn = panel_pos_bottom_toggled_cb;
+	else if (strcmp(handler_name, "panel_pos_left_toggled_cb") == 0)
+		fn = panel_pos_left_toggled_cb;
+	else if (strcmp(handler_name, "panel_pos_right_toggled_cb") == 0)
+		fn = panel_pos_right_toggled_cb;
+
+	if (fn != NULL)
+	{
+		g_signal_connect(object, signal_name, fn, connect_object);
+	}
+	else
+	{
+		g_warning("Unknown handler '%s'", handler_name);
+	}
 }
 
-static void panel_setup_options_dialog(GladeXML *glade, Panel *panel)
+static void panel_setup_options_dialog(GtkBuilder *builder, Panel *panel)
 {
 	char *wnm;
 	const char *pos_radio;
 
 	wnm = g_strdup_printf("panel_style_radio_%d", panel->style);
 	gtk_toggle_button_set_active(
-			GTK_TOGGLE_BUTTON(glade_xml_get_widget(glade, wnm)),
+			GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder, wnm)),
 			TRUE);
 	g_free(wnm);
 	gtk_spin_button_set_value(
-		GTK_SPIN_BUTTON(glade_xml_get_widget(glade, "panel_width")),
+		GTK_SPIN_BUTTON(gtk_builder_get_object(builder, "panel_width")),
 		panel->width);
 	gtk_toggle_button_set_active(
-		GTK_TOGGLE_BUTTON(glade_xml_get_widget(glade, "panel_avoid")),
+		GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder, "panel_avoid")),
 		panel->avoid);
 	gtk_toggle_button_set_active(
-		GTK_TOGGLE_BUTTON(glade_xml_get_widget(glade,
+		GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder,
 				"panel_xinerama_confine")),
 		panel->xinerama);
 	gtk_spin_button_set_adjustment(
-		GTK_SPIN_BUTTON(glade_xml_get_widget(glade, "panel_xinerama_monitor")),
+		GTK_SPIN_BUTTON(gtk_builder_get_object(builder, "panel_xinerama_monitor")),
 		GTK_ADJUSTMENT(gtk_adjustment_new(MAX(0, panel->monitor),
-				0, n_monitors - 1, 1, 10, 1)));
-	xinerama_sensitive(glade, panel->xinerama);
+				0, n_monitors - 1, 1, 10, 0)));
+	xinerama_sensitive(builder, panel->xinerama);
 	switch (panel->side)
 	{
 		case PANEL_TOP:
@@ -2570,7 +2598,7 @@ static void panel_setup_options_dialog(GladeXML *glade, Panel *panel)
 	}
 	g_return_if_fail(pos_radio != NULL);
 	gtk_toggle_button_set_active(
-		GTK_TOGGLE_BUTTON(glade_xml_get_widget(glade, pos_radio)),
+		GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder, pos_radio)),
 		TRUE);
 }
 
@@ -2578,27 +2606,28 @@ static void panel_show_options(Panel *panel)
 {
 	GtkWidget *dialog;
 	gboolean already_showing = FALSE;
-	GladeXML *glade = NULL;
+	GtkBuilder *builder;
+	gchar *ids[] = {"adjustment1", "adjustment2", "Panel Options", NULL};
+	
+	builder = get_gtk_builder(ids);
 
 	if (panel_options_dialog)
 	{
 		dialog = panel_options_dialog;
 		already_showing = TRUE;
-		glade = glade_get_widget_tree(dialog);
 	}
 	else
 	{
-		glade = get_glade_xml("Panel Options");
-		dialog = glade_xml_get_widget(glade, "Panel Options");
+		dialog = GTK_WIDGET(gtk_builder_get_object(builder, "Panel Options"));
 		panel_options_dialog = dialog;
 		g_signal_connect(dialog, "destroy",
 				G_CALLBACK(gtk_widget_destroyed),
 				&panel_options_dialog);
-		panel_connect_dialog_signal_handlers(glade);
+		gtk_builder_connect_signals_full(builder, &panel_connect_dialog_signal_handlers, NULL);
 	}
 	g_object_set_data(G_OBJECT(panel_options_dialog), "rox-panel", panel);
 
-	panel_setup_options_dialog(glade, panel);
+	panel_setup_options_dialog(builder, panel);
 
 	if (already_showing)
 	{
@@ -2616,6 +2645,8 @@ static void panel_show_options(Panel *panel)
 		gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_MOUSE);
 		gtk_widget_show_all(dialog);
 	}
+
+	g_object_unref(builder);
 }
 
 static void panel_position_menu(GtkMenu *menu, gint *x, gint *y,
