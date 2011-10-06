@@ -42,7 +42,7 @@
 #ifdef HAVE_MMAP
 #include <sys/mman.h>
 #else
-#warning Building xdgmime without MMAP support. Binary "mime.info" cache files will not be used.
+#warning Building xdgmime without MMAP support. Binary "mime.cache" files will not be used.
 #endif
 
 #include <sys/stat.h>
