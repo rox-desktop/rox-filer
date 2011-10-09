@@ -16,7 +16,7 @@
   </release:management>
 
   <group arch="*-src" compile:binary-main="ROX-Filer/AppRun" compile:min-version="0.19.1">
-    <command name='compile' shell-command="&quot;$SRCDIR/ROX-Filer/src/build&quot;"/>
+    <command name="compile" shell-command="&quot;$SRCDIR/ROX-Filer/src/build&quot;"/>
     <requires interface="http://repo.roscidus.com/devel/pkg-config">
       <environment insert="bin" name="PATH"/>
     </requires>
@@ -38,6 +38,6 @@
       <environment insert="lib/pkgconfig" name="PKG_CONFIG_PATH"/>
     </requires>
 
-    <implementation id="." version="2.10-post"/>
+    <implementation id="." released="2011-10-09" version="2.11"/>
   </group>
 </interface>
