@@ -6,6 +6,64 @@
 * log message with the commit and I'll update this file only when making a new
 * release.
 
+Release 2.11 (2011-10-09)
+
+- Converted from Glade to GtkBuilder.
+
+- Fixed typo in German translation (Alek).
+
+- "build" script runs autoconf and build the documentation if necessary. This
+  is needed for Git checkouts.
+
+- Don't lower panel when the pointer moves over an applet. Reported by mark76
+  on IRC.
+
+- Centre the pinboard image correctly if larger than the screen (Mohamed Amine
+  IL Idrissi). Patch sent to Ubuntu anonymously and forwarded; see Ubuntu bug
+  #615490.
+
+- Depend on 0compile 0.19.1. Fixes bug using distribution-provided pkg-config.
+
+- Added build dependency on pkg-config.
+
+- Bugfix: unselect item when menu is closed. We used to listen for
+  "unmap_event", but this is no longer emitted in recent versions of GTK.
+  Switched to using "selection-done" instead. Closes #2925212 (reported by
+  Barry Kauler).
+
+- Added button to options window to create the 'rox' start up script (Stephen
+  Watson).
+
+- Updated Italian translation (Yuri).
+
+- Updated Brazilian Portuguese translation (Sérgio Cipolla).
+
+- Updated Spanish and Galician translations (Antonio Sánchez). The
+  how-to-change-permissions explanation had a mistake that made the help window
+  appear blank.
+
+- Updated Spanish translation (Antonio Sánchez and Luis Felipe Abad).
+
+- Turn the error on invalid line breaks in uri_list_to_glist into a warning
+  (Stephen Watson). Firefox 3.5 upto and including 3.5.2 gets it wrong, but we
+  don't want to stop drops working until they fix it.
+
+- Eliminated the duplicated code between pixmap_background_thumb() and
+  pixmap_try_thumb(). pixmap_background_thumb() now calls pixmap_try_thumb() to
+  get from memory or load from cache (Stephen Watson).
+
+- Added option to place panels under the control of the _NET_WORKAREA property
+  (Stephen Watson). Note it only checks the work area at the point it creates
+  the panel.
+
+- Fix bug in XDG MIME magic: if two matches at the same priority returned
+  exactly the same type, it was considered a conflict (Stephen Watson).
+
+- Newer versions of GTK+ issue warnings if a spin button has a non-zero page
+  size (Stephen Watson).
+
+- If a file has a thumbnail, display it in the infobox (Stephen Watson).
+
 Release 2.10 (2009-07-18)
 
 - Added "Don't ask..." to may_offer_unmount() (Tony Houghton).
