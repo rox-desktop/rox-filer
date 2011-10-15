@@ -3,8 +3,9 @@
 echo Extracting messages from source files...
 echo
 
-(cd ..; python po/tips.py;
- xgettext --keyword=_ --keyword=N_ --output=messages.pot *.c tips ../Templates.glade)
+(cd ..; python po/tips.py &&
+ intltool-extract --type=gettext/glade --update ../Templates.ui &&
+ xgettext --keyword=_ --keyword=N_ --output=messages.pot *.c tips ../Templates.ui.h)
 
 echo
 
