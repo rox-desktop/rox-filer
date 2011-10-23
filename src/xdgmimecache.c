@@ -687,14 +687,25 @@ cache_get_mime_type_for_data (const void *data,
 
   if (result_prio)
     *result_prio = priority;
-  
-  if (priority > 0)
-    return mime_type;
 
+  if (priority > 0)
+    {
+      /* Pick glob-result R where mime_type inherits from R */
+      for (n = 0; n < n_mime_types; n++)
+        {
+          if (mime_types[n] && _xdg_mime_cache_mime_type_subclass(mime_types[n], mime_type))
+              return mime_types[n];
+        }
+
+      /* Return magic match */
+      return mime_type;
+    }
+
+  /* Pick first glob result, as fallback */
   for (n = 0; n < n_mime_types; n++)
     {
       if (mime_types[n])
-	return mime_types[n];
+        return mime_types[n];
     }
 
   return NULL;
