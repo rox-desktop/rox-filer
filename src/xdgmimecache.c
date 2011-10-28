@@ -404,7 +404,8 @@ cache_glob_lookup_literal (const char *file_name,
 static int
 cache_glob_lookup_fnmatch (const char *file_name,
 			   MimeWeight  mime_types[],
-			   int         n_mime_types)
+			   int         n_mime_types,
+			   int         case_sensitive_check)
 {
   const char *mime_type;
   const char *ptr;
@@ -424,16 +425,19 @@ cache_glob_lookup_fnmatch (const char *file_name,
 	  xdg_uint32_t offset = GET_UINT32 (cache->buffer, list_offset + 4 + 12 * j);
 	  xdg_uint32_t mimetype_offset = GET_UINT32 (cache->buffer, list_offset + 4 + 12 * j + 4);
 	  int weight = GET_UINT32 (cache->buffer, list_offset + 4 + 12 * j + 8);
+	  int case_sensitive = weight & 0x100;
 	  weight = weight & 0xff;
 	  ptr = cache->buffer + offset;
 	  mime_type = cache->buffer + mimetype_offset;
-
-	  /* FIXME: Not UTF-8 safe */
-	  if (fnmatch (ptr, file_name, 0) == 0)
+	  if (case_sensitive_check || !case_sensitive)
 	    {
-	      mime_types[n].mime = mime_type;
-	      mime_types[n].weight = weight;
-	      n++;
+	      /* FIXME: Not UTF-8 safe */
+	      if (fnmatch (ptr, file_name, 0) == 0)
+	        {
+	          mime_types[n].mime = mime_type;
+	          mime_types[n].weight = weight;
+	          n++;
+	        }
 	    }
 	}
 
@@ -614,11 +618,13 @@ cache_glob_lookup_file_name (const char *file_name,
   if (n == 0)
     n = cache_glob_lookup_suffix (file_name, len, TRUE, mimes, n_mimes);
 
-  free (lower_case);
-
   /* Last, try fnmatch */
   if (n == 0)
-    n = cache_glob_lookup_fnmatch (file_name, mimes, n_mimes);
+    n = cache_glob_lookup_fnmatch (lower_case, mimes, n_mimes, FALSE);
+  if (n == 0)
+    n = cache_glob_lookup_fnmatch (file_name, mimes, n_mimes, TRUE);
+
+  free (lower_case);
 
   qsort (mimes, n, sizeof (MimeWeight), compare_mime_weight);
 
