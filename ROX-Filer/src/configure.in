@@ -173,6 +173,9 @@ AC_TYPE_SIZE_T
 
 dnl Checks for library functions.
 AC_CHECK_FUNCS(gethostname unsetenv mkdir rmdir strdup strtol statvfs statfs mbrtowc)
+dnl Math functions and dlsym() could be defined outside the standard C library
+AC_CHECK_LIB(m, floor)
+AC_CHECK_LIB(dl, dlsym)
 dnl Since we're using libintl.h, check if libintl needs to be linked in
 AC_CHECK_LIB(intl, gettext)
 
