@@ -1674,7 +1674,7 @@ static void show_send_to_menu(GList *paths, GdkEvent *event)
 
 	send_to_paths = paths;
 
-	g_signal_connect(menu, "unmap_event", G_CALLBACK(menu_closed), NULL);
+	g_signal_connect(menu, "selection-done", G_CALLBACK(menu_closed), NULL);
 
 	popup_menu = menu;
 	show_popup_menu(menu, event, 0);
