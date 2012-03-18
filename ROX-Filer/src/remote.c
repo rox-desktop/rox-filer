@@ -885,6 +885,7 @@ static xmlNodePtr rpc_SetBackdrop(GList *args)
 	    !g_strcasecmp(style, "Scale") ? BACKDROP_SCALE :
 	    !g_strcasecmp(style, "Stretch") ? BACKDROP_STRETCH :
 	    !g_strcasecmp(style, "Centre") ? BACKDROP_CENTRE :
+	    !g_strcasecmp(style, "Fit") ? BACKDROP_FIT :
 					     BACKDROP_NONE;
 
 	if (s == BACKDROP_NONE)
