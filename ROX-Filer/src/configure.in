@@ -93,6 +93,7 @@ else
 fi
 ])
 
+ROX_REQUIRE(sm, 1)
 ROX_REQUIRE(gtk+-2.0, 2.12.0)
 ROX_REQUIRE(libxml-2.0, 2.0.0)
 ROX_REQUIRE(shared-mime-info, 0.14)
@@ -161,10 +162,6 @@ AC_HEADER_DIRENT
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS(fcntl.h sys/time.h unistd.h mntent.h sys/ucred.h sys/mntent.h apsymbols.h apbuild/apsymbols.h sys/statvfs.h sys/vfs.h wctype.h libintl.h sys/inotify.h)
-
-AC_CHECK_HEADER([X11/SM/SMlib.h], [],
-  [AC_MSG_ERROR([Session management library (libsm) missing. It is part of the X server distribution. Try installing the libsm-dev package.])]
-)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
