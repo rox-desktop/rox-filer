@@ -178,7 +178,6 @@ enum {
 	SESSION_BOTH,
 };
 Option o_session_panel_or_pin;
-Option o_session_panel_name;	/* Now a comma-separated list */
 Option o_session_pinboard_name;
 
 /* Always start a new filer, even if one seems to be already running */
@@ -339,8 +338,6 @@ int main(int argc, char **argv)
 
 	option_add_int(&o_session_panel_or_pin, "session_panel_or_pin",
 		       SESSION_BOTH);
-	option_add_string(&o_session_panel_name, "session_panel_name",
-			  "Default");
 	option_add_string(&o_session_pinboard_name, "session_pinboard_name",
 			  "Default");
 	option_register_widget("launch", build_launch);
@@ -885,10 +882,7 @@ static void add_default_panel_and_pinboard(xmlNodePtr body)
 			g_io_channel_shutdown(fp, FALSE, NULL);
 		if (use_old_option)
 		{
-			name = o_session_panel_name.value;
-			if (!name[0])
-				name="Default";
-			soap_add(body, "Panel", "Name", name, NULL, NULL);
+			soap_add(body, "Panel", "Name", "Default", NULL, NULL);
 		}
 		g_free(filename);
 	}
