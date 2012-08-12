@@ -1363,7 +1363,10 @@ static void forward_to_root(GdkEventButton *event)
 	{
 		xev.type = ButtonPress;
 		if (!o_blackbox_hack.int_value)
-			XUngrabPointer(gdk_display, event->time);
+		{
+			gdk_display_pointer_ungrab(gdk_x11_lookup_xdisplay(gdk_display),
+						   event->time);
+		}
 	}
 	else
 		xev.type = ButtonRelease;
