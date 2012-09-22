@@ -153,9 +153,7 @@ void diritem_restat(const guchar *path, DirItem *item, struct stat *parent)
 	}
 	else if (item->base_type == TYPE_FILE)
 	{
-		if (item->size == 0)
-			item->mime_type = text_plain;
-		else if (item->flags & ITEM_FLAG_SYMLINK)
+		if (item->flags & ITEM_FLAG_SYMLINK)
 		{
 			guchar *link_path;
 			link_path = pathdup(path);
