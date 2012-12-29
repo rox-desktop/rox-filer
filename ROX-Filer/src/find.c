@@ -993,7 +993,7 @@ static gboolean match(const gchar **expression, const gchar *word)
 	int	len;
 
 	len = strlen(word);
-	if (g_strncasecmp(*expression, word, len))
+	if (g_ascii_strncasecmp(*expression, word, len))
 		return FALSE;
 
 	if (g_ascii_isalpha(*(*expression + len)))

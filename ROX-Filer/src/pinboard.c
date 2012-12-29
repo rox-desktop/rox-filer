@@ -1514,12 +1514,12 @@ static void backdrop_from_xml(xmlNode *node)
 	if (style)
 	{
 		current_pinboard->backdrop_style =
-		  g_strcasecmp(style, "Tiled") == 0 ? BACKDROP_TILE :
-		  g_strcasecmp(style, "Scaled") == 0 ? BACKDROP_SCALE :
-		  g_strcasecmp(style, "Fit") == 0 ? BACKDROP_FIT :
-		  g_strcasecmp(style, "Stretched") == 0 ? BACKDROP_STRETCH :
-		  g_strcasecmp(style, "Centred") == 0 ? BACKDROP_CENTRE :
-		  g_strcasecmp(style, "Program") == 0 ? BACKDROP_PROGRAM :
+		  g_ascii_strcasecmp(style, "Tiled") == 0 ? BACKDROP_TILE :
+		  g_ascii_strcasecmp(style, "Scaled") == 0 ? BACKDROP_SCALE :
+		  g_ascii_strcasecmp(style, "Fit") == 0 ? BACKDROP_FIT :
+		  g_ascii_strcasecmp(style, "Stretched") == 0 ? BACKDROP_STRETCH :
+		  g_ascii_strcasecmp(style, "Centred") == 0 ? BACKDROP_CENTRE :
+		  g_ascii_strcasecmp(style, "Program") == 0 ? BACKDROP_PROGRAM :
 							     BACKDROP_NONE;
 		g_free(style);
 	}

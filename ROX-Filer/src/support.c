@@ -812,13 +812,13 @@ guchar *get_relative_path(const guchar *from, const guchar *to)
  */
 int text_to_boolean(const char *text, int defvalue)
 {
-	if (g_strcasecmp(text, "true")==0)
+	if (g_ascii_strcasecmp(text, "true")==0)
 	        return TRUE;
-	else if (g_strcasecmp(text, "false")==0)
+	else if (g_ascii_strcasecmp(text, "false")==0)
 	        return FALSE;
-	else if (g_strcasecmp(text, "yes")==0)
+	else if (g_ascii_strcasecmp(text, "yes")==0)
 	        return TRUE;
-	else if (g_strcasecmp(text, "no")==0)
+	else if (g_ascii_strcasecmp(text, "no")==0)
 	        return FALSE;
 	else if (g_ascii_isdigit(text[0]))
 	        return !!atoi(text);
@@ -1376,7 +1376,7 @@ gint strcmp2(gconstpointer a, gconstpointer b)
 	const char *aa = *(char **) a;
 	const char *bb = *(char **) b;
 
-	return g_strcasecmp(aa, bb);
+	return g_ascii_strcasecmp(aa, bb);
 }
 
 /* Returns an array listing all the names in the directory 'path'.

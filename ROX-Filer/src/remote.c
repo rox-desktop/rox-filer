@@ -713,10 +713,10 @@ static xmlNodePtr rpc_OpenDir(GList *args)
 	{
 		DisplayStyle ds;
 
-		ds = !g_strcasecmp(style, "Large") ? LARGE_ICONS :
-		     !g_strcasecmp(style, "Small") ? SMALL_ICONS :
-		     !g_strcasecmp(style, "Huge")  ? HUGE_ICONS :
-		     !g_strcasecmp(style, "Automatic")  ? AUTO_SIZE_ICONS :
+		ds = !g_ascii_strcasecmp(style, "Large") ? LARGE_ICONS :
+		     !g_ascii_strcasecmp(style, "Small") ? SMALL_ICONS :
+		     !g_ascii_strcasecmp(style, "Huge")  ? HUGE_ICONS :
+		     !g_ascii_strcasecmp(style, "Automatic")  ? AUTO_SIZE_ICONS :
 		     				     UNKNOWN_STYLE;
 		if (ds == UNKNOWN_STYLE)
 			delayed_error(_("Unknown style '%s'"), style);
@@ -731,12 +731,12 @@ static xmlNodePtr rpc_OpenDir(GList *args)
 		DetailsType dt;
 		ViewType view_type;
 		
-		dt = !g_strcasecmp(details, "None") ? DETAILS_NONE :
-		     !g_strcasecmp(details, "ListView") ? DETAILS_NONE :
-		     !g_strcasecmp(details, "Size") ? DETAILS_SIZE :
-		     !g_strcasecmp(details, "Type") ? DETAILS_TYPE :
-		     !g_strcasecmp(details, "Times") ? DETAILS_TIMES :
-		     !g_strcasecmp(details, "Permissions")
+		dt = !g_ascii_strcasecmp(details, "None") ? DETAILS_NONE :
+		     !g_ascii_strcasecmp(details, "ListView") ? DETAILS_NONE :
+		     !g_ascii_strcasecmp(details, "Size") ? DETAILS_SIZE :
+		     !g_ascii_strcasecmp(details, "Type") ? DETAILS_TYPE :
+		     !g_ascii_strcasecmp(details, "Times") ? DETAILS_TIMES :
+		     !g_ascii_strcasecmp(details, "Permissions")
 		     				? DETAILS_PERMISSIONS :
 						  DETAILS_UNKNOWN;
 
@@ -746,7 +746,7 @@ static xmlNodePtr rpc_OpenDir(GList *args)
 			display_set_layout(fwin, fwin->display_style_wanted,
 					   dt, TRUE);
 
-		if (g_strcasecmp(details, "ListView") == 0)
+		if (g_ascii_strcasecmp(details, "ListView") == 0)
 			view_type = VIEW_TYPE_DETAILS;
 		else
 			view_type = VIEW_TYPE_COLLECTION;
@@ -761,12 +761,12 @@ static xmlNodePtr rpc_OpenDir(GList *args)
 	{
 		SortType type;
 
-		type = !g_strcasecmp(sort, "Name") ? SORT_NAME :
-		       !g_strcasecmp(sort, "Type") ? SORT_TYPE :
-		       !g_strcasecmp(sort, "Date") ? SORT_DATE :
- 		       !g_strcasecmp(sort, "Size") ? SORT_SIZE :
- 		       !g_strcasecmp(sort, "Owner") ? SORT_OWNER :
- 		       !g_strcasecmp(sort, "Group") ? SORT_GROUP :
+		type = !g_ascii_strcasecmp(sort, "Name") ? SORT_NAME :
+		       !g_ascii_strcasecmp(sort, "Type") ? SORT_TYPE :
+		       !g_ascii_strcasecmp(sort, "Date") ? SORT_DATE :
+		       !g_ascii_strcasecmp(sort, "Size") ? SORT_SIZE :
+		       !g_ascii_strcasecmp(sort, "Owner") ? SORT_OWNER :
+		       !g_ascii_strcasecmp(sort, "Group") ? SORT_GROUP :
 						       -1;
 		if (type == -1)
 			delayed_error(_("Unknown sorting type '%s'"), sort);
@@ -881,11 +881,11 @@ static xmlNodePtr rpc_SetBackdrop(GList *args)
 	file = string_value(ARG(0));
 	style = string_value(ARG(1));
 
-	s = !g_strcasecmp(style, "Tile") ? BACKDROP_TILE :
-	    !g_strcasecmp(style, "Scale") ? BACKDROP_SCALE :
-	    !g_strcasecmp(style, "Stretch") ? BACKDROP_STRETCH :
-	    !g_strcasecmp(style, "Centre") ? BACKDROP_CENTRE :
-	    !g_strcasecmp(style, "Fit") ? BACKDROP_FIT :
+	s = !g_ascii_strcasecmp(style, "Tile") ? BACKDROP_TILE :
+	    !g_ascii_strcasecmp(style, "Scale") ? BACKDROP_SCALE :
+	    !g_ascii_strcasecmp(style, "Stretch") ? BACKDROP_STRETCH :
+	    !g_ascii_strcasecmp(style, "Centre") ? BACKDROP_CENTRE :
+	    !g_ascii_strcasecmp(style, "Fit") ? BACKDROP_FIT :
 					     BACKDROP_NONE;
 
 	if (s == BACKDROP_NONE)
