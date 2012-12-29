@@ -636,10 +636,6 @@ gtk_savebox_set_property (GObject      *object,
                           const GValue *value,
                           GParamSpec   *pspec)
 {
-  GtkSavebox *savebox;
-  
-  savebox = GTK_SAVEBOX (object);
-
   switch (prop_id)
     {
     case PROP_HAS_DISCARD:

@@ -735,12 +735,11 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, ViewIter *iter)
 	}
 
 	{
-		GtkWidget	*file_label, *file_menu;
+		GtkWidget	*file_label;
 		GString		*buffer;
 		DirItem		*item;
 
 		file_label = filer_file_item;
-		file_menu = filer_file_menu;
 		gtk_check_menu_item_set_active(
 				GTK_CHECK_MENU_ITEM(filer_thumb_menu),
 				filer_window->show_thumbs);

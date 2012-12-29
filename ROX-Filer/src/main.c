@@ -980,7 +980,6 @@ static gint new_script_cb(GObject *savebox,
 static void make_script_clicked(GtkWidget *button, gpointer udata)
 {
 	const gchar *filename;
-	const gchar *action;
 	GtkWidget   *savebox;
 	MaskedPixmap *image;
 
@@ -989,7 +988,6 @@ static void make_script_clicked(GtkWidget *button, gpointer udata)
 		filename=make_path(window_with_focus->sym_path, "rox");
 	else
 		filename="rox";
-	action = _("Start script");
 	image = type_to_icon(application_x_shellscript);
 
 	/* Create a save box to save the script */

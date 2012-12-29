@@ -1145,10 +1145,7 @@ static GdkPixbuf *extract_tiff_thumbnail(const gchar *path)
         int entry=ifd+2+12*i;
         int tag=s2n(data, entry, 2, format);
         int type=s2n(data, entry+2, 2, format);
-        int count, offset;
-
-        count=s2n(data, entry+4, 4, format);
-        offset=entry+8;
+        int offset=entry+8;
 
         if(type==4) {
             int val=(int) s2n(data, offset, 4, format);

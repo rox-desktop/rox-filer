@@ -704,7 +704,6 @@ static void resize_arrays(Collection *collection, guint new_size)
 static gint collection_key_press(GtkWidget *widget, GdkEventKey *event)
 {
 	Collection *collection;
-	int	   item;
 	int	   key;
 
 	g_return_val_if_fail(widget != NULL, FALSE);
@@ -712,7 +711,6 @@ static gint collection_key_press(GtkWidget *widget, GdkEventKey *event)
 	g_return_val_if_fail(event != NULL, FALSE);
 
 	collection = (Collection *) widget;
-	item = collection->cursor_item;
 
 	key = event->keyval;
 	if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK))
@@ -1215,13 +1213,10 @@ void collection_toggle_item(Collection *collection, gint item)
 /* Select all items in the collection */
 void collection_select_all(Collection *collection)
 {
-	GtkWidget	*widget;
 	int		item = 0;
 	
 	g_return_if_fail(collection != NULL);
 	g_return_if_fail(IS_COLLECTION(collection));
-
-	widget = GTK_WIDGET(collection);
 
 	if (collection->number_selected == collection->number_of_items)
 		return;		/* Nothing to do */
@@ -1280,15 +1275,12 @@ void collection_invert_selection(Collection *collection)
  */
 void collection_clear_except(Collection *collection, gint item)
 {
-	GtkWidget	*widget;
 	int		i = 0;
 	int		end;		/* Selected items to end up with */
 
 	g_return_if_fail(collection != NULL);
 	g_return_if_fail(IS_COLLECTION(collection));
 	g_return_if_fail(item >= -1 && item < collection->number_of_items);
-	
-	widget = GTK_WIDGET(collection);
 
 	if (item == -1)
 		end = 0;
