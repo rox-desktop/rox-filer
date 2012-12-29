@@ -276,7 +276,7 @@ void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 	if (image)
 	{
 		/* Thumbnail loaded */
-		callback(data, path);
+		callback(data, (gpointer)path);
 		return;
 	}
 
@@ -289,7 +289,7 @@ void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 		/* Thumbnail is known, or being created */
 		if (image)
 			g_object_unref(image);
-		callback(data, image? path: NULL);
+		callback(data, image? (gpointer)path: NULL);
 		return;
 	}
 
