@@ -153,6 +153,10 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 			filer_window->mini_cursor_base = -1;	/* History */
 			break;
 		case MINI_SELECT_BY_NAME:
+			view_show_cursor(filer_window->view);
+			view_get_cursor(filer_window->view, &cursor);
+			view_set_base(filer_window->view, &cursor);
+
 			gtk_entry_set_text(mini, "*.");
 			filer_window->mini_cursor_base = -1;	/* History */
 			view_select_if(filer_window->view, select_if_glob, "*.");
@@ -1073,6 +1077,8 @@ static gboolean select_if_glob(ViewIter *iter, gpointer data)
 
 static void changed(GtkEditable *mini, FilerWindow *filer_window)
 {
+	ViewIter	iter;
+
 	switch (filer_window->mini_type)
 	{
 		case MINI_PATH:
@@ -1088,6 +1094,10 @@ static void changed(GtkEditable *mini, FilerWindow *filer_window)
 					select_if_glob,
 					(gpointer) gtk_entry_get_text(
 					      GTK_ENTRY(filer_window->minibuffer)));
+			view_get_iter(filer_window->view, &iter,
+					VIEW_ITER_FROM_BASE | VIEW_ITER_SELECTED);
+			if (iter.next(&iter))
+				view_cursor_to_iter(filer_window->view, &iter);
 			return;
 		default:
 			break;
