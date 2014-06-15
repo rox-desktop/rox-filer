@@ -1338,7 +1338,7 @@ static void do_copy2(const char *path, const char *dest)
 		{
 			printf_send("<%s", path);
 			printf_send(">%s", dest_path);
-			if (!printf_reply(from_parent, TRUE,
+			if (!printf_reply(from_parent, merge,
 					  _("?'%s' already exists - %s?"),
 					  dest_path,
 					  merge ? _("merge contents")
