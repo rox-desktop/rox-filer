@@ -1,11 +1,12 @@
-			ROX-Filer
-			A RISC OS-like filer for X
-			by Thomas Leonard
+ROX-Filer
+=========
+A RISC OS-like filer for X
+by Thomas Leonard
 
 
 
 Quick start
-~~~~~~~~~~~
+-----------
 If you downloaded a source or binary tarball directly, type this ($ is the
 shell prompt):
 
@@ -21,12 +22,12 @@ $ rox
 
 
 ROX-Filer
-~~~~~~~~~
+---------
 Documentation for ROX-Filer can be found in the directory ROX-Filer/Help.
 
 
 Conditions
-~~~~~~~~~~
+----------
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -42,6 +43,4 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-Please report any bugs to the mailing list:
-
-	http://roscidus.com/desktop/lists
+Please report any bugs to the [rox-devel mailing list](http://rox.sourceforge.net/desktop/lists).
