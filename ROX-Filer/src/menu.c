@@ -38,6 +38,7 @@
 
 #include "global.h"
 
+#include "main.h"
 #include "menu.h"
 #include "run.h"
 #include "action.h"
@@ -52,7 +53,6 @@
 #include "mount.h"
 #include "minibuffer.h"
 #include "i18n.h"
-#include "main.h"
 #include "pinboard.h"
 #include "dir.h"
 #include "diritem.h"
@@ -438,7 +438,7 @@ void position_menu(GtkMenu *menu, gint *x, gint *y,
 	*push_in = FALSE;
 }
 
-GtkWidget *make_send_to_item(DirItem *ditem, const char *label,
+static GtkWidget *make_send_to_item(DirItem *ditem, const char *label,
 				MenuIconStyle style)
 {
 	GtkWidget *item;
@@ -503,7 +503,8 @@ static GList *menu_from_dir(GtkWidget *menu, const gchar *dir_name,
 		{
 			item = gtk_menu_item_new();
 			widgets = g_list_append(widgets, item);
-			gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+			if (menu)
+				gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
 			separator = FALSE;
 		}
 
@@ -546,7 +547,8 @@ static GList *menu_from_dir(GtkWidget *menu, const gchar *dir_name,
 
 		diritem_free(ditem);
 
-		gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+		if (menu)
+			gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
 		g_signal_connect_swapped(item, "destroy",
 				G_CALLBACK(g_free), fname);
 
@@ -1502,8 +1504,9 @@ static void customise_send_to(gpointer data)
 		"Advanced use:\n"
 		"You can also create subdirectories called "
 		"`.text_html', `.text', etc which will only be "
-		"shown for files of that type. `.group' is shown "
-		"only when multiple files are selected."),
+		"shown for files of that type and shared with the file menu. "
+		"In addition, `.group' is shown only when multiple files are selected. "
+		"`.all' is only for the menu."),
 		dirs->str,
 		save ? _("I'll show you your SendTo directory now; you should "
 			"symlink (Ctrl+Shift drag) any applications you want "
@@ -1562,8 +1565,19 @@ static void customise_new(gpointer data)
  */
 static void add_sendto(GtkWidget *menu, const gchar *type, const gchar *subtype)
 {
+		GList *widgets = NULL;
+		widgets = add_sendto_shared(menu, type, subtype, (CallbackFn) do_send_to);
+		if (widgets)
+			gtk_menu_shell_append(GTK_MENU_SHELL(menu),
+					gtk_menu_item_new());
+		g_list_free(widgets);	/* TODO: Get rid of this */
+}
+GList *add_sendto_shared(GtkWidget *menu,
+		const gchar *type, const gchar *subtype, CallbackFn swapped_func)
+{
 	gchar *searchdir;
 	GPtrArray *paths;
+	GList *widgets = NULL;
 	int i;
 
 	if (subtype)
@@ -1578,21 +1592,16 @@ static void add_sendto(GtkWidget *menu, const gchar *type, const gchar *subtype)
 
 	for (i = 0; i < paths->len; i++)
 	{
-		GList	*widgets = NULL;
 		guchar	*dir = (guchar *) paths->pdata[i];
 
-		widgets = menu_from_dir(menu, dir, get_menu_icon_style(),
-				(CallbackFn) do_send_to,
-				FALSE, FALSE, TRUE);
-
-		if (widgets)
-			gtk_menu_shell_append(GTK_MENU_SHELL(menu),
-					gtk_menu_item_new());
-
-		g_list_free(widgets);	/* TODO: Get rid of this */
+		widgets = g_list_concat(widgets,
+				menu_from_dir(menu, dir, get_menu_icon_style(),
+					swapped_func, FALSE, FALSE, TRUE)
+			);
 	}
 
 	choices_free_list(paths);
+	return widgets;
 }
 
 /* Scan the SendTo dir and create and show the Send To menu.

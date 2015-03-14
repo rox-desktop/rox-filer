@@ -32,8 +32,8 @@ void show_filer_menu(FilerWindow *filer_window,
 		     GdkEvent *event,
 		     ViewIter *item);
 void menu_popdown(void);
-GtkWidget *make_send_to_item(DirItem *ditem, const char *label,
-				MenuIconStyle style);
+GList *add_sendto_shared(GtkWidget *menu,
+		const gchar *type, const gchar *subtype, CallbackFn func);
 
 /* Public menu handlers */
 void menu_rox_help(gpointer data, guint action, GtkWidget *widget);

@@ -49,6 +49,7 @@
 #include "dir.h"
 #include "diritem.h"
 #include "usericons.h"
+#include "main.h"
 #include "menu.h"
 #include "bookmarks.h"
 
