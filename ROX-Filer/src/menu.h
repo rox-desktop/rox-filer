@@ -34,6 +34,8 @@ void show_filer_menu(FilerWindow *filer_window,
 void menu_popdown(void);
 GList *add_sendto_shared(GtkWidget *menu,
 		const gchar *type, const gchar *subtype, CallbackFn func);
+GList *add_sendto_desktop_items(GtkWidget *menu,
+		const gchar *type, const gchar *subtype, CallbackFn swapped_func);
 
 /* Public menu handlers */
 void menu_rox_help(gpointer data, guint action, GtkWidget *widget);
