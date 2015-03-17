@@ -329,9 +329,9 @@ static void build_menu_for_type(MIME_type *type)
 
 	widgets = add_sendto_shared(NULL,
 				type->media_type, type->subtype, (CallbackFn) send_to);
-	widgets = g_list_concat(widgets,
-		add_sendto_desktop_items(NULL,
-			type->media_type, type->subtype, (CallbackFn) send_to));
+    widgets = g_list_concat(widgets,
+        add_sendto_desktop_items(NULL,
+                type->media_type, type->subtype, (CallbackFn) send_to));
 	widgets = g_list_concat(widgets,
 			add_sendto_shared(NULL,
 				type->media_type, NULL, (CallbackFn) send_to)

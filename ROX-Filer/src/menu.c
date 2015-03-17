@@ -98,7 +98,7 @@ static GtkWidget *popup_menu = NULL;	/* Currently open menu */
 static gint updating_menu = 0;		/* Non-zero => ignore activations */
 static GList *send_to_paths = NULL;
 
-static Option o_menu_iconsize, o_menu_xterm, o_menu_quick;
+static Option o_menu_iconsize, o_menu_xterm, o_menu_quick, o_menu_xdg_apps;
 
 /* Static prototypes */
 
@@ -347,6 +347,7 @@ void menu_init(void)
 	option_add_string(&o_menu_xterm, "menu_xterm", "xterm");
 	option_add_int(&o_menu_iconsize, "menu_iconsize", MIS_SMALL);
 	option_add_int(&o_menu_quick, "menu_quick", FALSE);
+	option_add_int(&o_menu_xdg_apps, "menu_xdg_apps", TRUE);
 	option_add_saver(save_menus);
 
 	option_register_widget("menu-set-keys", set_keys_button);
@@ -1567,8 +1568,8 @@ static void add_sendto(GtkWidget *menu, const gchar *type, const gchar *subtype)
 {
 		GList *widgets = NULL;
 		widgets = add_sendto_shared(menu, type, subtype, (CallbackFn) do_send_to);
-		widgets = g_list_concat(widgets,
-			add_sendto_desktop_items(menu, type, subtype, (CallbackFn) do_send_to));
+        widgets = g_list_concat(widgets,
+            add_sendto_desktop_items(menu, type, subtype, (CallbackFn) do_send_to));
 		if (widgets)
 			gtk_menu_shell_append(GTK_MENU_SHELL(menu),
 					gtk_menu_item_new());
@@ -1629,6 +1630,9 @@ GList *add_sendto_desktop_items(GtkWidget *menu,
 	GHashTable *desktop_entries;
 	GHashTableIter hash_table_iter;
 	gpointer key, value;
+
+	if (!o_menu_xdg_apps.int_value)
+		return widgets;
 
 	if (!type || !subtype)
 		return widgets;
