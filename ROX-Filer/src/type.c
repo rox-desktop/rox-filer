@@ -330,6 +330,8 @@ char *handler_for(MIME_type *type)
 	char	*type_name;
 	char	*open;
 	char	*target;
+    char	**parents;
+    char	**parent;
 
 	type_name = g_strconcat(type->media_type, "_", type->subtype, NULL);
 	open = choices_find_xdg_path_load(type_name, "MIME-types", SITE);
@@ -338,6 +340,29 @@ char *handler_for(MIME_type *type)
 	if (!open)
 		open = choices_find_xdg_path_load(type->media_type,
 						  "MIME-types", SITE);
+
+    if (!open)
+    {
+        type_name = g_strconcat(type->media_type, "/", type->subtype, NULL);
+        parents = xdg_mime_list_mime_parents(type_name);
+        g_free(type_name);
+
+		if (!parents) {
+			return NULL;
+        }
+
+        for (parent = parents; *parent; parent++)
+        {
+			type = mime_type_lookup(*parent);
+			if (!type)
+				continue;
+			open = handler_for(type);
+			if (open)
+				return open;
+        }
+
+		g_strfreev(parents);
+    }
 
 	if (!open)
 		return NULL;
