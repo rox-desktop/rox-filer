@@ -92,6 +92,7 @@ static MIME_type *get_mime_type(const gchar *type_name, gboolean can_create);
 static gboolean remove_handler_with_confirm(const guchar *path);
 static void set_icon_theme(void);
 static GList *build_icon_theme(Option *option, xmlNode *node, guchar *label);
+static char *find_default_desktop_app(MIME_type *type);
 
 /* Hash of all allocated MIME types, indexed by "media/subtype".
  * MIME_type structs are never freed; this table prevents memory leaks
@@ -322,12 +323,12 @@ MIME_type *type_from_path(const char *path)
 	return NULL;
 }
 
-char *find_default_desktop_app(MIME_type *type)
+static char *find_default_desktop_app(MIME_type *type)
 {
 	GError *error = NULL;
 	const gchar *xdg_data_dirs_env;
 	gchar **xdg_data_dirs;
-	const gchar *xdg_data_home;
+	gchar *xdg_data_home;
 	GList *apps_dirs = NULL;
 	GList *list_iter;
 	GList *list_iter2;
