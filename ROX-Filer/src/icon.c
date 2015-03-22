@@ -484,14 +484,14 @@ void icon_set_path(Icon *icon, const char *pathname, const char *name)
 			if (leafname) {
 				if (error) {
 					g_free(leafname);
-					g_free_error(error);
+					g_error_free(error);
 				} else {
 					if (icon->item->leafname)
 						g_free(icon->item->leafname);
 					icon->item->leafname = leafname;
 				}
 			} else if (error) {
-				g_free_error(error);
+				g_error_free(error);
 			}
 		}
 	}
