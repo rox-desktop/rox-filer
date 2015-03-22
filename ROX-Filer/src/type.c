@@ -351,12 +351,14 @@ static char *find_default_desktop_app(MIME_type *type)
 
 	xdg_data_dirs = g_strsplit(xdg_data_dirs_env, ":", -1);
 
-	xdg_data_home = g_getenv("XDG_DATA_HOME");
+	xdg_data_home = g_strdup(g_getenv("XDG_DATA_HOME"));
 
-	if (xdg_data_home)
-		xdg_data_home = g_strdup(xdg_data_home);
+	if (xdg_data_home && !strcmp(xdg_data_home, "")) {
+		g_free(xdg_data_home);
+		xdg_data_home = NULL;
+	}
 
-	if (!xdg_data_home || !strcmp(xdg_data_home, ""))
+	if (!xdg_data_home)
 		xdg_data_home = g_strjoin("/", g_getenv("HOME"), ".local", "share", NULL);
 
 	apps_dirs = g_list_append(apps_dirs,
@@ -374,28 +376,34 @@ static char *find_default_desktop_app(MIME_type *type)
 			continue;
 
 		mimeappslist_path = g_strjoin("/", list_iter->data, "mimeapps.list", NULL);
+		printf("%s\n", mimeappslist_path);
 		error = NULL;
 		desktop_files_str = get_value_from_desktop_file(
 				mimeappslist_path, "Default Applications", mime_type, &error);
 
-		if (!desktop_files_str || error) {
-			g_free(mimeappslist_path);
+		g_free(mimeappslist_path);
+
+		if (error) {
+			g_error_free(error);
+			continue;
+		}
+
+		if (!desktop_files_str) {
 			continue;
 		}
 
 		desktop_files = g_strsplit(desktop_files_str, ";", -1);
+		g_free(desktop_files_str);
 
 		/* Iterate over all desktop files associated with the given MIME type. */
 		for (iter = desktop_files; *iter; iter++) {
 			if (!strcmp(*iter, "")) {
-				g_free(*iter);
 				continue;
 			}
 			/* Look for .desktop file in applications subdir of XDG_DATA_HOME and XDG_DATA_DIRS. */
 			for (list_iter2 = apps_dirs; list_iter2; list_iter2 = g_list_next(list_iter2)) {
 				if (!list_iter2->data)
 					continue;
-				error = NULL;
 				handler = g_strjoin("/", list_iter2->data, *iter, NULL);
 				if (g_file_test(handler, G_FILE_TEST_EXISTS)) {
 					break;
@@ -408,8 +416,6 @@ static char *find_default_desktop_app(MIME_type *type)
 			}
 		}
 		g_strfreev(desktop_files);
-		g_free(desktop_files_str);
-		g_free(mimeappslist_path);
 
 		if (handler) {
 			break;
