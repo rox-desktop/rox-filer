@@ -137,6 +137,7 @@ const char *drop_dest_bookmark = "drop_dest_bookmark";	/* Add to bookmarks */
 GdkAtom XdndDirectSave0;
 GdkAtom xa_text_plain;
 GdkAtom text_uri_list;
+GdkAtom gnome_copied_files;
 GdkAtom text_x_moz_url;
 GdkAtom xa_application_octet_stream;
 GdkAtom xa_string; /* Not actually used for DnD, but the others are here! */
@@ -155,6 +156,7 @@ void dnd_init(void)
 	XdndDirectSave0 = gdk_atom_intern("XdndDirectSave0", FALSE);
 	xa_text_plain = gdk_atom_intern("text/plain", FALSE);
 	text_uri_list = gdk_atom_intern("text/uri-list", FALSE);
+	gnome_copied_files = gdk_atom_intern("x-special/gnome-copied-files", FALSE);
 	text_x_moz_url = gdk_atom_intern("text/x-moz-url", FALSE);
 	xa_application_octet_stream = gdk_atom_intern("application/octet-stream",
 			FALSE);
