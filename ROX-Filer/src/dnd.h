@@ -16,6 +16,7 @@ enum
 	TARGET_XDS,
 	TARGET_STRING,
 	TARGET_MOZ_URL,
+	TARGET_GNOME_COPIED_FILES,
 };
 
 typedef enum {
@@ -38,6 +39,7 @@ extern const char *drop_dest_pass_through;
 extern const char *drop_dest_bookmark;
 extern GdkAtom XdndDirectSave0;
 extern GdkAtom text_uri_list;
+extern GdkAtom gnome_copied_files;
 extern GdkAtom _rox_run_action;
 extern GdkAtom xa_application_octet_stream;
 extern GdkAtom xa_string;
