@@ -2007,7 +2007,7 @@ static void run_applet(PanelIcon *pi)
 
 		/* Set a hint to let applets position their menus correctly */
 		pos = g_strdup_printf("%s,%d",
-				panel_side_to_name(side), MENU_MARGIN(side));
+				panel_side_to_name(side), pi->panel->width);
 		gdk_property_change(pi->socket->window,
 				gdk_atom_intern("_ROX_PANEL_MENU_POS", FALSE),
 				gdk_atom_intern("STRING", FALSE),
@@ -2706,7 +2706,7 @@ static void panel_show_menu(GdkEventButton *event, PanelIcon *pi, Panel *panel)
 
 	pos[0] = event->x_root;
 	pos[1] = event->y_root;
-	pos[2] = MENU_MARGIN(side);
+	pos[2] = panel->width;
 	/* FIXME: Should we read screen from event's window rather than
 	 * using default? */
 	pos[3] = gdk_screen_get_monitor_at_point(
