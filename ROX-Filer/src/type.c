@@ -92,6 +92,7 @@ static MIME_type *get_mime_type(const gchar *type_name, gboolean can_create);
 static gboolean remove_handler_with_confirm(const guchar *path);
 static void set_icon_theme(void);
 static GList *build_icon_theme(Option *option, xmlNode *node, guchar *label);
+static char *find_default_desktop_app(MIME_type *type);
 
 /* Hash of all allocated MIME types, indexed by "media/subtype".
  * MIME_type structs are never freed; this table prevents memory leaks
@@ -322,6 +323,117 @@ MIME_type *type_from_path(const char *path)
 	return NULL;
 }
 
+static char *find_default_desktop_app(MIME_type *type)
+{
+	GError *error = NULL;
+	const gchar *xdg_data_dirs_env;
+	gchar **xdg_data_dirs;
+	gchar *xdg_data_home;
+	GList *apps_dirs = NULL;
+	GList *list_iter;
+	GList *list_iter2;
+	gchar **iter;
+	gchar *mimeappslist_path;
+	gchar *desktop_files_str;
+	gchar **desktop_files;
+	gchar *mime_type;
+	gchar *handler = NULL;
+
+	if (!type->media_type || !type->subtype)
+		return NULL;
+
+	mime_type = g_strjoin("/", type->media_type, type->subtype, NULL);
+
+	xdg_data_dirs_env = g_getenv("XDG_DATA_DIRS");
+
+    if (!xdg_data_dirs_env || !strcmp(xdg_data_dirs_env, ""))
+        xdg_data_dirs_env = "/usr/local/share:/usr/share";
+
+	xdg_data_dirs = g_strsplit(xdg_data_dirs_env, ":", -1);
+
+	xdg_data_home = g_strdup(g_getenv("XDG_DATA_HOME"));
+
+	if (xdg_data_home && !strcmp(xdg_data_home, "")) {
+		g_free(xdg_data_home);
+		xdg_data_home = NULL;
+	}
+
+	if (!xdg_data_home)
+		xdg_data_home = g_strjoin("/", g_getenv("HOME"), ".local", "share", NULL);
+
+	apps_dirs = g_list_append(apps_dirs,
+			g_strjoin("/", xdg_data_home, "applications", NULL));
+
+	for (iter = xdg_data_dirs; *iter; iter++) {
+		apps_dirs = g_list_append(
+				apps_dirs, g_strjoin("/", *iter, "applications", NULL));
+	}
+	g_strfreev(xdg_data_dirs);
+
+	/* Iterate over applications dirs in XDG_DATA_HOME and XDG_DATA_DIRS. */
+	for (list_iter = apps_dirs; list_iter; list_iter = g_list_next(list_iter)) {
+		if (!list_iter->data)
+			continue;
+
+		mimeappslist_path = g_strjoin("/", list_iter->data, "mimeapps.list", NULL);
+		printf("%s\n", mimeappslist_path);
+		error = NULL;
+		desktop_files_str = get_value_from_desktop_file(
+				mimeappslist_path, "Default Applications", mime_type, &error);
+
+		g_free(mimeappslist_path);
+
+		if (error) {
+			g_error_free(error);
+			continue;
+		}
+
+		if (!desktop_files_str) {
+			continue;
+		}
+
+		desktop_files = g_strsplit(desktop_files_str, ";", -1);
+		g_free(desktop_files_str);
+
+		/* Iterate over all desktop files associated with the given MIME type. */
+		for (iter = desktop_files; *iter; iter++) {
+			if (!strcmp(*iter, "")) {
+				continue;
+			}
+			/* Look for .desktop file in applications subdir of XDG_DATA_HOME and XDG_DATA_DIRS. */
+			for (list_iter2 = apps_dirs; list_iter2; list_iter2 = g_list_next(list_iter2)) {
+				if (!list_iter2->data)
+					continue;
+				handler = g_strjoin("/", list_iter2->data, *iter, NULL);
+				if (g_file_test(handler, G_FILE_TEST_EXISTS)) {
+					break;
+				}
+				g_free(handler);
+				handler = NULL;
+			}
+			if (handler) {
+				break;
+			}
+		}
+		g_strfreev(desktop_files);
+
+		if (handler) {
+			break;
+		}
+	}
+
+	for (list_iter = apps_dirs; list_iter; list_iter = g_list_next(list_iter)) {
+		g_free(list_iter->data);
+	}
+	g_list_free(apps_dirs);
+
+	g_free(mime_type);
+	g_free(xdg_data_home);
+
+	return handler;
+}
+
+
 /* Returns the file/dir in Choices for handling this type.
  * NULL if there isn't one. g_free() the result.
  */
@@ -338,6 +450,9 @@ char *handler_for(MIME_type *type)
 	if (!open)
 		open = choices_find_xdg_path_load(type->media_type,
 						  "MIME-types", SITE);
+
+	if (!open)
+		open = find_default_desktop_app(type);
 
 	if (!open)
 		return NULL;
@@ -646,14 +761,7 @@ static guchar *handler_for_radios(GObject *dialog)
 							  "MIME-types", SITE);
 		case SET_TYPE:
 		{
-			gchar *tmp, *handler;
-			tmp = g_strconcat(type->media_type, "_",
-					  type->subtype, NULL);
-			handler = choices_find_xdg_path_load(tmp,
-							     "MIME-types",
-							     SITE);
-			g_free(tmp);
-			return handler;
+			return handler_for(type);
 		}
 		default:
 			g_warning("Bad type");
