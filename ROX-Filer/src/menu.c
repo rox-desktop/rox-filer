@@ -1708,6 +1708,56 @@ GList *add_sendto_desktop_items(GtkWidget *menu,
 					continue;
 				error = NULL;
 				full_path = g_strjoin("/", list_iter2->data, *iter, NULL);
+				gchar *only_show_in = get_value_from_desktop_file(full_path, "Desktop Entry", "OnlyShowIn", &error);
+				if (error) {
+					g_error_free(error);
+					if (only_show_in)
+						g_free(only_show_in);
+				} else {
+					if (only_show_in) {
+						gchar **envs = g_strsplit(only_show_in, ";", -1);
+						int i = 0;
+						gboolean show = FALSE;
+						while (envs[i]) {
+							if (strcmp(envs[i], "ROX") == 0) {
+								show = TRUE;
+								break;
+							};
+							i++;
+						}
+						g_strfreev(envs);
+						g_free(only_show_in);
+						if (!show) {
+							continue;
+						}
+					}
+				}
+				error = NULL;
+				gchar *not_show_in = get_value_from_desktop_file(full_path, "Desktop Entry", "NotShowIn", &error);
+				if (error) {
+					g_error_free(error);
+					if (not_show_in)
+						g_free(not_show_in);
+				} else {
+					if (not_show_in) {
+						gchar **envs = g_strsplit(not_show_in, ";", -1);
+						int i = 0;
+						gboolean show = TRUE;
+						while (envs[i]) {
+							if (strcmp(envs[i], "ROX") == 0) {
+								show = FALSE;
+								break;
+							};
+							i++;
+						}
+						g_strfreev(envs);
+						g_free(not_show_in);
+						if (!show) {
+							continue;
+						}
+					}
+				}
+				error = NULL;
 				label = get_value_from_desktop_file(full_path, "Desktop Entry", "Name", &error);
 				if (error) {
 					g_free(full_path);
