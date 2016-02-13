@@ -475,7 +475,8 @@ void icon_set_path(Icon *icon, const char *pathname, const char *name)
 		icon->item = diritem_new(name);
 		diritem_restat(icon->path, icon->item, NULL);
 
-		g_free(leafname);
+		if (leafname)
+			g_free(leafname);
 
 		if (icon->item->mime_type == application_x_desktop)
 		{
