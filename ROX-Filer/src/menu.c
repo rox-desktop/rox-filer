@@ -1626,6 +1626,8 @@ GList *add_sendto_desktop_items(GtkWidget *menu,
 	gchar **desktop_files;
 	gchar *mime_type;
 	gchar *label;
+	gchar *not_show_in;
+	gchar *only_show_in;
 	gchar *full_path;
 	GHashTable *desktop_entries;
 	GHashTableIter hash_table_iter;
@@ -1643,8 +1645,8 @@ GList *add_sendto_desktop_items(GtkWidget *menu,
 
 	xdg_data_dirs_env = g_getenv("XDG_DATA_DIRS");
 
-    if (!xdg_data_dirs_env || !strcmp(xdg_data_dirs_env, ""))
-        xdg_data_dirs_env = "/usr/local/share:/usr/share";
+	if (!xdg_data_dirs_env || !strcmp(xdg_data_dirs_env, ""))
+		xdg_data_dirs_env = "/usr/local/share:/usr/share";
 
 	xdg_data_dirs = g_strsplit(xdg_data_dirs_env, ":", -1);
 
@@ -1707,68 +1709,81 @@ GList *add_sendto_desktop_items(GtkWidget *menu,
 				if (!list_iter2->data)
 					continue;
 				error = NULL;
+				label = NULL;
+				only_show_in = NULL;
+				not_show_in = NULL;
 				full_path = g_strjoin("/", list_iter2->data, *iter, NULL);
-				gchar *only_show_in = get_value_from_desktop_file(full_path, "Desktop Entry", "OnlyShowIn", &error);
-				if (error) {
-					g_error_free(error);
-					if (only_show_in)
-						g_free(only_show_in);
-				} else {
-					if (only_show_in) {
-						gchar **envs = g_strsplit(only_show_in, ";", -1);
-						int i = 0;
-						gboolean show = FALSE;
-						while (envs[i]) {
-							if (strcmp(envs[i], "ROX") == 0) {
-								show = TRUE;
-								break;
-							};
-							i++;
-						}
-						g_strfreev(envs);
-						g_free(only_show_in);
-						if (!show) {
-							continue;
-						}
+				if (!get_values_from_desktop_file(full_path, &error,
+							"Desktop Entry", "OnlyShowIn", &only_show_in,
+							"Desktop Entry", "NotShowIn", &not_show_in,
+							"Desktop Entry", "Name", &label,
+							NULL)) {
+					if (error) {
+						g_error_free(error);
 					}
-				}
-				error = NULL;
-				gchar *not_show_in = get_value_from_desktop_file(full_path, "Desktop Entry", "NotShowIn", &error);
-				if (error) {
-					g_error_free(error);
-					if (not_show_in)
-						g_free(not_show_in);
-				} else {
-					if (not_show_in) {
-						gchar **envs = g_strsplit(not_show_in, ";", -1);
-						int i = 0;
-						gboolean show = TRUE;
-						while (envs[i]) {
-							if (strcmp(envs[i], "ROX") == 0) {
-								show = FALSE;
-								break;
-							};
-							i++;
-						}
-						g_strfreev(envs);
-						g_free(not_show_in);
-						if (!show) {
-							continue;
-						}
-					}
-				}
-				error = NULL;
-				label = get_value_from_desktop_file(full_path, "Desktop Entry", "Name", &error);
-				if (error) {
-					g_free(full_path);
-					g_error_free(error);
-					if (label)
+					if (label) {
 						g_free(label);
+					}
+					if (only_show_in) {
+						g_free(only_show_in);
+					}
+					if (not_show_in) {
+						g_free(not_show_in);
+					}
+					g_free(full_path);
 					continue;
 				}
 				if (!label) {
 					g_free(full_path);
 					continue;
+				}
+				if (only_show_in) {
+					gchar **envs = g_strsplit(only_show_in, ";", -1);
+					int i = 0;
+					gboolean show = FALSE;
+					while (envs[i]) {
+						if (strcmp(envs[i], "ROX") == 0) {
+							show = TRUE;
+							break;
+						};
+						i++;
+					}
+					g_strfreev(envs);
+					g_free(only_show_in);
+					if (!show) {
+						if (label) {
+							g_free(label);
+						}
+						if (not_show_in) {
+							g_free(not_show_in);
+						}
+						g_free(full_path);
+						continue;
+					}
+				}
+				if (not_show_in) {
+					gchar **envs = g_strsplit(not_show_in, ";", -1);
+					int i = 0;
+					gboolean show = TRUE;
+					while (envs[i]) {
+						if (strcmp(envs[i], "ROX") == 0) {
+							show = FALSE;
+							break;
+						};
+						i++;
+					}
+					g_strfreev(envs);
+					g_free(not_show_in);
+					if (!show) {
+						if (label) {
+							g_free(label);
+						}
+						if (only_show_in) {
+							g_free(only_show_in);
+						}
+						g_free(full_path);
+						continue;
+					}
 				}
 
 				ditem = diritem_new("");
