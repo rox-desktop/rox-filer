@@ -1988,12 +1988,14 @@ static void clipboard_data_received(GtkClipboard *clipboard,
 			"machine - I can't operate on multiple "
 			"remote files - sorry.");
 	else
+    {
 		action_copy(local_paths, dest_path, NULL, -1);
+        destroy_glist(&local_paths);
+    }
 
 	if (error)
 		delayed_error(_("Error getting file list: %s"), error);
 
-	destroy_glist(&local_paths);
 	g_strfreev(uri_list);
 
 	clipboard_clear(clipboard, NULL);
