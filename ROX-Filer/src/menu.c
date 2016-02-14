@@ -2128,17 +2128,8 @@ static void file_op(gpointer data, FileOp action, GtkWidget *unused)
 			break;	/* Not a bulk rename... see below */
 		case FILE_COPY_TO_CLIPBOARD:
 		{
-			gchar *selected_path;
-			ViewIter iter;
-
 			clipboard_clear(clipboard, NULL);
-
-			view_get_iter(window_with_focus->view, &iter, VIEW_ITER_SELECTED);
-			while ((item = iter.next(&iter)))
-			{
-				selected_path = g_strdup(make_path(window_with_focus->sym_path, item->leafname));
-				selected_paths = g_list_append(selected_paths, selected_path);
-			}
+            selected_paths = filer_selected_items(window_with_focus);
 			return;
 		}
 		default:
