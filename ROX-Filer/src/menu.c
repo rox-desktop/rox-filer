@@ -1958,8 +1958,8 @@ static void clipboard_data_received(GtkClipboard *clipboard,
 		GtkSelectionData *selection_data, gpointer data)
 {
 	GList *local_paths = NULL;
-	guchar **uri_iter;
-	guchar **uri_list;
+	gchar **uri_iter;
+	gchar **uri_list;
 	const gchar *error = NULL;
 	const gchar *dest_path = (gchar *)data;
 
