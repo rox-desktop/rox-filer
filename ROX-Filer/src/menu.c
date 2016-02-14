@@ -1988,10 +1988,10 @@ static void clipboard_data_received(GtkClipboard *clipboard,
 			"machine - I can't operate on multiple "
 			"remote files - sorry.");
 	else
-    {
+	{
 		action_copy(local_paths, dest_path, NULL, -1);
-        destroy_glist(&local_paths);
-    }
+		destroy_glist(&local_paths);
+	}
 
 	if (error)
 		delayed_error(_("Error getting file list: %s"), error);
@@ -2129,7 +2129,7 @@ static void file_op(gpointer data, FileOp action, GtkWidget *unused)
 		case FILE_COPY_TO_CLIPBOARD:
 		{
 			clipboard_clear(clipboard, NULL);
-            selected_paths = filer_selected_items(window_with_focus);
+			selected_paths = filer_selected_items(window_with_focus);
 			return;
 		}
 		default:
