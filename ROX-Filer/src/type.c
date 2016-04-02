@@ -26,6 +26,7 @@
 #include <errno.h>
 #include <ctype.h>
 #include <time.h>
+#include <math.h>
 #include <sys/param.h>
 #include <fnmatch.h>
 #include <sys/types.h>
@@ -466,7 +467,7 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 	if (type->image)
 	{
 		/* Yes - don't recheck too often */
-		if (abs(now - type->image_time) < 2)
+		if (fabs((double) (now - type->image_time)) < 2.0)
 		{
 			g_object_ref(type->image);
 			return type->image;
