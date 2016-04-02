@@ -173,7 +173,7 @@ static gboolean not_local = FALSE;
 static Option o_short_flag_names;
 static Option o_filer_view_type;
 Option o_filer_auto_resize, o_unique_filer_windows;
-Option o_filer_size_limit;
+Option o_filer_size_limit, o_filer_details_one_column;
 
 #define ROX_RESPONSE_EJECT 99 /**< User clicked on Eject button */
 
@@ -184,6 +184,7 @@ void filer_init(void)
 	gchar *dpyhost, *tmp;
   
 	option_add_int(&o_filer_size_limit, "filer_size_limit", 75);
+	option_add_int(&o_filer_details_one_column, "filer_details_one_column", 0);
 	option_add_int(&o_filer_auto_resize, "filer_auto_resize",
 							RESIZE_ALWAYS);
 	option_add_int(&o_unique_filer_windows, "filer_unique_windows", 0);

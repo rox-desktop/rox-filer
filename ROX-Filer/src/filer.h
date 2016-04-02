@@ -122,7 +122,7 @@ extern FilerWindow 	*window_with_focus;
 extern GList		*all_filer_windows;
 extern GHashTable	*child_to_filer;
 extern Option		o_filer_auto_resize, o_unique_filer_windows;
-extern Option		o_filer_size_limit;
+extern Option		o_filer_size_limit, o_filer_details_one_column;
 
 /* Prototypes */
 void filer_init(void);
