@@ -48,7 +48,7 @@ void display_set_filter(FilerWindow *filer_window, FilterType type,
 void display_set_thumbs(FilerWindow *filer_window, gboolean thumbs);
 int sort_by_name(const void *item1, const void *item2);
 int sort_by_type(const void *item1, const void *item2);
-int sort_by_date(const void *item1, const void *item2);
+int sort_by_mtime(const void *item1, const void *item2);
 int sort_by_atime(const void *item1, const void *item2);
 int sort_by_ctime(const void *item1, const void *item2);
 int sort_by_size(const void *item1, const void *item2);

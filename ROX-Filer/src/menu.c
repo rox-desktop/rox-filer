@@ -197,7 +197,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">",				NULL, NULL, 0, "<Separator>"},
 {">" N_("Sort by Name"),	NULL, set_sort, SORT_NAME, NULL},
 {">" N_("Sort by Type"),	NULL, set_sort, SORT_TYPE, NULL},
-{">" N_("Sort by Date"),	NULL, set_sort, SORT_DATE, NULL},
+{">" N_("Sort by Last Modified"),	NULL, set_sort, SORT_MTIME, NULL},
 {">" N_("Sort by Last Accessed"),	NULL, set_sort, SORT_ATIME, NULL},
 {">" N_("Sort by Last Changed"),	NULL, set_sort, SORT_CTIME, NULL},
 {">" N_("Sort by Size"),	NULL, set_sort, SORT_SIZE, NULL},

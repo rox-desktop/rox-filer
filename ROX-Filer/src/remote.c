@@ -763,7 +763,8 @@ static xmlNodePtr rpc_OpenDir(GList *args)
 
 		type = !g_ascii_strcasecmp(sort, "Name") ? SORT_NAME :
 		       !g_ascii_strcasecmp(sort, "Type") ? SORT_TYPE :
-		       !g_ascii_strcasecmp(sort, "Date") ? SORT_DATE :
+		       !g_ascii_strcasecmp(sort, "LastModified") ? SORT_MTIME :
+		       !g_ascii_strcasecmp(sort, "Date") ? SORT_MTIME : /* for backwards compatibility */
 		       !g_ascii_strcasecmp(sort, "LastAccessed") ? SORT_ATIME :
 		       !g_ascii_strcasecmp(sort, "LastChanged") ? SORT_CTIME :
 		       !g_ascii_strcasecmp(sort, "Size") ? SORT_SIZE :

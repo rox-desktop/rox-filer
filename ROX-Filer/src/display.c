@@ -411,7 +411,7 @@ int sort_by_group(const void *item1, const void *item2)
 	return strcmp(name1, name2);
 }
 
-int sort_by_date(const void *item1, const void *item2)
+int sort_by_mtime(const void *item1, const void *item2)
 {
 	const DirItem *i1 = (DirItem *) item1;
 	const DirItem *i2 = (DirItem *) item2;

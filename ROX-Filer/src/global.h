@@ -139,7 +139,7 @@ typedef enum {		/* Values used in options, must start at 0 */
 typedef enum {		/* Values used in options */
 	SORT_NAME = 0,
 	SORT_TYPE = 1,
-	SORT_DATE = 2,
+	SORT_MTIME = 2,
 	SORT_ATIME = 6,
 	SORT_CTIME = 7,
 	SORT_SIZE = 3,

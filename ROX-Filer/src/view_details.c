@@ -535,7 +535,7 @@ static gboolean details_get_sort_column_id(GtkTreeSortable *sortable,
 	{
 		case SORT_NAME: col = COL_LEAF; break;
 		case SORT_TYPE: col = COL_TYPE; break;
-		case SORT_DATE: col = COL_MTIME; break;
+		case SORT_MTIME: col = COL_MTIME; break;
 		case SORT_ATIME: col = COL_ATIME; break;
 		case SORT_CTIME: col = COL_CTIME; break;
 		case SORT_SIZE: col = COL_SIZE; break;
@@ -571,7 +571,7 @@ static void details_set_sort_column_id(GtkTreeSortable     *sortable,
 			display_set_sort_type(filer_window, SORT_SIZE, order);
 			break;
 		case COL_MTIME:
-			display_set_sort_type(filer_window, SORT_DATE, order);
+			display_set_sort_type(filer_window, SORT_MTIME, order);
 			break;
 		case COL_ATIME:
 			display_set_sort_type(filer_window, SORT_ATIME, order);
@@ -1202,7 +1202,7 @@ static void resort(ViewDetails *view_details)
 	{
 		case SORT_NAME: view_details->sort_fn = sort_by_name; break;
 		case SORT_TYPE: view_details->sort_fn = sort_by_type; break;
-		case SORT_DATE: view_details->sort_fn = sort_by_date; break;
+		case SORT_MTIME: view_details->sort_fn = sort_by_mtime; break;
 		case SORT_ATIME: view_details->sort_fn = sort_by_atime; break;
 		case SORT_CTIME: view_details->sort_fn = sort_by_ctime; break;
 		case SORT_SIZE: view_details->sort_fn = sort_by_size; break;
