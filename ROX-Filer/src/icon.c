@@ -35,6 +35,7 @@
 #include <string.h>
 #include <gtk/gtk.h>
 #include <X11/keysym.h>
+#include <X11/XKBlib.h>
 #include <gdk/gdkx.h>
 
 #include "global.h"
@@ -753,7 +754,7 @@ static GdkFilterReturn filter_get_key(GdkXEvent *xevent,
 		KeySym sym;
 		unsigned int m = kev->state;
 
-		sym = XKeycodeToKeysym(dpy, kev->keycode, 0);
+		sym = XkbKeycodeToKeysym(dpy, kev->keycode, 0, 0);
 		if (!sym)
 			return GDK_FILTER_CONTINUE;
 
