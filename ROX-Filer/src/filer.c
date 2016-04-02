@@ -1508,7 +1508,7 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win,
 	filer_window->display_style_wanted = UNKNOWN_STYLE;
 	filer_window->thumb_queue = NULL;
 	filer_window->max_thumbs = 0;
-	filer_window->sort_type = -1;
+	filer_window->sort_type = SORT_UNKNOWN;
 
 	filer_window->filter = FILER_SHOW_ALL;
 	filer_window->filter_string = NULL;
