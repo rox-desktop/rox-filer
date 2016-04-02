@@ -694,16 +694,16 @@ static char *details(FilerWindow *filer_window, DirItem *item)
 	}
 	else if (filer_window->details_type == DETAILS_TIMES)
 	{
-		guchar	*ctime, *mtime, *atime;
+		guchar	*mtime, *atime, *ctime;
 		
-		ctime = pretty_time(&item->ctime);
 		mtime = pretty_time(&item->mtime);
 		atime = pretty_time(&item->atime);
+		ctime = pretty_time(&item->ctime);
 		
-		buf = g_strdup_printf("a[%s] c[%s] m[%s]", atime, ctime, mtime);
-		g_free(ctime);
+		buf = g_strdup_printf("m[%s] a[%s] c[%s]", mtime, atime, ctime);
 		g_free(mtime);
 		g_free(atime);
+		g_free(ctime);
 	}
 	else if (filer_window->details_type == DETAILS_PERMISSIONS)
 	{
