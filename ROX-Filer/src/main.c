@@ -256,7 +256,7 @@ int main(int argc, char **argv)
 	int		 wakeup_pipe[2];
 	int		 i;
 	struct sigaction act;
-	guchar		*tmp, *dir;
+	guchar		*tmp, *base, *dir;
 	gchar *client_id = NULL;
 	gboolean	show_user = FALSE;
 	gboolean	rpc_mode = FALSE;
@@ -430,7 +430,8 @@ int main(int argc, char **argv)
 				break;
 			case 's':
 				tmp = g_path_get_dirname(VALUE);
-				
+				base = g_path_get_basename(VALUE);
+
 				if (tmp[0] == '/')
 					dir = NULL;
 				else
@@ -438,8 +439,9 @@ int main(int argc, char **argv)
 
 				soap_add(body, "Show",
 					"Directory", dir ? dir : tmp,
-					"Leafname", g_basename(VALUE));
+					"Leafname", base);
 				g_free(tmp);
+				g_free(base);
 				g_free(dir);
 				break;
 			case 'l':

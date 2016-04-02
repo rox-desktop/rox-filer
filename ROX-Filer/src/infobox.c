@@ -208,13 +208,15 @@ static GtkWidget *make_vbox(const guchar *path, GObject *window)
 	GtkBox		*vbox;
 	XMLwrapper	*ai;
 	xmlNode 	*about = NULL;
-	gchar		*help_dir;
+	gchar		*base, *help_dir;
 	GtkWidget	*hbox, *name, *label;
 	MaskedPixmap    *thumb;
 
 	g_return_val_if_fail(path[0] == '/', NULL);
 	
-	item = diritem_new(g_basename(path));
+	base = g_path_get_basename(path);
+	item = diritem_new(path);
+	g_free(base);
 	diritem_restat(path, item, NULL);
 
 	ai = appinfo_get(path, item);
@@ -837,7 +839,8 @@ static GtkWidget *make_file_says(const guchar *path)
 #ifdef FILE_B_FLAG
 			argv[2] = (char *) path;
 #else
-			argv[1] = (char *) g_basename(path);
+			/* No need to free these, as we're about to exec anyway */
+			argv[1] = (char *) g_path_get_basename(path);
 			chdir(g_path_get_dirname(path));
 #endif
 			if (execvp(argv[0], argv))

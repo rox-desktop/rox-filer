@@ -106,7 +106,11 @@ void log_info_paths(const gchar *message, GList *paths, const gchar *path)
 	}
 
 	if (n_paths == 1)
-		actual_message = g_strdup_printf(_("%s '%s'"), message, g_basename((char *) paths->data));
+	{
+		gchar *base = g_path_get_basename((char *) paths->data);
+		actual_message = g_strdup_printf(_("%s '%s'"), message, base);
+		g_free(base);
+	}
 	else if (n_paths > 1)
 		actual_message = g_strdup_printf(_("%s on %d items"), message, n_paths);
 

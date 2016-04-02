@@ -313,7 +313,9 @@ void dir_check_this(const guchar *path)
 					FSCACHE_LOOKUP_PEEK, NULL);
 	if (dir)
 	{
-		dir_recheck(dir, real_path, g_basename(path));
+		gchar *base = g_path_get_basename(path);
+		dir_recheck(dir, real_path, base);
+		g_free(base);
 		g_object_unref(dir);
 	}
 	
@@ -359,7 +361,9 @@ void dir_force_update_path(const gchar *path)
 			NULL);
 	if (dir)
 	{
-		dir_force_update_item(dir, g_basename(path));
+		gchar *base = g_path_get_basename(path);
+		dir_force_update_item(dir, base);
+		g_free(base);
 		g_object_unref(dir);
 	}
 	
