@@ -438,12 +438,15 @@ static void toolbar_sort_clicked(GtkWidget *widget,
 	gchar *tip;
 
 	static const SortType sorts[]={
-		SORT_NAME, SORT_TYPE, SORT_DATE, SORT_SIZE,
-		SORT_OWNER, SORT_GROUP, 
+		SORT_NAME, SORT_TYPE,
+		SORT_DATE, SORT_ATIME, SORT_CTIME,
+		SORT_SIZE, SORT_OWNER, SORT_GROUP,
 	};
 	static const char *sort_names[] = {
-		N_("Sort by name"), N_("Sort by type"), N_("Sort by date"), 
-		N_("Sort by size"), N_("Sort by owner"), N_("Sort by group"), 
+		N_("Sort by name"), N_("Sort by type"),
+		N_("Sort by date"),
+		N_("Sort by last accessed"), N_("Sort by last changed"),
+		N_("Sort by size"), N_("Sort by owner"), N_("Sort by group"),
 	};
 
 	bev = (GdkEventButton *) get_current_event(GDK_BUTTON_RELEASE);
