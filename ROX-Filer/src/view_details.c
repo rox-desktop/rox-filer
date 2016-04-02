@@ -50,11 +50,13 @@
 #define COL_GROUP 4
 #define COL_SIZE 5
 #define COL_MTIME 6
-#define COL_ITEM 7
-#define COL_COLOUR 8
-#define COL_WEIGHT 9
-#define COL_VIEW_ITEM 10
-#define N_COLUMNS 11
+#define COL_ATIME 7
+#define COL_CTIME 8
+#define COL_ITEM 9
+#define COL_COLOUR 10
+#define COL_WEIGHT 11
+#define COL_VIEW_ITEM 12
+#define N_COLUMNS 13
 
 static gpointer parent_class = NULL;
 
@@ -355,9 +357,16 @@ static void details_get_value(GtkTreeModel *tree_model,
 			g_value_set_string(value, group_name(item->gid));
 			break;
 		case COL_MTIME:
+		case COL_ATIME:
+		case COL_CTIME:
 		{
 			gchar *time;
-			time = pretty_time(&item->mtime);
+			if (column == COL_MTIME)
+				time = pretty_time(&item->mtime);
+			else if (column == COL_ATIME)
+				time = pretty_time(&item->atime);
+			else
+				time = pretty_time(&item->ctime);
 			g_value_init(value, G_TYPE_STRING);
 			g_value_set_string(value, time);
 			g_free(time);
@@ -526,7 +535,9 @@ static gboolean details_get_sort_column_id(GtkTreeSortable *sortable,
 	{
 		case SORT_NAME: col = COL_LEAF; break;
 		case SORT_TYPE: col = COL_TYPE; break;
-		case SORT_DATE: col = COL_MTIME; break;
+		case SORT_MTIME: col = COL_MTIME; break;
+		case SORT_ATIME: col = COL_ATIME; break;
+		case SORT_CTIME: col = COL_CTIME; break;
 		case SORT_SIZE: col = COL_SIZE; break;
 		case SORT_OWNER: col = COL_OWNER; break;
 		case SORT_GROUP: col = COL_GROUP; break;
@@ -560,7 +571,13 @@ static void details_set_sort_column_id(GtkTreeSortable     *sortable,
 			display_set_sort_type(filer_window, SORT_SIZE, order);
 			break;
 		case COL_MTIME:
-			display_set_sort_type(filer_window, SORT_DATE, order);
+			display_set_sort_type(filer_window, SORT_MTIME, order);
+			break;
+		case COL_ATIME:
+			display_set_sort_type(filer_window, SORT_ATIME, order);
+			break;
+		case COL_CTIME:
+			display_set_sort_type(filer_window, SORT_CTIME, order);
 			break;
 		case COL_TYPE:
 			display_set_sort_type(filer_window, SORT_TYPE, order);
@@ -1077,6 +1094,10 @@ static void view_details_init(GTypeInstance *object, gpointer gclass)
 	gtk_tree_view_column_set_sort_column_id(column, COL_SIZE);
 	ADD_TEXT_COLUMN(_("Last _Modified"), COL_MTIME);
 	gtk_tree_view_column_set_sort_column_id(column, COL_MTIME);
+	ADD_TEXT_COLUMN(_("Last _Accessed"), COL_ATIME);
+	gtk_tree_view_column_set_sort_column_id(column, COL_ATIME);
+	ADD_TEXT_COLUMN(_("Last _Changed"), COL_CTIME);
+	gtk_tree_view_column_set_sort_column_id(column, COL_CTIME);
 }
 
 /* Create the handers for the View interface */
@@ -1181,7 +1202,9 @@ static void resort(ViewDetails *view_details)
 	{
 		case SORT_NAME: view_details->sort_fn = sort_by_name; break;
 		case SORT_TYPE: view_details->sort_fn = sort_by_type; break;
-		case SORT_DATE: view_details->sort_fn = sort_by_date; break;
+		case SORT_MTIME: view_details->sort_fn = sort_by_mtime; break;
+		case SORT_ATIME: view_details->sort_fn = sort_by_atime; break;
+		case SORT_CTIME: view_details->sort_fn = sort_by_ctime; break;
 		case SORT_SIZE: view_details->sort_fn = sort_by_size; break;
 		case SORT_OWNER: view_details->sort_fn = sort_by_owner; break;
 		case SORT_GROUP: view_details->sort_fn = sort_by_group; break;

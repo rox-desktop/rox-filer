@@ -411,7 +411,7 @@ int sort_by_group(const void *item1, const void *item2)
 	return strcmp(name1, name2);
 }
 
-int sort_by_date(const void *item1, const void *item2)
+int sort_by_mtime(const void *item1, const void *item2)
 {
 	const DirItem *i1 = (DirItem *) item1;
 	const DirItem *i2 = (DirItem *) item2;
@@ -420,6 +420,30 @@ int sort_by_date(const void *item1, const void *item2)
 
 	return i1->mtime < i2->mtime ? -1 :
 		i1->mtime > i2->mtime ? 1 :
+		sort_by_name(item1, item2);
+}
+
+int sort_by_atime(const void *item1, const void *item2)
+{
+	const DirItem *i1 = (DirItem *) item1;
+	const DirItem *i2 = (DirItem *) item2;
+
+	/* SORT_DIRS; -- too confusing! */
+
+	return i1->atime < i2->atime ? -1 :
+		i1->atime > i2->atime ? 1 :
+		sort_by_name(item1, item2);
+}
+
+int sort_by_ctime(const void *item1, const void *item2)
+{
+	const DirItem *i1 = (DirItem *) item1;
+	const DirItem *i2 = (DirItem *) item2;
+
+	/* SORT_DIRS; -- too confusing! */
+
+	return i1->ctime < i2->ctime ? -1 :
+		i1->ctime > i2->ctime ? 1 :
 		sort_by_name(item1, item2);
 }
 
@@ -670,16 +694,16 @@ static char *details(FilerWindow *filer_window, DirItem *item)
 	}
 	else if (filer_window->details_type == DETAILS_TIMES)
 	{
-		guchar	*ctime, *mtime, *atime;
+		guchar	*mtime, *atime, *ctime;
 		
-		ctime = pretty_time(&item->ctime);
 		mtime = pretty_time(&item->mtime);
 		atime = pretty_time(&item->atime);
+		ctime = pretty_time(&item->ctime);
 		
-		buf = g_strdup_printf("a[%s] c[%s] m[%s]", atime, ctime, mtime);
-		g_free(ctime);
+		buf = g_strdup_printf("m[%s] a[%s] c[%s]", mtime, atime, ctime);
 		g_free(mtime);
 		g_free(atime);
+		g_free(ctime);
 	}
 	else if (filer_window->details_type == DETAILS_PERMISSIONS)
 	{
