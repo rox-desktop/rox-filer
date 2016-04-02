@@ -417,8 +417,6 @@ _xdg_glob_hash_lookup_file_name (XdgGlobHash *glob_hash,
 
   assert (file_name != NULL && n_mime_types > 0);
 
-  n = 0;
-
   lower_case = ascii_tolower (file_name);
 
   for (list = glob_hash->literal_list; list; list = list->next)

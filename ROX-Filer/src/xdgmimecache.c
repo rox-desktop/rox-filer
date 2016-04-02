@@ -384,7 +384,6 @@ cache_glob_lookup_literal (const char *file_name,
 	    {
 	      int weight = GET_UINT32 (cache->buffer, list_offset + 4 + 12 * mid + 8);
 	      int case_sensitive = weight & 0x100;
-	      weight = weight & 0xff;
 
 	      if (case_sensitive_check || !case_sensitive)
 		{
