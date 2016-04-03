@@ -304,13 +304,14 @@ static void show_help(FilerWindow *filer_window)
 
 static void path_return_pressed(FilerWindow *filer_window, GdkEventKey *event)
 {
-	const gchar	*path, *pattern;
+	const gchar	*path;
+	gchar		*pattern;
 	int		flags = OPEN_FROM_MINI | OPEN_SAME_WINDOW;
 	ViewIter	iter;
 	DirItem		*item;
 
 	path = gtk_entry_get_text(GTK_ENTRY(filer_window->minibuffer));
-	pattern = g_basename(path);
+	pattern = g_path_get_basename(path);
 
 	view_get_cursor(filer_window->view, &iter);
 
@@ -318,9 +319,11 @@ static void path_return_pressed(FilerWindow *filer_window, GdkEventKey *event)
 	if (item == NULL || !matches(&iter, pattern))
 	{
 		gdk_beep();
+		g_free(pattern);
 		return;
 	}
-	
+	g_free(pattern);
+
 	if ((event->state & GDK_SHIFT_MASK) != 0)
 		flags |= OPEN_SHIFT;
 
@@ -446,7 +449,8 @@ static void complete(FilerWindow *filer_window)
 static void path_changed(FilerWindow *filer_window)
 {
 	GtkWidget *mini = filer_window->minibuffer;
-	const char	*rawnew, *leaf;
+	const char	*rawnew;
+	gchar		*leaf;
 	char		*path;
 	char		*new = NULL;
 	gboolean	error = FALSE;
@@ -505,8 +509,8 @@ static void path_changed(FilerWindow *filer_window)
 	}
 		
 
-	leaf = g_basename(new);
-	if (leaf == new)
+	leaf = g_path_get_basename(new);
+	if (strcmp(leaf, new) == 0)
 		path = g_strdup("/");
 	else
 		path = g_path_get_dirname(new);
@@ -538,6 +542,7 @@ static void path_changed(FilerWindow *filer_window)
 	}
 		
 	g_free(new);
+	g_free(leaf);
 	g_free(path);
 
 	entry_set_error(mini, error);
@@ -623,17 +628,20 @@ static gboolean matches(ViewIter *iter, const char *pattern)
 /* Find next match and set base for future matches. */
 static void search_in_dir(FilerWindow *filer_window, int dir)
 {
-	const char *path, *pattern;
+	const char *path;
+	gchar *pattern;
 	ViewIter iter;
 
 	path = gtk_entry_get_text(GTK_ENTRY(filer_window->minibuffer));
-	pattern = g_basename(path);
+	pattern = g_path_get_basename(path);
 	
 	view_get_cursor(filer_window->view, &iter);
 	view_set_base(filer_window->view, &iter);
 	find_next_match(filer_window, pattern, dir);
 	view_get_cursor(filer_window->view, &iter);
 	view_set_base(filer_window->view, &iter);
+
+	g_free(pattern);
 }
 
 /*			SHELL COMMANDS			*/

@@ -313,22 +313,22 @@ void dir_check_this(const guchar *path)
 					FSCACHE_LOOKUP_PEEK, NULL);
 	if (dir)
 	{
-		dir_recheck(dir, real_path, g_basename(path));
+		gchar *base = g_path_get_basename(path);
+		dir_recheck(dir, real_path, base);
+		g_free(base);
 		g_object_unref(dir);
 	}
 	
 	g_free(real_path);
 }
 
-#ifdef USE_NOTIFY
+#ifdef USE_DNOTIFY
 static void drop_notify(gpointer key, gpointer value, gpointer data)
 {
 #ifdef USE_INOTIFY
         inotify_rm_watch(inotify_fd, GPOINTER_TO_INT(key));
 #endif
-#ifdef USE_DNOTIFY
 	close(GPOINTER_TO_INT(key));
-#endif
 }
 #endif
 
@@ -359,7 +359,9 @@ void dir_force_update_path(const gchar *path)
 			NULL);
 	if (dir)
 	{
-		dir_force_update_item(dir, g_basename(path));
+		gchar *base = g_path_get_basename(path);
+		dir_force_update_item(dir, base);
+		g_free(base);
 		g_object_unref(dir);
 	}
 	

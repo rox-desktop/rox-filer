@@ -476,17 +476,19 @@ void abox_add_filename(ABox *abox, const gchar *path)
 {	
 	GtkTreeModel *model;
 	GtkTreeIter iter;
-	gchar	*dir;
+	gchar	*dir, *base;
 
 	model = gtk_tree_view_get_model(GTK_TREE_VIEW(abox->results));
 
 	gtk_list_store_append(GTK_LIST_STORE(model), &iter);
 
 	dir = g_path_get_dirname(path);
+	base = g_path_get_basename(path);
 	gtk_list_store_set(GTK_LIST_STORE(model), &iter,
-			   0, g_basename(path),
+			   0, base,
 			   1, dir, -1);
 	g_free(dir);
+	g_free(base);
 }
 
 /* Clear search results area */

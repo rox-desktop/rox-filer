@@ -332,7 +332,7 @@ void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 		{
 			DirItem *item;
 			
-			item = diritem_new(g_basename(thumb_prog));
+			item = diritem_new(g_path_get_basename(thumb_prog));
 
 			diritem_restat(thumb_prog, item, NULL);
 			if (item->flags & ITEM_FLAG_APPDIR)

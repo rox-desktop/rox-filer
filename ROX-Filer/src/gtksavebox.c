@@ -375,7 +375,8 @@ button_press_over_icon (GtkWidget *drag_box, GdkEventButton *event,
 			GtkSavebox *savebox)
 {
   GdkDragContext  *context;
-  const gchar	  *uri = NULL, *leafname;
+  const gchar	  *uri = NULL;
+  gchar           *leafname;
 
   g_return_if_fail (savebox != NULL);
   g_return_if_fail (GTK_IS_SAVEBOX (savebox));
@@ -390,11 +391,12 @@ button_press_over_icon (GtkWidget *drag_box, GdkEventButton *event,
 
   uri = gtk_entry_get_text (GTK_ENTRY (savebox->entry));
   if (uri && *uri)
-    leafname = g_basename (uri);
+    leafname = g_path_get_basename (uri);
   else
-    leafname = _("Unnamed");
+    leafname = g_strdup (_("Unnamed"));
   
   write_xds_property (context, leafname);
+  g_free(leafname);
 
   gtk_drag_set_icon_pixbuf (context,
 			    gtk_image_get_pixbuf (GTK_IMAGE (savebox->icon)),

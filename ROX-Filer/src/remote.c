@@ -767,8 +767,8 @@ static xmlNodePtr rpc_OpenDir(GList *args)
 		       !g_ascii_strcasecmp(sort, "Size") ? SORT_SIZE :
 		       !g_ascii_strcasecmp(sort, "Owner") ? SORT_OWNER :
 		       !g_ascii_strcasecmp(sort, "Group") ? SORT_GROUP :
-						       -1;
-		if (type == -1)
+						       SORT_UNKNOWN;
+		if (type == SORT_UNKNOWN)
 			delayed_error(_("Unknown sorting type '%s'"), sort);
 		else
 			display_set_sort_type(fwin, type, GTK_SORT_ASCENDING);

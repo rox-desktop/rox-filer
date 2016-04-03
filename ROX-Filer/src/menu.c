@@ -1122,13 +1122,15 @@ static void savebox_show(const gchar *action, const gchar *path,
 		gtk_savebox_set_pathname(GTK_SAVEBOX(savebox), path);
 	else
 	{
-		gchar *u8, *dir;
+		gchar *u8, *dir, *base;
 		dir = g_path_get_dirname(path);
-		u8 = to_utf8(g_basename(path));
+		base = g_path_get_basename(path);
+		u8 = to_utf8(base);
 		gtk_savebox_set_pathname(GTK_SAVEBOX(savebox),
 				make_path(dir, u8));
 		g_free(u8);
 		g_free(dir);
+		g_free(base);
 	}
 	gtk_savebox_set_icon(GTK_SAVEBOX(savebox), image->pixbuf);
 	g_object_unref(image);
@@ -1411,34 +1413,37 @@ static void new_file(gpointer data, guint action, GtkWidget *widget)
 static gboolean new_file_type_cb(GObject *savebox,
 			         const gchar *initial, const gchar *path)
 {
-	const gchar *oleaf, *leaf;
+	gchar *oleaf, *leaf;
 	gchar *templ, *rtempl, *templ_dname, *dest;
 	GList *paths;
 
 	/* We can work out the template path from the initial name */
-	oleaf = g_basename(initial);
+	oleaf = g_path_get_basename(initial);
 	templ_dname = choices_find_xdg_path_load("Templates", "", SITE);
 	if (!templ_dname)
 	{
 		report_error(
 		_("Error creating file: could not find the template for %s"),
 				oleaf);
+		g_free(oleaf);
 		return FALSE;
 	}
 
 	templ = g_strconcat(templ_dname, "/", oleaf, NULL);
+	g_free(oleaf);
 	g_free(templ_dname);
 	rtempl = pathdup(templ);
 	g_free(templ);
 
 	dest = g_path_get_dirname(path);
-	leaf = g_basename(path);
+	leaf = g_path_get_basename(path);
 	paths = g_list_append(NULL, rtempl);
 
 	action_copy(paths, dest, leaf, TRUE);
 
 	g_list_free(paths);
 	g_free(dest);
+	g_free(leaf);
 	g_free(rtempl);
 
 	if (filer_exists(window_with_focus))
@@ -1456,18 +1461,20 @@ static void do_send_to(gchar *templ)
 
 static void new_file_type(gchar *templ)
 {
-	const gchar *leaf;
+	gchar *leaf;
 	MIME_type *type;
 
 	g_return_if_fail(window_with_focus != NULL);
 	
-	leaf = g_basename(templ);
+	leaf = g_path_get_basename(templ);
 	type = type_get_type(templ);
 
 	savebox_show(_("Create"),
 		make_path(window_with_focus->sym_path, leaf),
 		type_to_icon(type),
 		new_file_type_cb, GDK_ACTION_COPY);
+
+	g_free(leaf);
 }
 
 static void customise_send_to(gpointer data)

@@ -149,7 +149,7 @@ GtkWidget *view_details_new(FilerWindow *filer_window)
 	gtk_range_set_adjustment(GTK_RANGE(filer_window->scrollbar),
 		gtk_tree_view_get_vadjustment(GTK_TREE_VIEW(view_details)));
 
-	if (filer_window->sort_type != -1)
+	if (filer_window->sort_type != SORT_UNKNOWN)
 		view_details_sort((ViewIface *) view_details);
 
 	details_update_header_visibility(view_details);

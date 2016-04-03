@@ -956,14 +956,18 @@ static void do_delete(const char *src_path, const char *unused)
 		send_error();
 	else
 	{
+		gchar *base;
+
 		send_check_path(safe_path);
-		if (strcmp(g_basename(safe_path), ".DirIcon") == 0)
+		base = g_path_get_basename(safe_path);
+		if (strcmp(base, ".DirIcon") == 0)
 		{
 			gchar *dir;
 			dir = g_path_get_dirname(safe_path);
 			send_check_path(dir);
 			g_free(dir);
 		}
+		g_free(base);
 	}
 
 	g_free(safe_path);
@@ -1021,6 +1025,7 @@ static void do_eject(const char *path)
  */
 static void do_find(const char *path, const char *unused)
 {
+	gchar		*base;
 	FindInfo	info;
 
 	check_flags();
@@ -1060,10 +1065,12 @@ static void do_find(const char *path, const char *unused)
 	info.fullpath = path;
 	time(&info.now);	/* XXX: Not for each check! */
 
-	info.leaf = g_basename(path);
+	base = g_path_get_basename(path);
+	info.leaf = base;
 	info.prune = FALSE;
 	if (find_test_condition(find_condition, &info))
 		printf_send("=%s", path);
+	g_free(base);
 
 	if (S_ISDIR(info.stats.st_mode) && !info.prune)
 	{
@@ -1695,6 +1702,7 @@ static void usage_cb(gpointer data)
 	for (i=0; paths; paths = paths->next, i++)
 	{
 		guchar	*path = (guchar *) paths->data;
+		gchar	*base;
 
 		send_dir(path);
 
@@ -1707,9 +1715,10 @@ static void usage_cb(gpointer data)
 		}
 		do_usage(path, NULL);
 
+		base = g_path_get_basename(path);
 		printf_send("'%s: %s\n",
-			    g_basename(path),
-			    format_double_size(size_tally));
+			    base, format_double_size(size_tally));
+		g_free(base);
 		total_size += size_tally;
 	}
 	printf_send("%%-1");
@@ -1885,8 +1894,12 @@ static void chmod_cb(gpointer data)
 		if (mc_stat(path, &info) != 0)
 			send_error();
 		else if (S_ISLNK(info.st_mode))
+		{
+			gchar *base = g_path_get_basename(path);
 			printf_send(_("!'%s' is a symbolic link\n"),
-				    g_basename(path));
+				    base);
+			g_free(base);
+		}
 		else
 			do_chmod(path, NULL);
 	}
@@ -1916,8 +1929,12 @@ static void settype_cb(gpointer data)
 		if (mc_stat(path, &info) != 0)
 			send_error();
 		else if (S_ISLNK(info.st_mode))
+		{
+			gchar *base = g_path_get_basename(path);
 			printf_send(_("!'%s' is a symbolic link\n"),
-				    g_basename(path));
+				    base);
+			g_free(base);
+		}
 		else
 			do_settype(path, NULL);
 	}
