@@ -38,6 +38,7 @@
 #include "dnd.h"
 #include "bind.h"
 #include "gui_support.h"
+#include "main.h"
 #include "menu.h"
 #include "options.h"
 #include "cell_icon.h"

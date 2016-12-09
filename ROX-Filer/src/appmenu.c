@@ -37,6 +37,7 @@
 #include "fscache.h"
 #include "gui_support.h"
 #include "support.h"
+#include "main.h"
 #include "menu.h"
 #include "filer.h"
 #include "appmenu.h"
@@ -256,7 +257,7 @@ static GtkWidget *create_menu_item(xmlNode *node)
 }
 
 /* Send to current_app_path (though not actually an app) */
-static void send_to(GtkWidget *item, const char *app)
+static void send_to(const gchar *app)
 {
 	GList *file_list;
 
@@ -323,49 +324,30 @@ static void customise_type(GtkWidget *item, MIME_type *type)
 
 static void build_menu_for_type(MIME_type *type)
 {
-	GPtrArray *names;
-	char *path;
-	int i;
-	char *leaf;
 	GtkWidget *item;
-	DirItem *ditem;
+	GList *widgets = NULL;
 
-	leaf = g_strconcat(".", type->media_type, "_", type->subtype, NULL);
-	path = choices_find_xdg_path_load(leaf, "SendTo", SITE);
+	widgets = add_sendto_shared(NULL,
+				type->media_type, type->subtype, (CallbackFn) send_to);
+    widgets = g_list_concat(widgets,
+        add_sendto_desktop_items(NULL,
+                type->media_type, type->subtype, (CallbackFn) send_to));
+	widgets = g_list_concat(widgets,
+			add_sendto_shared(NULL,
+				type->media_type, NULL, (CallbackFn) send_to)
+		);
+	widgets = g_list_concat(widgets,
+			add_sendto_shared(NULL,
+				"all", NULL, (CallbackFn) send_to)
+		);
 
-	if (!path)
-		goto out;
-
-	names = list_dir(path);
-
-	ditem = diritem_new("");
-
-	for (i = 0; i < names->len; i++)
-	{
-		char	*leaf = names->pdata[i];
-		char	*full_path;
-
-		full_path = g_build_filename(path, leaf, NULL);
-		diritem_restat(full_path, ditem, NULL);
-		
-		item = make_send_to_item(ditem, leaf, MIS_SMALL);
-		current_items = g_list_prepend(current_items, item);
-		gtk_widget_show(item);
-		g_signal_connect_data(item, "activate", G_CALLBACK(send_to),
-				full_path, (GClosureNotify) g_free, 0);
-	}
-
-	g_ptr_array_free(names, TRUE);
-
-	g_free(path);
-
-out:
+	widgets = g_list_reverse(widgets);
+	current_items = g_list_concat(widgets, current_items);
+	
 	item = gtk_menu_item_new_with_label(_("Customise Menu..."));
 	current_items = g_list_prepend(current_items, item);
 	g_signal_connect(item, "activate", G_CALLBACK(customise_type), type);
 	gtk_widget_show(item);
-
-	g_free(leaf);
 }
 
 static inline gboolean is_dir(const char *dir)

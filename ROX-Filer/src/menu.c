@@ -38,6 +38,7 @@
 
 #include "global.h"
 
+#include "main.h"
 #include "menu.h"
 #include "run.h"
 #include "action.h"
@@ -52,7 +53,6 @@
 #include "mount.h"
 #include "minibuffer.h"
 #include "i18n.h"
-#include "main.h"
 #include "pinboard.h"
 #include "dir.h"
 #include "diritem.h"
@@ -98,7 +98,7 @@ static GtkWidget *popup_menu = NULL;	/* Currently open menu */
 static gint updating_menu = 0;		/* Non-zero => ignore activations */
 static GList *send_to_paths = NULL;
 
-static Option o_menu_iconsize, o_menu_xterm, o_menu_quick;
+static Option o_menu_iconsize, o_menu_xterm, o_menu_quick, o_menu_xdg_apps;
 
 /* Static prototypes */
 
@@ -347,6 +347,7 @@ void menu_init(void)
 	option_add_string(&o_menu_xterm, "menu_xterm", "xterm");
 	option_add_int(&o_menu_iconsize, "menu_iconsize", MIS_SMALL);
 	option_add_int(&o_menu_quick, "menu_quick", FALSE);
+	option_add_int(&o_menu_xdg_apps, "menu_xdg_apps", TRUE);
 	option_add_saver(save_menus);
 
 	option_register_widget("menu-set-keys", set_keys_button);
@@ -438,7 +439,7 @@ void position_menu(GtkMenu *menu, gint *x, gint *y,
 	*push_in = FALSE;
 }
 
-GtkWidget *make_send_to_item(DirItem *ditem, const char *label,
+static GtkWidget *make_send_to_item(DirItem *ditem, const char *label,
 				MenuIconStyle style)
 {
 	GtkWidget *item;
@@ -503,7 +504,8 @@ static GList *menu_from_dir(GtkWidget *menu, const gchar *dir_name,
 		{
 			item = gtk_menu_item_new();
 			widgets = g_list_append(widgets, item);
-			gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+			if (menu)
+				gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
 			separator = FALSE;
 		}
 
@@ -546,7 +548,8 @@ static GList *menu_from_dir(GtkWidget *menu, const gchar *dir_name,
 
 		diritem_free(ditem);
 
-		gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+		if (menu)
+			gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
 		g_signal_connect_swapped(item, "destroy",
 				G_CALLBACK(g_free), fname);
 
@@ -1502,8 +1505,9 @@ static void customise_send_to(gpointer data)
 		"Advanced use:\n"
 		"You can also create subdirectories called "
 		"`.text_html', `.text', etc which will only be "
-		"shown for files of that type. `.group' is shown "
-		"only when multiple files are selected."),
+		"shown for files of that type and shared with the file menu. "
+		"In addition, `.group' is shown only when multiple files are selected. "
+		"`.all' is only for the menu."),
 		dirs->str,
 		save ? _("I'll show you your SendTo directory now; you should "
 			"symlink (Ctrl+Shift drag) any applications you want "
@@ -1562,8 +1566,22 @@ static void customise_new(gpointer data)
  */
 static void add_sendto(GtkWidget *menu, const gchar *type, const gchar *subtype)
 {
+		GList *widgets = NULL;
+		widgets = add_sendto_shared(menu, type, subtype, (CallbackFn) do_send_to);
+        widgets = g_list_concat(widgets,
+            add_sendto_desktop_items(menu, type, subtype, (CallbackFn) do_send_to));
+		if (widgets)
+			gtk_menu_shell_append(GTK_MENU_SHELL(menu),
+					gtk_menu_item_new());
+
+		g_list_free(widgets);	/* TODO: Get rid of this */
+}
+GList *add_sendto_shared(GtkWidget *menu,
+		const gchar *type, const gchar *subtype, CallbackFn swapped_func)
+{
 	gchar *searchdir;
 	GPtrArray *paths;
+	GList *widgets = NULL;
 	int i;
 
 	if (subtype)
@@ -1578,21 +1596,238 @@ static void add_sendto(GtkWidget *menu, const gchar *type, const gchar *subtype)
 
 	for (i = 0; i < paths->len; i++)
 	{
-		GList	*widgets = NULL;
 		guchar	*dir = (guchar *) paths->pdata[i];
 
-		widgets = menu_from_dir(menu, dir, get_menu_icon_style(),
-				(CallbackFn) do_send_to,
-				FALSE, FALSE, TRUE);
-
-		if (widgets)
-			gtk_menu_shell_append(GTK_MENU_SHELL(menu),
-					gtk_menu_item_new());
-
-		g_list_free(widgets);	/* TODO: Get rid of this */
+		widgets = g_list_concat(widgets,
+				menu_from_dir(menu, dir, get_menu_icon_style(),
+					swapped_func, FALSE, FALSE, TRUE)
+			);
 	}
 
 	choices_free_list(paths);
+	return widgets;
+}
+GList *add_sendto_desktop_items(GtkWidget *menu,
+        const gchar *type, const gchar *subtype, CallbackFn swapped_func)
+{
+	GList *widgets = NULL;
+	GError *error = NULL;
+	DirItem *ditem;
+	GtkWidget *item;
+	const gchar *xdg_data_dirs_env;
+	gchar **xdg_data_dirs;
+	gchar *xdg_data_home;
+	GList *apps_dirs = NULL;
+	GList *list_iter;
+	GList *list_iter2;
+	gchar **iter;
+	gchar *mimeinfo_path;
+	gchar *desktop_files_str;
+	gchar **desktop_files;
+	gchar *mime_type;
+	gchar *label;
+	gchar *not_show_in;
+	gchar *only_show_in;
+	gchar *full_path;
+	GHashTable *desktop_entries;
+	GHashTableIter hash_table_iter;
+	gpointer key, value;
+
+	if (!o_menu_xdg_apps.int_value)
+		return widgets;
+
+	if (!type || !subtype)
+		return widgets;
+
+	desktop_entries = g_hash_table_new(g_str_hash, g_str_equal);
+
+	mime_type = g_strjoin("/", type, subtype, NULL);
+
+	xdg_data_dirs_env = g_getenv("XDG_DATA_DIRS");
+
+	if (!xdg_data_dirs_env || !strcmp(xdg_data_dirs_env, ""))
+		xdg_data_dirs_env = "/usr/local/share:/usr/share";
+
+	xdg_data_dirs = g_strsplit(xdg_data_dirs_env, ":", -1);
+
+	xdg_data_home = g_strdup(g_getenv("XDG_DATA_HOME"));
+
+	if (xdg_data_home && !strcmp(xdg_data_home, "")) {
+		g_free(xdg_data_home);
+		xdg_data_home = NULL;
+	}
+
+	if (!xdg_data_home)
+		xdg_data_home = g_strjoin("/", g_getenv("HOME"), ".local", "share", NULL);
+
+	apps_dirs = g_list_append(apps_dirs,
+			g_strjoin("/", xdg_data_home, "applications", NULL));
+
+	for (iter = xdg_data_dirs; *iter; iter++) {
+		apps_dirs = g_list_append(
+				apps_dirs, g_strjoin("/", *iter, "applications", NULL));
+	}
+	g_strfreev(xdg_data_dirs);
+
+	/* Iterate over applications dirs in XDG_DATA_HOME and XDG_DATA_DIRS. */
+	for (list_iter = apps_dirs; list_iter; list_iter = g_list_next(list_iter)) {
+		if (!list_iter->data)
+			continue;
+
+		mimeinfo_path = g_strjoin("/", list_iter->data, "mimeinfo.cache", NULL);
+		error = NULL;
+		desktop_files_str = get_value_from_desktop_file(
+				mimeinfo_path, "MIME Cache", mime_type, &error);
+
+		g_free(mimeinfo_path);
+
+		if (error) {
+			g_error_free(error);
+			continue;
+		}
+
+		if (!desktop_files_str) {
+			continue;
+		}
+
+		desktop_files = g_strsplit(desktop_files_str, ";", -1);
+		iter = desktop_files;
+
+		/* Iterate over all desktop files associated with the given mimetype. */
+		for (iter = desktop_files; *iter; iter++) {
+			if (!strcmp(*iter, "")) {
+				g_free(*iter);
+				continue;
+			}
+			if (g_hash_table_contains(desktop_entries, *iter)) {
+				/* Item already added to menu. */
+				g_free(*iter);
+				continue;
+			}
+			/* Look for .desktop file in applications subdir of XDG_DATA_HOME and XDG_DATA_DIRS. */
+			for (list_iter2 = apps_dirs; list_iter2; list_iter2 = g_list_next(list_iter2)) {
+				if (!list_iter2->data)
+					continue;
+				error = NULL;
+				label = NULL;
+				only_show_in = NULL;
+				not_show_in = NULL;
+				full_path = g_strjoin("/", list_iter2->data, *iter, NULL);
+				if (!get_values_from_desktop_file(full_path, &error,
+							"Desktop Entry", "OnlyShowIn", &only_show_in,
+							"Desktop Entry", "NotShowIn", &not_show_in,
+							"Desktop Entry", "Name", &label,
+							NULL)) {
+					if (error) {
+						g_error_free(error);
+					}
+					if (label) {
+						g_free(label);
+					}
+					if (only_show_in) {
+						g_free(only_show_in);
+					}
+					if (not_show_in) {
+						g_free(not_show_in);
+					}
+					g_free(full_path);
+					continue;
+				}
+				if (!label) {
+					g_free(full_path);
+					continue;
+				}
+				if (only_show_in) {
+					gchar **envs = g_strsplit(only_show_in, ";", -1);
+					int i = 0;
+					gboolean show = FALSE;
+					while (envs[i]) {
+						if (strcmp(envs[i], "ROX") == 0) {
+							show = TRUE;
+							break;
+						};
+						i++;
+					}
+					g_strfreev(envs);
+					g_free(only_show_in);
+					if (!show) {
+						if (label) {
+							g_free(label);
+						}
+						if (not_show_in) {
+							g_free(not_show_in);
+						}
+						g_free(full_path);
+						continue;
+					}
+				}
+				if (not_show_in) {
+					gchar **envs = g_strsplit(not_show_in, ";", -1);
+					int i = 0;
+					gboolean show = TRUE;
+					while (envs[i]) {
+						if (strcmp(envs[i], "ROX") == 0) {
+							show = FALSE;
+							break;
+						};
+						i++;
+					}
+					g_strfreev(envs);
+					g_free(not_show_in);
+					if (!show) {
+						if (label) {
+							g_free(label);
+						}
+						if (only_show_in) {
+							g_free(only_show_in);
+						}
+						g_free(full_path);
+						continue;
+					}
+				}
+
+				ditem = diritem_new("");
+				diritem_restat(full_path, ditem, NULL);
+
+				item = make_send_to_item(ditem, label, get_menu_icon_style());
+
+				g_signal_connect_swapped(item, "activate",
+						G_CALLBACK(swapped_func), full_path);
+				if (menu)
+					gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+
+				widgets = g_list_append(widgets, item);
+				g_hash_table_add(desktop_entries, *iter);
+
+				g_signal_connect_swapped(item, "destroy",
+						G_CALLBACK(g_free), full_path);
+
+				g_free(label);
+				break;
+			}
+			if (!g_hash_table_contains(desktop_entries, *iter)) {
+				g_free(*iter);
+			}
+		}
+		g_free(desktop_files);
+		g_free(desktop_files_str);
+	}
+
+	for (list_iter = apps_dirs; list_iter; list_iter = g_list_next(list_iter)) {
+		g_free(list_iter->data);
+	}
+	g_list_free(apps_dirs);
+
+	g_hash_table_iter_init (&hash_table_iter, desktop_entries);
+	while (g_hash_table_iter_next (&hash_table_iter, &key, &value)) {
+		g_free(key);
+	}
+
+	g_hash_table_destroy(desktop_entries);
+	g_free(mime_type);
+	g_free(xdg_data_home);
+
+	return widgets;
 }
 
 /* Scan the SendTo dir and create and show the Send To menu.
