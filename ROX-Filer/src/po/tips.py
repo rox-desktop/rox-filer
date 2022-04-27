@@ -2,16 +2,16 @@
 
 from xml.sax import *
 from xml.sax.handler import ContentHandler
-import string, os
+import sys, os
 
-print "Extracting translatable bits from Options.xml..."
+sys.stdout.write("Extracting translatable bits from Options.xml...\n")
 
 class Handler(ContentHandler):
 	data = ""
 
 	def startElement(self, tag, attrs):
 		for x in ['title', 'label', 'end', 'unit']:
-			if attrs.has_key(x):
+			if x in attrs:
 				self.trans(attrs[x])
 		self.data = ""
 	
@@ -19,13 +19,13 @@ class Handler(ContentHandler):
 		self.data = self.data + data
 	
 	def endElement(self, tag):
-		data = string.strip(self.data)
+		data = self.data.strip()
 		if data:
 			self.trans(data)
 		self.data = ""
 	
 	def trans(self, data):
-		data = string.join(string.split(data, '\n'), '\\n')
+		data = '\\n'.join(data.split('\n'))
 		if data:
 			out.write('_("%s")\n' % data.replace('"', '\\"'))
 
@@ -34,6 +34,6 @@ try:
 except OSError:
 	pass
 	
-out = open('../tips', 'wb')
+out = open('../tips', 'w')
 parse('../../Options.xml', Handler())
 out.close()
