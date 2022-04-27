@@ -17,8 +17,6 @@ typedef enum {
 	PANEL_DEFAULT_SIDE	/* Read from file, or use free side */
 } PanelSide;
 
-#define MENU_MARGIN(side) ((side) == PANEL_BOTTOM ? 32 : 8)
-
 struct _Panel {
 	GtkWidget	*window;
 	GtkAdjustment	*adj;		/* Scroll position of the bar */
