@@ -1286,7 +1286,7 @@ void filer_open_parent(FilerWindow *filer_window)
 
 void change_to_parent(FilerWindow *filer_window)
 {
-	char	*dir;
+	gchar	*dir, *base;
 	const char *current = filer_window->sym_path;
 
 	if (current[0] == '/' && current[1] == '\0')
@@ -1297,8 +1297,10 @@ void change_to_parent(FilerWindow *filer_window)
 				g_strdup(filer_window->real_path));
 	
 	dir = g_path_get_dirname(current);
-	filer_change_to(filer_window, dir, g_basename(current));
+	base = g_path_get_basename(current);
+	filer_change_to(filer_window, dir, base);
 	g_free(dir);
+	g_free(base);
 }
 
 /* Removes trailing /s from path (modified in place) */
@@ -1506,7 +1508,7 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win,
 	filer_window->display_style_wanted = UNKNOWN_STYLE;
 	filer_window->thumb_queue = NULL;
 	filer_window->max_thumbs = 0;
-	filer_window->sort_type = -1;
+	filer_window->sort_type = SORT_UNKNOWN;
 
 	filer_window->filter = FILER_SHOW_ALL;
 	filer_window->filter_string = NULL;

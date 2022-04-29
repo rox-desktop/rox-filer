@@ -35,6 +35,7 @@
 #include <string.h>
 #include <gtk/gtk.h>
 #include <X11/keysym.h>
+#include <X11/XKBlib.h>
 #include <gdk/gdkx.h>
 
 #include "global.h"
@@ -456,6 +457,8 @@ void icon_set_path(Icon *icon, const char *pathname, const char *name)
 
 	if (pathname)
 	{
+		gchar *src_base = NULL;
+
 		if (g_utf8_validate(pathname, -1, NULL))
 			icon->src_path = g_strdup(pathname);
 		else
@@ -465,10 +468,15 @@ void icon_set_path(Icon *icon, const char *pathname, const char *name)
 		icon_hash_path(icon);
 
 		if (!name)
-			name = g_basename(icon->src_path);
+		{
+			src_base = g_path_get_basename(icon->src_path);
+			name = src_base;
+		}
 
 		icon->item = diritem_new(name);
 		diritem_restat(icon->path, icon->item, NULL);
+
+		g_free(src_base);
 	}
 }
 
@@ -746,7 +754,7 @@ static GdkFilterReturn filter_get_key(GdkXEvent *xevent,
 		KeySym sym;
 		unsigned int m = kev->state;
 
-		sym = XKeycodeToKeysym(dpy, kev->keycode, 0);
+		sym = XkbKeycodeToKeysym(dpy, kev->keycode, 0, 0);
 		if (!sym)
 			return GDK_FILTER_CONTINUE;
 
