@@ -1032,7 +1032,9 @@ static SortFn sort_fn(FilerWindow *fw)
 	{
 		case SORT_NAME: return sort_by_name;
 		case SORT_TYPE: return sort_by_type;
-		case SORT_DATE: return sort_by_date;
+		case SORT_MTIME: return sort_by_mtime;
+		case SORT_ATIME: return sort_by_atime;
+		case SORT_CTIME: return sort_by_ctime;
 		case SORT_SIZE: return sort_by_size;
 		case SORT_OWNER: return sort_by_owner;
 		case SORT_GROUP: return sort_by_group;
