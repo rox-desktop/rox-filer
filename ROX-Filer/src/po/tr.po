@@ -1,0 +1,4914 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ROX-Filer 2.2.0 and newer\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-07-03 10:06+0300\n"
+"PO-Revision-Date: 2023-07-04 10:58+0300\n"
+"Last-Translator: madanadam <madanadam@madan>\n"
+"Language-Team: Turkish\n"
+"Language: tr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.3.2\n"
+
+#: abox.c:125
+msgid "<dir>"
+msgstr "<dizin>"
+
+#: abox.c:218
+msgid "_Quiet"
+msgstr "_Sessiz"
+
+#: abox.c:227
+msgid "Quiet"
+msgstr "Sessiz"
+
+#: abox.c:227
+msgid "Don't confirm every operation"
+msgstr "Her işlemi onaylama"
+
+#: abox.c:454 infobox.c:792 tips:36
+msgid "Name"
+msgstr "Ad"
+
+#: abox.c:460 menu.c:237
+msgid "Directory"
+msgstr "Dizin"
+
+#: abox.c:549
+msgid "Expression:"
+msgstr "İfade:"
+
+#: action.c:57
+msgid "See the attr(5) man page for full details."
+msgstr "Tüm ayrıntılar için attr(5) man sayfasına bakın."
+
+#: action.c:59
+msgid "See the fsattr(5) man page for full details."
+msgstr "Tüm ayrıntılar için fsattr(5) man sayfasına bakın."
+
+#: action.c:61
+msgid "You do not appear to have OS support."
+msgstr "İS desteğiniz yok gibi görünüyor."
+
+#: action.c:191
+msgid "Find expression reference"
+msgstr "İfade başvurusunu bul"
+
+#: action.c:202
+msgid ""
+"<u>Quick Start</u>\n"
+"Just put the name of the file you're looking for in single quotes:\n"
+"<b>'index.html'</b> (to find a file called 'index.html')\n"
+"\n"
+"<u>Examples</u>\n"
+"<b>'*.htm', '*.html'</b> (finds HTML files)\n"
+"<b>IsDir 'lib'</b> (finds directories called 'lib')\n"
+"<b>IsReg 'core'</b> (finds a regular file called 'core')\n"
+"<b>! (IsDir, IsReg)</b> (is neither a directory nor a regular file)\n"
+"<b>mtime after 1 day ago and size > 1Mb</b> (big, and recently modified)\n"
+"<b>'CVS' prune, isreg</b> (a regular file not in CVS)\n"
+"<b>IsReg system(grep -q fred \"%\")</b> (contains the word 'fred')\n"
+"\n"
+"<u>Simple Tests</u>\n"
+"<b>IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket, IsDoor</"
+"b> (types)\n"
+"<b>IsSUID, IsSGID, IsSticky, IsReadable, IsWriteable, IsExecutable</b> "
+"(permissions)\n"
+"<b>IsEmpty, IsMine</b>\n"
+"A pattern in single quotes is a shell-style wildcard pattern to match. If "
+"it\n"
+"contains a slash then the match is against the full path; otherwise it is\n"
+"against the leafname only.\n"
+"\n"
+"<u>Comparisons</u>\n"
+"<b>&lt;, &lt;=, =, !=, &gt;, &gt;=, After, Before</b> (compare two values)\n"
+"<b>5 bytes, 1Kb, 2Mb, 3Gb</b> (file sizes)\n"
+"<b>2 secs|mins|hours|days|weeks|years  ago|hence</b> (times)\n"
+"<b>atime, ctime, mtime, now, size, inode, nlinks, uid, gid, blocks</b> "
+"(values)\n"
+"\n"
+"<u>Specials</u>\n"
+"<b>system(command)</b> (true if 'command' returns with a zero exit status;\n"
+"a % in 'command' is replaced with the path of the current file)\n"
+"<b>prune</b> (false, and prevents searching the contents of a directory)."
+msgstr ""
+"<u> Hızlı Başlangıç </u>\n"
+"Aradığınız dosyanın adını tek tırnak halinde koyun:\n"
+"<b> 'index.html' </b> ('index.html' adlı bir dosya bulmak için)\n"
+"\n"
+"<u> Örnekler </u>\n"
+"<b> '*. htm', '*.html' </b> (html dosyalarını bulur)\n"
+"<b>IsDir 'lib' </b> ('lib' adlı dizinleri bulur)\n"
+"<b>IsReg 'çekirdek' </b> ('Çekirdek' adlı normal bir dosya bulur)\n"
+"<b>! (IsDir, IsReg)</b> (ne bir dizin ne de normal bir dosya)\n"
+"<b>mtime after 1 day ago and size > 1Mb</b> (büyük ve yakın zamanda "
+"değiştirilmiş)\n"
+"<b>CVS' prune, isreg</b> (CVS'de olmayan normal bir dosya)\n"
+"<b>IsReg system(grep -q fred \"%\")</b> ('fred' kelimesini içerir)\n"
+"\n"
+"<u> Basit Testler </u>\n"
+"<b>IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket, IsDoor</"
+"b>  (Türler)\n"
+"<b>IsSUID, IsSGID, IsSticky, IsReadable, IsWriteable, IsExecutable</b>  "
+"(İzinler)\n"
+"<b>IsEmpty, IsMine</b>\n"
+"A pattern in single quotes is a shell-style wildcard pattern to match. If "
+"it\n"
+"contains a slash then the match is against the full path; otherwise it is\n"
+"against the leafname only.\n"
+"\n"
+"\n"
+"<U> Karşılaştırmalar </u>\n"
+"<b> & lt;, & lt; =, =,! =, & gt;, & gt; =, sonra </b> (iki değer "
+"karşılaştırın)\n"
+"<b> 5 bayt, 1KB, 2MB, 3GB </b> (dosya boyutları)\n"
+"<b> 2 saniye | Mins | Saatler | Günler | Haftalar | Yıllar önce | Bu nedenle "
+"</b> (Times)\n"
+"<b> atime, ctime, mTime, şimdi, boyut, inode, nlinks, uid, gid, bloklar </b> "
+"(değerler)\n"
+"\n"
+"<u> Özel komutlar </u>\n"
+"<b> Sistem (komut) </b> ('Komut' sıfır çıkış durumuyla dönerse doğru;\n"
+"'Komut' in A %, geçerli dosyanın yolu ile değiştirilir)\n"
+"<b> prune </b> (Yanlış ve bir dizinin içeriğini aramayı önler)."
+
+#: action.c:249
+msgid "Change permissions reference"
+msgstr "İzin referansını değiştir"
+
+#: action.c:260
+msgid ""
+"Normally, you can just select a command from the menu (click \n"
+"on the arrow beside the command box). Sometimes, you need more...\n"
+"\n"
+"The format of a command is: <b>CHANGE, CHANGE, ...</b>\n"
+"Each <b>CHANGE</b> is: <b>WHO HOW PERMISSIONS</b>\n"
+"<b>WHO</b> is some combination of <b>u</b>, <b>g</b> and <b>o</b> which "
+"determines whether to\n"
+"change the permissions for the User (owner), Group or Others.\n"
+"<b>HOW</b> is <b>+</b>, <b>-</b> or <b>=</b> to add, remove or set exactly "
+"the permissions.\n"
+"<b>PERMISSIONS</b> is some combination of the letters <b>rwxXstugo</b>\n"
+"\n"
+"Bracketed text and spaces are ignored.\n"
+"\n"
+"<u>Examples</u>\n"
+"<b>u+rw</b>: the file owner gains read and write permission\n"
+"<b>g=u</b>: the group permissions are set to be the same as the user's\n"
+"<b>o=u-w</b>: others get the same permissions as the owner, but without "
+"write permission\n"
+"<b>a+x</b>: <b>a</b>ll get execute/access permission - same as <b>ugo+x</b>\n"
+"<b>a+X</b>: directories become accessable by everyone; files which were\n"
+"executable by anyone become executable by everyone\n"
+"<b>u+rw, go+r</b>: two commands at once!\n"
+"<b>u+s</b>: set the SetUID bit - often has no effect on script files\n"
+"<b>755</b>: set the permissions directly\n"
+"\n"
+"See the chmod(1) man page for full details."
+msgstr ""
+"Normalde menüden bir komut seçebilirsiniz (komut kutusunun \n"
+"yanındaki oka tıklayın). Bazen daha fazlasına ihtiyaç duyarsın...\n"
+"\n"
+"Bir komutun formatı: <b>DEĞİŞİKLİK, DEĞİŞİKLİK, ...</b>\n"
+"Her <b>DEĞİŞİKLİK</b>: <b>KİM NASIL İZİNLER</b> şeklindedir\n"
+"<b>KİM</b>, <b>u</b>, <b>g</b> ve <b>o</b>'nin bir kombinasyonu olup "
+"olmayacağını belirler.\n"
+"Kullanıcı (sahip), Grup veya Diğerleri için izinleri değiştirin.\n"
+"İzinleri tam olarak eklemek, kaldırmak veya ayarlamak için <b>NASIL</b> "
+"<b>+</b>, <b>-</b> veya <b>=</b> şeklindedir.\n"
+"<b>İZİNLER</b>, <b>rwxXstugo</b> harflerinin bir kombinasyonudur\n"
+"\n"
+"Parantez içindeki metin ve boşluklar dikkate alınmaz.\n"
+"\n"
+"<u>Örnekler</u>\n"
+"<b>u+rw</b>: dosya sahibi okuma ve yazma izni alır\n"
+"<b>g=u</b>: grup izinleri, kullanıcının izinleriyle aynı olacak şekilde "
+"ayarlanır\n"
+"<b>o=u-w</b>: diğerleri, sahiple aynı izinlere sahip olur, ancak yazma izni "
+"yoktur\n"
+"<b>a+x</b>: <b>a</b> yürütme/erişim izni alır - <b>ugo+x</b> ile aynı\n"
+"<b>a+X</b>: dizinler herkes tarafından erişilebilir hale gelir; olan "
+"dosyalar\n"
+"herkes tarafından yürütülebilir herkes tarafından yürütülebilir hale gelir\n"
+"<b>u+rw, go+r</b>: aynı anda iki komut!\n"
+"<b>u+s</b>: SetUID bitini ayarlayın - genellikle betik dosyaları üzerinde "
+"hiçbir etkisi yoktur\n"
+"<b>755</b>: izinleri doğrudan ayarlayın\n"
+"\n"
+"Tüm ayrıntılar için chmod(1) kılavuz sayfasına bakın."
+
+#: action.c:301
+msgid "Set type reference"
+msgstr "Tür başvurusunu ayarla"
+
+#: action.c:312
+msgid ""
+"Normally ROX-Filer determines the type of a regular file\n"
+"by matching it's name against a pattern. To change the\n"
+"type of the file you must rename it.\n"
+"\n"
+"Newer file systems can support something called 'Extended\n"
+"Attributes' which can be used to store additional data with\n"
+"each file as named parameters. ROX-Filer uses the\n"
+"'user.mime_type' attribute to store file types.\n"
+"\n"
+"File types are only supported for regular files, not\n"
+"directories, devices, pipes or sockets, and then only\n"
+"on certain file systems and where the OS implements them.\n"
+msgstr ""
+"Normalde Rox-Filer, adını bir desenle eşleştirerek normal\n"
+"bir dosyanın türünü belirler. Dosyanın türünü değiştirmek\n"
+"için yeniden adlandırmanız gerekir.\n"
+"\n"
+"Daha yeni dosya sistemleri, adlandırılan parametreler gibi\n"
+"her dosyayla ek veri depolamak için kullanılabilen 'genişletilmiş \n"
+"öznitelikler' adı verilen bir şeyi destekleyebilir. Rox-Filer, \n"
+"dosya türlerini depolamak için 'user.mime_type' özniteliğini kullanır.\n"
+"\n"
+"Dosya türleri yalnızca dizinler, cihazlar, borular veya soketler \n"
+"ve daha sonra yalnızca belirli dosya sistemlerinde ve işletim \n"
+"sisteminin bunları uyguladığı düzenli dosyalar için desteklenir.\n"
+
+#: action.c:419
+msgid ""
+"\n"
+"Process terminated.\n"
+msgstr ""
+"\n"
+"İşlem sonlandırıldı.\n"
+
+#: action.c:435
+msgid "There was one error.\n"
+msgstr "Bir hata vardı.\n"
+
+#: action.c:437
+#, c-format
+msgid "There were %d errors.\n"
+msgstr "%d hata vardı.\n"
+
+#: action.c:461
+msgid "ERROR reading"
+msgstr "Okumada HATA"
+
+#: action.c:504
+msgid ""
+"'\n"
+"Done\n"
+msgstr ""
+"'\n"
+"Bitti\n"
+
+#: action.c:560 support.c:395
+msgid "ERROR"
+msgstr "HATA"
+
+#: action.c:714 main.c:699 main.c:706 main.c:713 main.c:727
+msgid "Yes"
+msgstr "Evet"
+
+#: action.c:717 main.c:701 main.c:708 main.c:715 main.c:727
+msgid "No"
+msgstr "Hayır"
+
+#: action.c:735
+msgid ""
+"\n"
+"Asking child process to terminate...\n"
+msgstr ""
+"\n"
+"Alt sürecin sonlandırılması isteniyor...\n"
+
+#: action.c:742
+msgid ""
+"\n"
+"Trying to KILL run-away process...\n"
+msgstr ""
+"\n"
+"Çalışan süreç ÖLDÜRMEYE çalışılıyor...\n"
+
+#: action.c:895
+#, c-format
+msgid "?Count contents of %s?"
+msgstr "? %s içeriğini say?"
+
+#: action.c:931
+#, c-format
+msgid "?Delete %s'%s'?"
+msgstr "? %s'%s' sil?"
+
+#: action.c:932
+msgid "WRITE-PROTECTED "
+msgstr "YAZMA KORUMALI "
+
+#: action.c:939
+#, c-format
+msgid "'Deleting '%s'\n"
+msgstr "''%s' siliniyor\n"
+
+#: action.c:952
+#, c-format
+msgid "'Directory '%s' deleted\n"
+msgstr "''%s' dizini silindi\n"
+
+#: action.c:985
+#, c-format
+msgid "?Eject '%s'?"
+msgstr "? '%s' öğesini çıkar?"
+
+#: action.c:992
+#, c-format
+msgid "'Eject '%s'\n"
+msgstr "%s'yi çıkar\n"
+
+#: action.c:1011
+#, c-format
+msgid ""
+"!%s\n"
+"eject failed\n"
+msgstr ""
+"!%s\n"
+"çıkarma başarısız\n"
+
+#: action.c:1030 action.c:1049
+#, c-format
+msgid "?Check '%s'?"
+msgstr "? '%s' seçeneğini işaretle?"
+
+#: action.c:1046
+msgid "!Invalid find condition - change it and try again\n"
+msgstr "! Geçersiz bulma koşulu - değiştirin ve yeniden deneyin\n"
+
+#: action.c:1056
+#, c-format
+msgid "'(while checking '%s')\n"
+msgstr "'('%s' kontrol ederilirken)\n"
+
+#: action.c:1130 action.c:1155
+#, c-format
+msgid "?Change permissions of '%s'?"
+msgstr "? '%s' izinlerini mi değiştiriyorsunuz?"
+
+#: action.c:1136
+#, c-format
+msgid "'Changing permissions of '%s'\n"
+msgstr "'%s' için izinleri değiştir\n"
+
+#: action.c:1153
+msgid "!Invalid mode command - change it and try again\n"
+msgstr "! Geçersiz mod komutu - değiştirin ve yeniden deneyin\n"
+
+#: action.c:1211
+#, c-format
+msgid "?Change contents of '%s'?"
+msgstr "? '%s' içeriğini değiştir?"
+
+#: action.c:1214 action.c:1234
+#, c-format
+msgid "?Change type of '%s'?"
+msgstr "? '%s' türünü değiştir?"
+
+#: action.c:1231
+msgid "!Invalid type - change it and try again\n"
+msgstr "! Geçersiz tür - değiştirin ve yeniden deneyin\n"
+
+#: action.c:1253
+#, c-format
+msgid "'Changing type of '%s' to '%s'\n"
+msgstr "'%s' türünü '%s' olarak değiştir\n"
+
+#: action.c:1276
+#, c-format
+msgid "'Not changing type of directory '%s'\n"
+msgstr "'Dizin türü değiştirilmiyor '%s '\n"
+
+#: action.c:1282
+#, c-format
+msgid "'Non-regular file '%s' not changed\n"
+msgstr "Normal-dışı '%s' dosyası değiştirilmedi\n"
+
+#: action.c:1342
+#, c-format
+msgid "?'%s' already exists - %s?"
+msgstr "?' %s' zaten var - %s?"
+
+#: action.c:1344
+msgid "merge contents"
+msgstr "içeriği birleştir"
+
+#: action.c:1345
+msgid "overwrite"
+msgstr "üzerine yaz"
+
+#: action.c:1361
+msgid "'Trying copy anyway...\n"
+msgstr "Yine de kopyalamayı deniyorum...\n"
+
+#: action.c:1370
+#, c-format
+msgid "?Copy %s as %s?"
+msgstr "? %s'yi %s olarak mı kopyala?"
+
+#: action.c:1374
+#, c-format
+msgid "'Copying %s as %s\n"
+msgstr "'%s %s olarak kopyalanıyor\n"
+
+#: action.c:1389
+msgid "!ERROR: Destination already exists, but is not a directory\n"
+msgstr "!ERROR: Hedef zaten var, ancak bir dizin değil\n"
+
+#: action.c:1461
+#, c-format
+msgid ""
+"!%s\n"
+"Failed to copy '%s'\n"
+msgstr ""
+"!%s\n"
+"'%s' kopyalanamadı\n"
+
+#: action.c:1505
+#, c-format
+msgid "?'%s' already exists - overwrite?"
+msgstr "?' %s' zaten var - üzerine yaz?"
+
+#: action.c:1520
+msgid "'Trying move anyway...\n"
+msgstr "Yine de taşımaya çalışıyorum...\n"
+
+#: action.c:1528
+#, c-format
+msgid "?Move %s as %s?"
+msgstr "? %s'yi %s olarak mı taşıyacaksınız?"
+
+#: action.c:1532
+#, c-format
+msgid "'Moving %s as %s\n"
+msgstr "'%s %s olarak taşınıyor\n"
+
+#: action.c:1540
+#, c-format
+msgid ""
+"!%s\n"
+"Failed to move %s as %s\n"
+msgstr ""
+"!%s\n"
+"%s %s olarak taşınamadı\n"
+
+#: action.c:1561
+msgid "!ERROR: Can't copy object into itself\n"
+msgstr "!ERROR: Nesne kendi üzerine kopyalanamaz\n"
+
+#: action.c:1576
+msgid "!ERROR: Can't move/rename object into itself\n"
+msgstr "!HATA: Nesne kendi üzerine taşınamaz/adlandırılamaz\n"
+
+#: action.c:1588
+#, c-format
+msgid "'Linking %s as %s\n"
+msgstr "'%s %s olarak bağlanıyor\n"
+
+#: action.c:1593
+#, c-format
+msgid "?Link %s as %s?"
+msgstr "? %s'yi %s olarak mı bağlayın?"
+
+#: action.c:1636
+#, c-format
+msgid "'Mounting %s\n"
+msgstr "'%s bağlanıyor\n"
+
+#: action.c:1637
+#, c-format
+msgid "'Unmounting %s\n"
+msgstr "'%s ayrılıyor\n"
+
+#: action.c:1640
+#, c-format
+msgid "?Mount %s?"
+msgstr "? %s bağlansın mı?"
+
+#: action.c:1641
+#, c-format
+msgid "?Unmount %s?"
+msgstr "? %s ayrılsın mı?"
+
+#: action.c:1662
+#, c-format
+msgid ""
+"!%s\n"
+"Mount failed\n"
+msgstr ""
+"!%s\n"
+"Bağlama başarısız\n"
+
+#: action.c:1663
+#, c-format
+msgid ""
+"!%s\n"
+"Unmount failed\n"
+msgstr ""
+"!%s\n"
+"Ayırma başarısız\n"
+
+#: action.c:1671
+msgid "'(seems to be mounted now anyway)\n"
+msgstr "'(zaten bağlı görünüyor)\n"
+
+#: action.c:1717
+#, c-format
+msgid ""
+"'\n"
+"Total: %s ("
+msgstr ""
+"'\n"
+"Toplam: %s ("
+
+#: action.c:1723
+msgid "file"
+msgstr "dosya"
+
+#: action.c:1723
+msgid "files"
+msgstr "dosyalar"
+
+#: action.c:1727
+msgid "no directories)\n"
+msgstr "dizin yok)\n"
+
+#: action.c:1731
+msgid "directory"
+msgstr "dizin"
+
+#: action.c:1732
+msgid "directories"
+msgstr "dizinler"
+
+#: action.c:1773
+msgid "!No mount points selected!\n"
+msgstr "!Bağlama noktası seçilmedi!\n"
+
+#: action.c:1858
+msgid "?Another search?"
+msgstr "? Başka bir arama?"
+
+#: action.c:1888 action.c:1919
+#, c-format
+msgid "!'%s' is a symbolic link\n"
+msgstr "!' %s' bir sembolik bağdır\n"
+
+#: action.c:1959
+msgid "You need to select some items to search through"
+msgstr "Arama yapmak için bazı öğeleri seçmeniz gerekir"
+
+#: action.c:1969 menu.c:228
+msgid "Find"
+msgstr "Bul"
+
+#: action.c:2002
+msgid "You need to select some items to count"
+msgstr "Sayılacak bazı öğeleri seçmeniz gerekir"
+
+#: action.c:2006
+msgid "Disk Usage"
+msgstr "Disk Kullanımı"
+
+#: action.c:2042
+msgid "Mount / Unmount"
+msgstr "Bağla / Ayır"
+
+#: action.c:2059
+msgid "ROX-Filer does not yet support mount points on your system. Sorry."
+msgstr ""
+"ROX-Filer henüz sisteminizdeki bağlama noktalarını desteklememektedir. "
+"Üzgünüz."
+
+#: action.c:2073 menu.c:216 tips:171
+msgid "Delete"
+msgstr "Sil"
+
+#: action.c:2085 tips:176
+msgid "Force"
+msgstr "Zorla"
+
+#: action.c:2085
+msgid "Don't confirm deletion of non-writeable items"
+msgstr "Yazılamayan öğelerin silinmesini onaylama"
+
+#: action.c:2088 action.c:2147 action.c:2210 action.c:2283 action.c:2323
+#: tips:178
+msgid "Brief"
+msgstr "Özet"
+
+#: action.c:2088
+msgid "Only log directories being deleted"
+msgstr "Dizinleri yalnızca silindikleri sırada günlüğe kaydet"
+
+#: action.c:2107
+msgid "You need to select the items whose permissions you want to change"
+msgstr "İzinlerini değiştirmek istediğiniz öğeleri seçmeniz gerekir"
+
+#: action.c:2115
+msgid "a+x (Make executable/searchable)"
+msgstr "a+x (Çalıştırılabilir/aranabilir yap)"
+
+#: action.c:2117
+msgid "a-x (Make non-executable/non-searchable)"
+msgstr "a-x (Çalıştırılamaz/aranamaz yap)"
+
+#: action.c:2119
+msgid "u+rw (Give owner read+write)"
+msgstr "u+rw (Sahibine okuma+yazma izni ver)"
+
+#: action.c:2121
+msgid "go-rwx (Private - owner access only)"
+msgstr "go-rwx (Özel - yalnızca sahibi erişir)"
+
+#: action.c:2123
+msgid "go=u-w (Public access, not write)"
+msgstr "go=u-w (Genel erişim, yazılamaz)"
+
+#: action.c:2134 menu.c:189 menu.c:226 tips:53
+msgid "Permissions"
+msgstr "İzinler"
+
+#: action.c:2147 action.c:2210
+msgid "Don't list processed files"
+msgstr "İşlenen dosyaları listeleme"
+
+#: action.c:2150 action.c:2213 tips:180
+msgid "Recurse"
+msgstr "Yinelemeli"
+
+#: action.c:2150
+msgid "Also change contents of subdirectories"
+msgstr "Ayrıca alt dizinlerin içeriğini de değiştir"
+
+#: action.c:2154
+msgid "Command:"
+msgstr "Komut:"
+
+#: action.c:2184
+msgid "You need to select the items whose type you want to change"
+msgstr "Türünü değiştirmek istediğiniz öğeleri seçmeniz gerekir"
+
+#: action.c:2197
+msgid "Set type"
+msgstr "Türü ayarla"
+
+#: action.c:2213
+msgid "Change contents of subdirectories"
+msgstr "Alt dizinlerin içeriğini değiştirme"
+
+#: action.c:2220 infobox.c:648
+msgid "Type:"
+msgstr "Tür:"
+
+#: action.c:2267 dnd.c:122 menu.c:2023 tips:165
+msgid "Copy"
+msgstr "Kopyala"
+
+#: action.c:2279 action.c:2319 tips:182
+msgid "Newer"
+msgstr "Daha yeni"
+
+#: action.c:2280 action.c:2320 tips:183
+msgid "Only over-write if source is newer than destination."
+msgstr "Yalnızca kaynak hedeften daha yeniyse üzerine yaz."
+
+#: action.c:2283
+msgid "Only log directories as they are copied"
+msgstr "Dizinleri yalnızca kopyalandıkları sırada günlüğe kaydet"
+
+#: action.c:2307 dnd.c:123 tips:167
+msgid "Move"
+msgstr "Taşı"
+
+#: action.c:2323
+msgid "Don't log each file as it is moved"
+msgstr "Her dosyayı taşınırken günlüğe kaydetme"
+
+#: action.c:2346 tips:169
+msgid "Link"
+msgstr "Bağ"
+
+#: action.c:2369 appmenu.c:111 filer.c:646 infobox.c:1061
+msgid "Eject"
+msgstr "Çıkar"
+
+#: action.c:2437
+msgid "Deleting items such as "
+msgstr "Öğeler siliniyor: "
+
+#: action.c:2441
+msgid "Deleting the item "
+msgstr "Öğe siliniyor "
+
+#: action.c:2443
+msgid "Deleting the items "
+msgstr "Öğeler siliniyor "
+
+#: action.c:2462
+msgid " and "
+msgstr " ve "
+
+#: action.c:2471
+msgid " will affect some items on the pinboard or panel - really delete it?"
+msgstr ""
+" pinboard veya paneldeki bazı öğeleri etkileyecek - gerçekten silinsin mi?"
+
+#: action.c:2478
+msgid " will affect some items on the pinboard or panel - really delete them?"
+msgstr ""
+" pinboard veya paneldeki bazı öğeleri etkileyecek - gerçekten silinsinler mi?"
+
+#: appmenu.c:197
+msgid "<missing label>"
+msgstr "<etiket yok>"
+
+#: appmenu.c:319
+#, c-format
+msgid ""
+"Symlink any programs you want into this directory. They will appear in the "
+"menu for all items of this type (%s/%s)."
+msgstr ""
+"İstediğiniz programları bu dizine sembolik olarak bağlayın. Bu türdeki tüm "
+"öğeler menüde görünürler (%s/%s)."
+
+#: appmenu.c:363 menu.c:239
+msgid "Customise Menu..."
+msgstr "Menüyü Özelleştir..."
+
+#: appmenu.c:420 menu.c:257 toolbar.c:158
+msgid "Help"
+msgstr "Yardım"
+
+#: bookmarks.c:148 log.c:161
+msgid "Path"
+msgstr "Yol"
+
+#: bookmarks.c:156
+msgid "Title"
+msgstr "Başlık"
+
+#: bookmarks.c:305
+#, c-format
+msgid "Can't bookmark non-local resource '%s'\n"
+msgstr "Yerel olmayan kaynak '%s' yer imlerine eklenemez\n"
+
+#: bookmarks.c:313 bookmarks.c:631
+#, c-format
+msgid "'%s' isn't a directory"
+msgstr "'%s' bir dizin değil"
+
+#: bookmarks.c:519
+msgid "You should first select some rows to delete"
+msgstr "Öncelikle silinecek bazı satırları seçmelisiniz"
+
+#: bookmarks.c:543
+msgid "Put the cursor on an entry in the list to move it"
+msgstr "Taşımak için imleci listedeki bir girişin üzerine getirin"
+
+#: bookmarks.c:563
+msgid "This item is already at the end"
+msgstr "Bu öğe zaten sonda"
+
+#: bookmarks.c:637
+#, c-format
+msgid "Can't bookmark non-local directories like '%s'"
+msgstr "'%s' gibi yerel olmayan dizinler yer imlerine konulamaz"
+
+#: bookmarks.c:779
+msgid "Add New Bookmark"
+msgstr "Yeni Yer İşareti Ekle"
+
+#: bookmarks.c:786
+msgid "Edit Bookmarks"
+msgstr "Yer imlerini düzenle"
+
+#: bookmarks.c:791
+msgid "Recently Visited"
+msgstr "Son Ziyaret Edilenler"
+
+#: bulk_rename.c:66
+msgid "Bulk rename files"
+msgstr "Dosyaları toplu olarak yeniden adlandırma"
+
+#: bulk_rename.c:69
+msgid "Reset"
+msgstr "Sıfırla"
+
+#: bulk_rename.c:74
+msgid "Make the New column a copy of Old"
+msgstr "Yeni sütunu Eski'nin kopyası yap"
+
+#: bulk_rename.c:79
+msgid "_Rename"
+msgstr "_Yeniden Adlandır"
+
+#: bulk_rename.c:92
+msgid "Replace:"
+msgstr "Değiştir:"
+
+#: bulk_rename.c:99
+msgid ""
+"This is a regular expression to search for.\n"
+"^ matches the start of a filename\n"
+"$ matches the end\n"
+"\\. matches a dot\n"
+"\\.htm$ matches the '.htm' in 'index.htm', etc"
+msgstr ""
+"Bu, aranması gereken düzenli ifadedir.\n"
+"^ bir dosya adının başıyla eşleşir.\n"
+"$ sonuyla eşleşir.\n"
+"\\. bir noktayla eşleşir.\n"
+"\\.htm$ 'index.htm' içindeki '.htm' ile eşleşir, vb"
+
+#: bulk_rename.c:107
+msgid "With:"
+msgstr "Birlikte:"
+
+#: bulk_rename.c:114
+msgid ""
+"The first match in each filename will be replaced by this string. The only "
+"special characters are back-references from \\0 to \\9. To use them "
+"literally, they have to be escaped with a backslash."
+msgstr ""
+"Her dosya adındaki ilk eşleşme bu dize ile değiştirilecektir. Tek özel "
+"karakterler \\ 0 ila \\ 9 arasında geri referanslardır. Onları tam anlamıyla "
+"kullanmak için, bir ters eğik ile kapatılması gerekir."
+
+#: bulk_rename.c:120
+msgid "Apply"
+msgstr "Uygula"
+
+#: bulk_rename.c:123
+msgid ""
+"Do a search-and-replace in the New column. The files are not actually "
+"renamed until you click on the Rename button below."
+msgstr ""
+"Yeni sütununda bir arama ve değiştirme işlemi yapın. Aşağıdaki Yeniden "
+"Adlandır düğmesine tıklayana kadar dosyalar aslında yeniden adlandırılmaz."
+
+#: bulk_rename.c:142
+msgid "Old name"
+msgstr "Eski ad"
+
+#: bulk_rename.c:151
+msgid "New name"
+msgstr "Yeni ad"
+
+#: bulk_rename.c:293
+msgid "No strings (in the New column) matched the given expression"
+msgstr "Hiçbir dize (Yeni sütunda) verilen ifadeyle eşleşmedi"
+
+#: bulk_rename.c:298
+msgid "One name matched, but the result was the same"
+msgstr "Bir isim eşleşti, ancak sonuç aynıydı"
+
+#: bulk_rename.c:301
+#, c-format
+msgid "%d names matched, but the results were all the same"
+msgstr "%d adları eşleşti, ancak sonuçların hepsi aynıydı"
+
+#: bulk_rename.c:327
+msgid ""
+"Specify a regular expression to match, and a string to replace matches with."
+msgstr ""
+"Eşleşecek düzenli ifade ve eşleşmelerin değiştirileceği bir dize belirtin."
+
+#: bulk_rename.c:344
+#, c-format
+msgid "%s (for '%s')"
+msgstr "%s ('%s' için)"
+
+#: bulk_rename.c:377
+#, c-format
+msgid "A file called '%s' already exists. Aborting bulk rename."
+msgstr ""
+"'%s' adlı bir dosya zaten var. Toplu yeniden adlandırma iptal ediliyor."
+
+#: bulk_rename.c:382
+#, c-format
+msgid ""
+"Failed to rename '%s' as '%s':\n"
+"%s\n"
+"Aborting bulk rename."
+msgstr ""
+"'%s' '%s' olarak yeniden adlandırılamadı:\n"
+"%s\n"
+"Toplu yeniden adlandırma iptal ediliyor."
+
+#: bulk_rename.c:444
+#, c-format
+msgid "A file called '%s' already exists"
+msgstr "'%s' adlı bir dosya zaten var"
+
+#: bulk_rename.c:455
+#, c-format
+msgid ""
+"Some of the New names contain / characters (eg '%s'). This will cause the "
+"files to end up in different directories. Continue?"
+msgstr ""
+"Yeni adlardan bazıları / karakteri içerir (örneğin, '%s'). Bu, dosyaların "
+"farklı dizinlerde bitmesine neden olur. Devam edilsin mi?"
+
+#: bulk_rename.c:470
+msgid "None of the names have changed. Nothing to do!"
+msgstr "İsimlerin hiçbiri değişmedi. Yapacak bir şey yok!"
+
+#: choices.c:434
+#, c-format
+msgid "%d directories could not be migrated"
+msgstr "%d dizinleri aktarılamadı"
+
+#: choices.c:436
+#, c-format
+msgid ""
+"Choices have been moved from \n"
+"%s\n"
+" to the new location \n"
+"%s\n"
+"%s"
+msgstr ""
+"Seçenekler şuradan taşındı:\n"
+"%s\n"
+"yeni konumu\n"
+"%s\n"
+"%s"
+
+#: dir.c:1041
+#, c-format
+msgid "Can't stat directory: %s"
+msgstr "Dizin özellikleri alınamıyor: %s"
+
+#: dir.c:1050
+#, c-format
+msgid "Can't open directory: %s"
+msgstr "Dizin açılamıyor : %s"
+
+#: display.c:659
+#, c-format
+msgid "lstat(2) failed: %s"
+msgstr "lstat(2) başarısız: %s"
+
+#: dnd.c:124
+msgid "Link (relative)"
+msgstr "Bağ (göreceli)"
+
+#: dnd.c:125
+msgid "Link (absolute)"
+msgstr "Bağ (mutlak)"
+
+#: dnd.c:424
+msgid "Internal error - bad info type"
+msgstr "İç hata - hatalı bilgi türü"
+
+#: dnd.c:563
+msgid "Drag a directory here to bookmark it."
+msgstr "Bir dizini yer imlerine eklemek için buraya sürükleyin."
+
+#: dnd.c:578
+msgid "XDS protocol error: leafname may not contain '/'\n"
+msgstr "XDS protokol hatası: yaprak adı '/' içermez\n"
+
+#: dnd.c:603
+msgid ""
+"XdndDirectSave0 target provided, but the atom XdndDirectSave0 (type text/"
+"plain) did not contain a leafname\n"
+msgstr ""
+"XdndDirectSave0 hedefi sağlandı, ancak atom XdndDirectSave0 (tür text/plain) "
+"bir yaprak adı içermiyordu\n"
+
+#: dnd.c:616
+msgid "Sorry - I require a target type of text/uri-list or XdndDirectSave0."
+msgstr ""
+"Üzgünüm - text/uri-list veya XdndDirectSave0 hedef türüne ihtiyacım var."
+
+#: dnd.c:619
+msgid ""
+"Sorry - I require a target type of text/uri-list or application/octet-stream."
+msgstr ""
+"Üzgünüm - text/uri-list veya application/octet-stream. hedef türüne "
+"ihtiyacım var."
+
+#: dnd.c:689
+#, c-format
+msgid ""
+"Failed to add some items to the pinboard, because they are on a remote "
+"machine. For example:\n"
+"\n"
+"%s"
+msgstr ""
+"Uzak bir makinede oldukları için pinboard'a bazı öğeler eklenemedi. "
+"Örneğin:\n"
+"\n"
+"%s"
+
+#: dnd.c:764
+msgid "Unknown target"
+msgstr "Bilinmeyen hedef"
+
+#: dnd.c:797
+msgid "Remote app can't or won't send me the data - sorry"
+msgstr "Uzak uygulama bana veri gönderemiyor veya göndermiyor - üzgünüm"
+
+#: dnd.c:810
+msgid "XDS protocol error: return code should be 'S', 'F' or 'E'\n"
+msgstr "XDS protokol hatası: dönüş kodu 'S', 'F' veya 'E' olmalıdır\n"
+
+#: dnd.c:843
+msgid "Sorry, can't display a menu of actions for a remote file / raw data."
+msgstr ""
+"Üzgünüz, uzak bir dosya için eylemler menüsü görüntülenemiyor / ham veri."
+
+#: dnd.c:859
+msgid "UntitledData"
+msgstr "İsimsizVeri"
+
+#: dnd.c:886
+#, c-format
+msgid "Error saving file: %s"
+msgstr "Dosya kaydında hata: %s"
+
+#: dnd.c:959
+msgid "No URIs in the text/uri-list (nothing to do!)"
+msgstr "Hiç text/uri-list içinde URI yok (yapacak bir şey yok!)"
+
+#: dnd.c:991
+msgid ""
+"Can't get data from remote machine (application/octet-stream not provided)"
+msgstr "Uzak makineden veri alınamıyor (application/octet-stream sağlanmadı)"
+
+#: dnd.c:1014
+msgid ""
+"Some of these files are on a different machine - they will be ignored - sorry"
+msgstr ""
+"Bu dosyalardan bazıları farklı bir makinede - göz ardı edilecekler - üzgünüm"
+
+#: dnd.c:1021
+msgid ""
+"None of these files are on the local machine - I can't operate on multiple "
+"remote files - sorry."
+msgstr ""
+"Bu dosyaların hiçbiri yerel makinede değil - birden fazla uzak dosyada "
+"çalışamıyorum - üzgünüm."
+
+#: dnd.c:1034
+msgid "Unknown action requested"
+msgstr "Bilinmeyen eylem istendi"
+
+#: dnd.c:1042
+#, c-format
+msgid "Error getting file list: %s"
+msgstr "Dosya listesi: %s alınırken hata oluştu"
+
+#: dropbox.c:112
+msgid "Show"
+msgstr "Göster"
+
+#: dropbox.c:118
+msgid "Show the current choice in a filer window"
+msgstr "Geçerli seçimi dosya penceresinde gösterme"
+
+#: dropbox.c:172
+msgid "<nothing>"
+msgstr "<hiçbirşey>"
+
+#: dropbox.c:237
+msgid ""
+"I can't show you the currently set item, because nothing is currently set. "
+"Drag something onto me!"
+msgstr ""
+"Şu anda ayarlanmış olan öğeyi size gösteremiyorum, çünkü şu anda hiçbir şey "
+"ayarlanmamış. Bana bir şey sürükle!"
+
+#: dropbox.c:261
+msgid "Sorry, you need to drop exactly one file onto the drop area."
+msgstr "Üzgünüz, bırakma alanına sadece bir dosya bırakmanız gerekiyor."
+
+#: dropbox.c:271
+#, c-format
+msgid "Sorry, I can't use '%s' because it's not a local file."
+msgstr "Üzgünüm, yerel bir dosya olmadığı için '%s' kullanamıyorum."
+
+#: dropbox.c:278 pinboard.c:932
+#, c-format
+msgid ""
+"Can't access '%s':\n"
+"%s"
+msgstr ""
+"'%s' erişemiyor:\n"
+"%s"
+
+#: filer.c:461
+#, c-format
+msgid ""
+"Error scanning '%s':\n"
+"%s\n"
+msgstr ""
+"Tarama hatası '%s':\n"
+"%s\n"
+
+#: filer.c:465
+#, c-format
+msgid ""
+"Error scanning '%s':\n"
+"%s"
+msgstr ""
+"Tarama hatası '%s':\n"
+"%s"
+
+#: filer.c:621
+msgid ""
+"Do you want to unmount this device?\n"
+"\n"
+"Unmounting a device makes it safe to remove the disk."
+msgstr ""
+"Bu cihazı ayırmak istiyor musunuz?\n"
+"\n"
+"Cihazı ayırmak diski çıkarmayı güvenli hale getirir."
+
+#: filer.c:626
+msgid "Perform the same action in future for this mount point"
+msgstr "Bu bağlama noktası için gelecekte aynı eylemi gerçekleştir"
+
+#: filer.c:633
+msgid "No change"
+msgstr "Değişiklik yok"
+
+#: filer.c:639 infobox.c:1059 menu.c:871
+msgid "Unmount"
+msgstr "Ayır"
+
+#: filer.c:743
+msgid "Directory missing/deleted"
+msgstr "Dizin kayıp/silinmiş"
+
+#: filer.c:1107
+#, c-format
+msgid ""
+"Group %s is not set. Select some files and press Ctrl+%s to set the group. "
+"Press %s on its own to reselect the files later.\n"
+"Make sure NumLock is on if you use the keypad."
+msgstr ""
+"Grup %s ayarlanmamış. Bazı dosyaları seçin ve grubu ayarlamak için Ctrl+%s "
+"tuşlarına basın. Dosyaları daha sonra yeniden seçmek için kendi başına %s "
+"tuşuna basın.\n"
+"Tuş takımını kullanıyorsanız NumLock'un açık olduğundan emin olun."
+
+#: filer.c:1343
+#, c-format
+msgid "Directory '%s' is not accessible"
+msgstr "'%s' dizinine erişilemiyor"
+
+#: filer.c:1495
+#, c-format
+msgid "Directory '%s' not found."
+msgstr "'%s' dizini bulunamadı."
+
+#: filer.c:1795
+msgid "Cancel"
+msgstr "İptal"
+
+#: filer.c:2076
+msgid "A"
+msgstr "A"
+
+#: filer.c:2078 find.c:923
+msgid "G"
+msgstr "G"
+
+#: filer.c:2083
+msgid "S"
+msgstr "S"
+
+#: filer.c:2085
+msgid "T"
+msgstr "T"
+
+#: filer.c:2095
+msgid "All, "
+msgstr "Hepsi, "
+
+#: filer.c:2098
+#, c-format
+msgid "Glob (%s), "
+msgstr "Glob (%s), "
+
+#: filer.c:2106
+msgid "Scanning, "
+msgstr "Taranıyor, "
+
+#: filer.c:2108
+msgid "Thumbs, "
+msgstr "Önizleme, "
+
+#: filer.c:2384
+msgid "Symbolic link to "
+msgstr "Sembolik bağ şuraya "
+
+#: filer.c:2426
+msgid "This filename is not valid UTF-8. You should rename it.\n"
+msgstr "Bu dosya adı geçerli UTF-8 değil. Yeniden adlandırmalısınız.\n"
+
+#: filer.c:2743 menu.c:2013
+msgid "Item no longer exists!"
+msgstr "Öğe artık yok!"
+
+#: filer.c:3549
+msgid "Select display properties to save"
+msgstr "Kaydedilecek görüntü özelliklerini seç"
+
+#: filer.c:3553
+msgid "<b>Save display settings for directory</b>"
+msgstr "<b>Dizin için görüntü ayarlarını kaydet</b>"
+
+#: filer.c:3560
+msgid "Select settings to save"
+msgstr "Kaydedilecek ayarları seç"
+
+#: filer.c:3567
+msgid "Position"
+msgstr "Konum"
+
+#: filer.c:3572 toolbar.c:133 toolbar.c:137 tips:39
+msgid "Size"
+msgstr "Boyut"
+
+#: filer.c:3577
+msgid "Show hidden"
+msgstr "Gizlileri göster"
+
+#: filer.c:3583
+msgid "Display style"
+msgstr "Ekran stili"
+
+#: filer.c:3589
+msgid "Sort type and order"
+msgstr "Sıralama türü ve düzeni"
+
+#: filer.c:3594 toolbar.c:141
+msgid "Details"
+msgstr "Detaylar"
+
+#: filer.c:3599 tips:92 tips:93
+msgid "Thumbnails"
+msgstr "Önizleme"
+
+#: filer.c:3605
+msgid "Filter"
+msgstr "Süzgeç"
+
+#: find.c:485
+msgid "And"
+msgstr "Ve"
+
+#: find.c:509
+msgid "Not"
+msgstr "Değil"
+
+#: find.c:552
+msgid "system"
+msgstr "sistem"
+
+#: find.c:560
+msgid "prune"
+msgstr "prune"
+
+#: find.c:648
+msgid "After"
+msgstr "Sonra"
+
+#: find.c:650
+msgid "Before"
+msgstr "Önce"
+
+#: find.c:744
+msgid "IsReg"
+msgstr "IsReg"
+
+#: find.c:746
+msgid "IsLink"
+msgstr "IsLink"
+
+#: find.c:748
+msgid "IsDir"
+msgstr "IsDir"
+
+#: find.c:750
+msgid "IsChar"
+msgstr "IsChar"
+
+#: find.c:752
+msgid "IsBlock"
+msgstr "IsBlock"
+
+#: find.c:754
+msgid "IsDev"
+msgstr "IsDev"
+
+#: find.c:756
+msgid "IsPipe"
+msgstr "IsPipe"
+
+#: find.c:758
+msgid "IsSocket"
+msgstr "IsSocket"
+
+#: find.c:760
+msgid "IsDoor"
+msgstr "IsDoor"
+
+#: find.c:762
+msgid "IsSUID"
+msgstr "IsSUID"
+
+#: find.c:764
+msgid "IsSGID"
+msgstr "IsSGID"
+
+#: find.c:766
+msgid "IsSticky"
+msgstr "IsSticky"
+
+#: find.c:768
+msgid "IsReadable"
+msgstr "IsReadable"
+
+#: find.c:770
+msgid "IsWriteable"
+msgstr "IsWriteable"
+
+#: find.c:772
+msgid "IsExecutable"
+msgstr "IsExecutable"
+
+#: find.c:774
+msgid "IsEmpty"
+msgstr "IsEmpty"
+
+#: find.c:776
+msgid "IsMine"
+msgstr "IsMine"
+
+#: find.c:904
+msgid "Now"
+msgstr "Şimdi"
+
+#: find.c:917
+msgid "Byte"
+msgstr "Bayt"
+
+#: find.c:917
+msgid "Bytes"
+msgstr "Bayt"
+
+#: find.c:919
+msgid "Kb"
+msgstr "Kb"
+
+#: find.c:919
+msgid "K"
+msgstr "K"
+
+#: find.c:921
+msgid "Mb"
+msgstr "Mb"
+
+#: find.c:921
+msgid "M"
+msgstr "M"
+
+#: find.c:923
+msgid "Gb"
+msgstr "Gb"
+
+#: find.c:925
+msgid "Sec"
+msgstr "Sn"
+
+#: find.c:925
+msgid "Secs"
+msgstr "Sn"
+
+#: find.c:927
+msgid "Min"
+msgstr "Dk"
+
+#: find.c:927
+msgid "Mins"
+msgstr "Dk"
+
+#: find.c:929
+msgid "Hour"
+msgstr "Saat"
+
+#: find.c:929
+msgid "Hours"
+msgstr "Saat"
+
+#: find.c:931
+msgid "Day"
+msgstr "Gün"
+
+#: find.c:931
+msgid "Days"
+msgstr "Gün"
+
+#: find.c:933
+msgid "Week"
+msgstr "Hafta"
+
+#: find.c:933
+msgid "Weeks"
+msgstr "Hafta"
+
+#: find.c:935
+msgid "Year"
+msgstr "Yıl"
+
+#: find.c:935
+msgid "Years"
+msgstr "Yıl"
+
+#: find.c:944
+msgid "Ago"
+msgstr "Önce"
+
+#: find.c:946
+msgid "Hence"
+msgstr "Bu yüzden"
+
+#: find.c:961
+msgid "atime"
+msgstr "atime"
+
+#: find.c:963
+msgid "ctime"
+msgstr "ctime"
+
+#: find.c:965
+msgid "mtime"
+msgstr "mtime"
+
+#: find.c:967
+msgid "size"
+msgstr "boyut"
+
+#: find.c:969
+msgid "inode"
+msgstr "inode"
+
+#: find.c:971
+msgid "nlinks"
+msgstr "nlinks"
+
+#: find.c:973
+msgid "uid"
+msgstr "uid"
+
+#: find.c:975
+msgid "gid"
+msgstr "gid"
+
+#: find.c:977
+msgid "blocks"
+msgstr "blok"
+
+#: gtksavebox.c:249
+msgid "Save As:"
+msgstr "Farklı Kaydet:"
+
+#: gtksavebox.c:395
+msgid "Unnamed"
+msgstr "İsimsiz"
+
+#: gtksavebox.c:471
+msgid ""
+"Remote application wants to use Direct Save, but I can't read the "
+"XdndDirectSave0 (type text/plain) property.\n"
+msgstr ""
+"Uzak uygulama Direct Save'i kullanmak istiyor, ancak XdndDirectSave0 (type "
+"text/plain) özelliği okunamıyor.\n"
+
+#: gtksavebox.c:596
+msgid ""
+"Drag the icon to a directory viewer\n"
+"(or enter a full pathname)"
+msgstr ""
+"Simgeyi dizin görüntüleyiciye sürükleyin \n"
+"(veya tam bir yol adı girin)"
+
+#: gui_support.c:456
+msgid ""
+"\n"
+"---\n"
+msgstr ""
+"\n"
+"---\n"
+
+#: gui_support.c:525
+#, c-format
+msgid "Attempt to read an XML file as a text file. File '%s' may be corrupted."
+msgstr ""
+"XML dosyasını metin dosyası olarak okumayı deneyin. '%s' dosyası bozulmuş "
+"olabilir."
+
+#: gui_support.c:542
+#, c-format
+msgid ""
+"Error in '%s' file at line %d: \n"
+"\"%s\"\n"
+"This may be due to upgrading from a previous version of ROX-Filer. Open the "
+"Options window and try changing something and then changing it back (causing "
+"the file to be resaved).\n"
+"Further errors will be ignored."
+msgstr ""
+"'%s' dosyası %d satırında  hata oluştu:\n"
+"\"%s\"\n"
+"Bunun nedeni, ROX-Filer'ın eski sürümünden yükseltme yapılması olabilir. "
+"Seçenekler penceresini açın ve Kaydet'e tıklayın.\n"
+"Diğer hatalar yok sayılacaktır."
+
+#: gui_support.c:1134
+msgid "Incorrect or missing line break in text/uri-list data"
+msgstr "Bir text/uri-list verisinde yanlış veya eksik satır sonu"
+
+#: gui_support.c:1471
+#, c-format
+msgid "Failed to open file '%s': %s"
+msgstr "Dosya açılamadı '%s': %s"
+
+#: gui_support.c:1515
+#, c-format
+msgid ""
+"Failed to load image '%s': reason not known, probably a corrupt image file"
+msgstr ""
+"'%s' resmi yüklenemedi: nedeni bilinmiyor, muhtemelen bozuk bir resim dosyası"
+
+#: gui_support.c:1580
+#, c-format
+msgid ""
+"This program (%s) cannot be run, as the 0launch command is not available. It "
+"can be downloaded from here:\n"
+"\n"
+"http://0install.net/injector.html"
+msgstr ""
+"0launch komutu mevcut olmadığı için bu program (%s) çalıştırılamaz. Buradan "
+"indirilebilir:\n"
+"\n"
+"http://0install.net/injector.html"
+
+#: i18n.c:39
+msgid ""
+"Note that you must save your choices and restart the filer for the new "
+"language setting to take full effect."
+msgstr ""
+"Yeni dil ayarının tam olarak etkili olması için seçimlerinizi kaydetmeniz ve "
+"dosya yöneticisini yeniden başlatmanız gerektiğini unutmayın."
+
+#: icon.c:76
+msgid "(click to set)"
+msgstr "(ayarlamak için tıklayın)"
+
+#: icon.c:131
+msgid "ROX-Filer"
+msgstr "ROX-Filer"
+
+#: icon.c:132 menu.c:258
+msgid "About ROX-Filer..."
+msgstr "ROX-Filer Hakkında..."
+
+#: icon.c:133 menu.c:259
+msgid "Show Help Files"
+msgstr "Yardım Dosyalarını Göster"
+
+#: icon.c:134 menu.c:260
+msgid "Manual"
+msgstr "Kılavuz"
+
+#: icon.c:136 menu.c:235
+msgid "Options..."
+msgstr "Seçenekler..."
+
+#: icon.c:137 menu.c:244
+msgid "Home Directory"
+msgstr "Ana Dizin"
+
+#: icon.c:138 icon.c:1410 menu.c:212 type.c:223
+msgid "File"
+msgstr "Dosya"
+
+#: icon.c:139 menu.c:218 menu.c:884
+msgid "Shift Open"
+msgstr "Shift Aç"
+
+#: icon.c:140 menu.c:223
+msgid "Properties"
+msgstr "Özellikler"
+
+#: icon.c:141 menu.c:221
+msgid "Set Run Action..."
+msgstr "Çalıştırma eylemini ayarlayın..."
+
+#: icon.c:142 menu.c:222
+msgid "Set Icon..."
+msgstr "Simgeyi Ayarla..."
+
+#: icon.c:143 icon.c:867
+msgid "Edit Item"
+msgstr "Öğeyi Düzenle"
+
+#: icon.c:144
+msgid "Show Location"
+msgstr "Konumu Göster"
+
+#: icon.c:145
+msgid "Remove Item(s)"
+msgstr "Öğe(ler)i Kaldır"
+
+#: icon.c:318 log.c:109 menu.c:773
+#, c-format
+msgid "%s '%s'"
+msgstr "%s '%s'"
+
+#: icon.c:331
+msgid "Nothing"
+msgstr "Hiçbirşey"
+
+#: icon.c:592
+msgid "The location must contain at least one character!"
+msgstr "Konum en az bir karakter içermelidir!"
+
+#: icon.c:657
+#, c-format
+msgid "You must unlock '%s' before removing it"
+msgstr "Kaldırmadan önce '%s' kilidini açmalısınız"
+
+#: icon.c:667
+msgid "You must first select some items to remove"
+msgstr "Önce kaldırılacak bazı öğeleri seçmeniz gerekir"
+
+#: icon.c:673
+msgid "An item must be unlocked before it can be removed."
+msgstr "Bir öğe kaldırılmadan önce kilidi açılmalıdır."
+
+#: icon.c:687
+msgid "You must open the menu over an item"
+msgstr "Menüyü bir öğenin üzerinde açmanız gerekir"
+
+#: icon.c:712 menu.c:1284
+msgid "You can only set the run action for a regular file"
+msgstr "Çalıştır eylemini yalnızca normal bir dosya için ayarlayabilirsiniz"
+
+#: icon.c:798
+msgid "Press the desired shortcut (eg, Control+F1)"
+msgstr "İstediğiniz kısayola basın (örneğin, Kontrol + F1)"
+
+#: icon.c:820
+msgid "Failed to get keyboard grab!"
+msgstr "Klavye yakalama başarısız!"
+
+#: icon.c:870
+msgid "Clicking the icon opens:"
+msgstr "Simgeyi tıklamak şunu açar:"
+
+#: icon.c:880
+msgid "Arguments to pass (for executables):"
+msgstr "Geçilecek değişkenler (çalıştırılır dosyalar için):"
+
+#: icon.c:894
+msgid "The text displayed under the icon is:"
+msgstr "Simgenin altında görüntülenen metin şu:"
+
+#: icon.c:907
+msgid "The keyboard shortcut is:"
+msgstr "Klavye kısayolu şu:"
+
+#: icon.c:927
+msgid "Locked"
+msgstr "Kilitli"
+
+#: icon.c:932
+msgid "Locking an item prevents it from being accidentally removed"
+msgstr "Bir öğenin kilitlenmesi, yanlışlıkla kaldırılmasını önler"
+
+#: infobox.c:113
+#, c-format
+msgid "Are you sure you want to open %d windows?"
+msgstr "%d pencereleri açmak istediğinizden emin misiniz?"
+
+#: infobox.c:114
+msgid "Show Info"
+msgstr "Bilgi Göster"
+
+#: infobox.c:136 menu.c:778
+msgid "(bad utf-8)"
+msgstr "(kötü utf-8)"
+
+#: infobox.c:271
+msgid "Show _Help Files"
+msgstr "_Yardım Dosyalarını Göster"
+
+#: infobox.c:284
+msgid "<b>Permissions</b>"
+msgstr "<b>İzinler</b>"
+
+#: infobox.c:302
+msgid "<b>Contents indicate...</b>"
+msgstr "<b>İçindekiler gösteriyor ki...</b>"
+
+#: infobox.c:312
+msgid "<b>When all directories are closed</b>"
+msgstr "<b>Tüm dizinler kapatıldığında</b>"
+
+#: infobox.c:448 infobox.c:589 support.c:349
+msgid "bytes"
+msgstr "bayt"
+
+#: infobox.c:471
+msgid "Failed to read size"
+msgstr "Boyut okunamadı"
+
+#: infobox.c:532
+#, c-format
+msgid "'%s' is no longer a symlink"
+msgstr "'%s' artık bir sembolik bağ değil"
+
+#: infobox.c:539
+#, c-format
+msgid ""
+"Failed to unlink '%s':\n"
+"%s"
+msgstr ""
+"'%s' bağlantısını kaldıramadı:\n"
+"%s"
+
+#: infobox.c:544
+#, c-format
+msgid ""
+"Failed to create symlink from '%s':\n"
+"%s\n"
+"(note: old link has been deleted)"
+msgstr ""
+"'%s' den sembolik bağ oluşturulamadı:\n"
+"%s\n"
+"(Not: eski bağlantı silindi)"
+
+#: infobox.c:568 tips:240
+msgid "Error:"
+msgstr "Hata:"
+
+#: infobox.c:575
+msgid "Real directory:"
+msgstr "Gerçek dizin:"
+
+#: infobox.c:578
+msgid "Owner, Group:"
+msgstr "Sahip, Grup:"
+
+#: infobox.c:585 infobox.c:600 infobox.c:609
+msgid "Size:"
+msgstr "Boyut:"
+
+#: infobox.c:610
+msgid "Scanning"
+msgstr "Taranıyor"
+
+#: infobox.c:635
+msgid "Failed to scan"
+msgstr "Tarama yapılamadı"
+
+#: infobox.c:642
+msgid "Change time:"
+msgstr "Zamanı değiştir:"
+
+#: infobox.c:644
+msgid "Modify time:"
+msgstr "Değiştirme zamanı:"
+
+#: infobox.c:646
+msgid "Access time:"
+msgstr "Erişim time:"
+
+#: infobox.c:654
+msgid "Extended attributes:"
+msgstr "Genişletilmiş özellikler:"
+
+#: infobox.c:656
+msgid "Present"
+msgstr "Mevcut"
+
+#: infobox.c:657
+msgid "None"
+msgstr "Hiçbiri"
+
+#: infobox.c:658
+msgid "Not supported"
+msgstr "Desteklenmiyor"
+
+#: infobox.c:670
+msgid "Link target:"
+msgstr "Bağlantı hedefi:"
+
+#: infobox.c:682 infobox.c:685
+msgid "Run action:"
+msgstr "Çalıştır komutu:"
+
+#: infobox.c:682
+msgid "Execute file"
+msgstr "Dosyayı çalıştır"
+
+#: infobox.c:794
+msgid "Comment"
+msgstr "Yorum"
+
+#: infobox.c:796
+msgid "Execute"
+msgstr "Çalıştır"
+
+#: infobox.c:810
+msgid "<nothing yet>"
+msgstr "<birşey yok>"
+
+#: infobox.c:881
+#, c-format
+msgid "file(1) says... %s"
+msgstr "file(1) diyor ki... %s"
+
+#: infobox.c:938
+#, c-format
+msgid "Could not change permissions: %s"
+msgstr "İzinler değiştirilemedi: %s"
+
+#: infobox.c:956
+msgid "Owner"
+msgstr "Sahip"
+
+#: infobox.c:958
+msgid "Group"
+msgstr "Grup"
+
+#: infobox.c:960
+msgid "World"
+msgstr "Herkes"
+
+#: infobox.c:963
+msgid "Read"
+msgstr "Oku"
+
+#: infobox.c:966
+msgid "Write"
+msgstr "Yaz"
+
+#: infobox.c:969
+msgid "Exec"
+msgstr "Çalıştır"
+
+#: infobox.c:987
+msgid "SUID"
+msgstr "SUID"
+
+#: infobox.c:994
+msgid "SGID"
+msgstr "SGID"
+
+#: infobox.c:1001
+msgid "Sticky"
+msgstr "Yapışkan"
+
+#: infobox.c:1057
+msgid "Do nothing"
+msgstr "Hiçbirşey yapma"
+
+#: infobox.c:1063
+msgid "Ask"
+msgstr "Sor"
+
+#: infobox.c:1075
+msgid "Symbolic link"
+msgstr "Sembolik bağ"
+
+#: infobox.c:1078
+msgid "ROX application"
+msgstr "ROX uygulaması"
+
+#: infobox.c:1086
+msgid "mounted"
+msgstr "bağlı"
+
+#: infobox.c:1086
+msgid "unmounted"
+msgstr "ayrık"
+
+#: infobox.c:1090
+#, c-format
+msgid "Mount point for %s (%s)"
+msgstr "%s (%s) için bağlama noktası"
+
+#: infobox.c:1093
+#, c-format
+msgid "Mount point (%s)"
+msgstr "Bağlama noktası (%s)"
+
+#: log.c:54
+msgid "ROX-Filer started"
+msgstr "ROX-Filer başlatılıyor"
+
+#: log.c:111
+#, c-format
+msgid "%s on %d items"
+msgstr "%s %d öğede"
+
+#: log.c:124
+msgid "Item"
+msgstr "Öğe"
+
+#: log.c:150
+msgid "Time"
+msgstr "Zaman"
+
+#: log.c:155
+msgid "Action"
+msgstr "Eylem"
+
+#: main.c:97
+msgid ""
+"Copyright (C) 2005 Thomas Leonard.\n"
+"ROX-Filer comes with ABSOLUTELY NO WARRANTY,\n"
+"to the extent permitted by law.\n"
+"You may redistribute copies of ROX-Filer\n"
+"under the terms of the GNU General Public License.\n"
+"For more information about these matters, see the file named COPYING.\n"
+msgstr ""
+"Telif Hakkı (C) 2005 Thomas Leonard.\n"
+"ROX-Filer için KESİNLİKLE GARANTİ VERİLMEMEKTEDİR,\n"
+"Yasaların izin verdiği ölçüde \n"
+"GNU Genel Kamu Lisansı şartları altında. \n"
+"ROX-Filer kopyalarını yeniden dağıtabilirsiniz\n"
+"Bu konular hakkında daha fazla bilgi için, COPYING adlı dosyaya bakın.\n"
+
+#: main.c:106
+msgid "Try `ROX-Filer/AppRun --help' for more information.\n"
+msgstr "Daha fazla bilgi için `ROX-Filer/AppRun --help' deneyin.\n"
+
+#: main.c:109
+msgid "Try `ROX-Filer/AppRun -h' for more information.\n"
+msgstr "Daha fazla bilgi için `ROX-Filer/AppRun -h' deneyin.\n"
+
+#: main.c:111
+msgid ""
+"NOTE: Your system does not support long options - \n"
+"you must use the short versions instead.\n"
+"\n"
+msgstr ""
+"NOT: Sisteminiz uzun seçenekleri desteklemiyor - \n"
+"bunun yerine kısa sürümleri kullanmanız gerekir.\n"
+"\n"
+
+#: main.c:117
+#, c-format
+msgid ""
+"Usage: ROX-Filer/AppRun [OPTION]... [FILE]...\n"
+"Open each directory or file listed, or the current working\n"
+"directory if no arguments are given.\n"
+"\n"
+"  -b, --border=PANEL\topen PANEL as a border panel\n"
+"  -B, --bottom=PANEL\topen PAN as a bottom-edge panel\n"
+"  -c, --client-id=ID\tused for session management\n"
+"  -d, --dir=DIR\t\topen DIR as directory (not application)\n"
+"  -D, --close=DIR\tclose DIR and its subdirectories\n"
+"  -h, --help\t\tdisplay this help and exit\n"
+"  -l, --left=PANEL\topen PAN as a left-edge panel\n"
+"  -m, --mime-type=FILE\tprint MIME type of FILE and exit\n"
+"  -n, --new\t\tstart new copy; for debugging the filer\n"
+"  -p, --pinboard=PIN\tuse pinboard PIN as the pinboard\n"
+"  -r, --right=PANEL\topen PAN as a right-edge panel\n"
+"  -R, --RPC\t\tinvoke method call read from stdin\n"
+"  -s, --show=FILE\topen a directory showing FILE\n"
+"  -S, --rox-session\tuse default panel and pinboard options, and -n\n"
+"  -t, --top=PANEL\topen PANEL as a top-edge panel\n"
+"  -u, --user\t\tshow user name in each window \n"
+"  -U, --url=URL\t\topen file or directory in URI form\n"
+"  -v, --version\t\tdisplay the version information and exit\n"
+"  -x, --examine=FILE\tFILE has changed - re-examine it\n"
+"\n"
+"Report bugs to %s.\n"
+"Home page (including updated versions): http://rox.sourceforge.net/\n"
+msgstr ""
+"Kullanım: ROX-Filer/AppRun [SEÇENEK]... [DOSYA]...\n"
+"Listelenen her dizini veya dosyayı ya da geçerli \n"
+"çalışmayı açın dizinine bağımsız değişken verilmemişse.\n"
+"\n"
+"-b, --border=PANEL\topen PANEL kenarlık paneli olarak \n"
+"-B, --bottom=PANEL\topen PAN alt kenar paneli olarak \n"
+"-c, --client-id=ID\tused oturum yönetimi için kullanılır \n"
+"-d, --dir=DIR\topen DIR dizin olarak (uygulama değil) \n"
+"-D, --close=DIR\tclose DIR ve alt dizinleri \n"
+"-h, --help\tBu yardımı ve çıkışı görüntüle \n"
+"-l, --left=PANEL\topen PAN sol kenar paneli olarak \n"
+"-m, --mime-type=FILE\tprint MIME FILE türü ve çıkış \n"
+"-n, --new\t\tstart yeni kopya; Dosyalayıcıda hata ayıklamak için \n"
+"-p, --pinboard=PINpinboard \tPIN'ini pinboard olarak kullan \n"
+"-r, --right=PANEL\topen PAN sağ kenar paneli olarak \n"
+"-R, --RPC\t\tinvoke yöntem çağrısı stdin'den okundu \n"
+"-s, --show=FILE\topen DOSYA'yı gösteren bir dizin \n"
+"-S, --rox-session\tuse varsayılan panel ve pinboard seçenekleri ve \n"
+"-t, --top=PANEL\topen PANEL üst kenar paneli olarak \n"
+"-u, --user\t\tshow her pencerede kullanıcı adı \n"
+"-U, --url=URL\t\topen dosyası veya dizini URI biçiminde \n"
+"-v, --version\t\tSürüm bilgilerini görüntüle ve çık \n"
+"-x, --examine=FILE\tFILE değişti - yeniden inceleyin  \n"
+"\n"
+"Hataları %s bildirin. \n"
+"Ana sayfa (güncellenmiş versionlar dahil): http://rox.sourceforge.net/\n"
+
+#: main.c:239
+msgid ""
+"We got a BadWindow error from the X server. This might be due to this GTK "
+"bug (during drag-and-drop?):\n"
+"http://bugzilla.gnome.org/show_bug.cgi?id=152151\n"
+"Trying to continue..."
+msgstr ""
+"X sunucusundan bir BadWindow hatası aldık. Bunun nedeni bu GTK hatası "
+"olabilir (sürükle ve bırakma sırasında?):\n"
+"http://bugzilla.gnome.org/show_bug.cgi?id=152151\n"
+"Devam etmeye çalışıyorum ..."
+
+#: main.c:401
+msgid ""
+"The -o argument is no longer used. You can turn on override redirect from "
+"the Options box instead."
+msgstr ""
+"-o değişkeni artık kullanılmamaktadır. Bunun yerine Seçenekler kutusundan "
+"yönlendirmeyi geçersiz kıl özelliğini etkinleştirebilirsiniz."
+
+#: main.c:530
+#, c-format
+msgid "Running as user '%s'"
+msgstr "'%s' kullanıcısı olarak çalıştırılıyor"
+
+#: main.c:691
+#, c-format
+msgid "Compiled with GTK version %s\n"
+msgstr "GTK %s sürümü ile derlenmiştir.\n"
+
+#: main.c:692
+#, c-format
+msgid "Running with GTK version %d.%d.%d\n"
+msgstr "GTK %d.%d.%d sürümü ile çalıştırılıyor.\n"
+
+#: main.c:696
+msgid "features set at compile time"
+msgstr "derlemede ayarlanan özellikler"
+
+#: main.c:697
+msgid "Large File Support"
+msgstr "Büyük Dosya Desteği"
+
+#: main.c:704
+msgid "Inotify support"
+msgstr "Inotify desteği"
+
+#: main.c:711
+msgid "Dnotify support"
+msgstr "Dnotify desteği"
+
+#: main.c:718
+msgid "Binary compatibility"
+msgstr "İkili uyumluluk"
+
+#: main.c:720
+msgid "Yes (can run with older glibc versions)"
+msgstr "Evet (eski glibc sürümleriyle çalışabilir)"
+
+#: main.c:722
+msgid "No (apsymbols.h not found)"
+msgstr "Hayır (apsymbols.h bulunamadı)"
+
+#: main.c:726
+msgid "Extended attribute support"
+msgstr "Genişletilmiş özellik desteği"
+
+#: main.c:877
+#, c-format
+msgid "Unable to read '%s': %s"
+msgstr "Okunamadı '%s': %s"
+
+#: main.c:916
+#, c-format
+msgid ""
+"Left-click to run %s.\n"
+"Right-click for a list of versions."
+msgstr ""
+"%s çalıştırmak için sol tıklayın.\n"
+"Sürümlerin listesi için sağ tıklatın."
+
+#: main.c:963 menu.c:1379 menu.c:1385
+#, c-format
+msgid "Error creating '%s': %s"
+msgstr "'%s' oluşturulurken hata oluştu: %s"
+
+#: main.c:994
+msgid "Save"
+msgstr "Kaydet"
+
+#: main.c:999
+msgid "Start script"
+msgstr "Komut dosyası başlat"
+
+#: main.c:1024
+msgid ""
+"Click to save a script to run ROX-Filer.\n"
+"If you are using Zero Install you should use 0alias instead."
+msgstr ""
+"ROX-Filer'ı çalıştırmak üzere bir komut dosyası kaydetmek için tıklayın.\n"
+"Zero Install kullanıyorsanız, bunun yerine 0alias kullanmalısınız."
+
+#: menu.c:185 tips:28
+msgid "Display"
+msgstr "Göster"
+
+#: menu.c:186 tips:33
+msgid "Icons View"
+msgstr "Simge Görünümü"
+
+#: menu.c:187
+msgid "Icons, With..."
+msgstr "Simge, Birlikte..."
+
+#: menu.c:188 tips:52
+msgid "Sizes"
+msgstr "Boyut"
+
+#: menu.c:190 tips:224
+msgid "Types"
+msgstr "Tür"
+
+#: menu.c:191 tips:55
+msgid "Times"
+msgstr "Zaman"
+
+#: menu.c:192 tips:34 tips:70
+msgid "List View"
+msgstr "Liste Görünümü"
+
+#: menu.c:194
+msgid "Bigger Icons"
+msgstr "Büyük Simgeler"
+
+#: menu.c:195
+msgid "Smaller Icons"
+msgstr "Küçük Simgeler"
+
+#: menu.c:196 tips:49
+msgid "Automatic"
+msgstr "Otomatik"
+
+#: menu.c:198
+msgid "Sort by Name"
+msgstr "Ada göre Sırala"
+
+#: menu.c:199
+msgid "Sort by Type"
+msgstr "Türe göre Sırala"
+
+#: menu.c:200
+msgid "Sort by Date"
+msgstr "Tarihe göre Sırala"
+
+#: menu.c:201
+msgid "Sort by Size"
+msgstr "Boyuta göre Sırala"
+
+#: menu.c:202
+msgid "Sort by Owner"
+msgstr "Sahibe göre Sırala"
+
+#: menu.c:203
+msgid "Sort by Group"
+msgstr "Gruba göre Sırala"
+
+#: menu.c:204
+msgid "Reversed"
+msgstr "Ters"
+
+#: menu.c:206
+msgid "Show Hidden"
+msgstr "Gizlileri Göster"
+
+#: menu.c:207
+msgid "Filter Files..."
+msgstr "Dosyaları Süz..."
+
+#: menu.c:208
+msgid "Filter Directories With Files"
+msgstr "Dizinleri dosyalarla süz"
+
+#: menu.c:209
+msgid "Show Thumbnails"
+msgstr "Önizlemeleri Göster"
+
+#: menu.c:210
+msgid "Refresh"
+msgstr "Yenile"
+
+#: menu.c:211
+msgid "Save Current Display Settings..."
+msgstr "Geçerli Ekran Ayarlarını Kaydet..."
+
+#: menu.c:213
+msgid "Copy..."
+msgstr "Kopyala..."
+
+#: menu.c:214
+msgid "Rename..."
+msgstr "Yeniden Adlandır..."
+
+#: menu.c:215
+msgid "Link..."
+msgstr "Bağ..."
+
+#: menu.c:219
+msgid "Send To..."
+msgstr "Gönder..."
+
+#: menu.c:224
+msgid "Count"
+msgstr "Say"
+
+#: menu.c:225
+msgid "Set Type..."
+msgstr "Türü Ayarla..."
+
+#: menu.c:229 toolbar.c:154
+msgid "Select"
+msgstr "Seç"
+
+#: menu.c:230
+msgid "Select All"
+msgstr "Tümünü Seç"
+
+#: menu.c:231
+msgid "Clear Selection"
+msgstr "Seçimi Temizle"
+
+#: menu.c:232
+msgid "Invert Selection"
+msgstr "Seçimi Ters Çevir"
+
+#: menu.c:233
+msgid "Select by Name..."
+msgstr "İsme Göre Seç..."
+
+#: menu.c:234
+msgid "Select If..."
+msgstr "Seç Eğer..."
+
+#: menu.c:236
+msgid "New"
+msgstr "Yeni"
+
+#: menu.c:238
+msgid "Blank file"
+msgstr "Boş dosya"
+
+#: menu.c:240 tasklist.c:305
+msgid "Window"
+msgstr "Pencere"
+
+#: menu.c:241
+msgid "Parent, New Window"
+msgstr "Üst, Yeni Pencere"
+
+#: menu.c:242
+msgid "Parent, Same Window"
+msgstr "Üst, Aynı Pencere"
+
+#: menu.c:243
+msgid "New Window"
+msgstr "Yeni Pencere"
+
+#: menu.c:245
+msgid "Show Bookmarks"
+msgstr "Yer İmlerini Göster"
+
+#: menu.c:246
+msgid "Show Log"
+msgstr "Günlüğü Göster"
+
+#: menu.c:247
+msgid "Follow Symbolic Links"
+msgstr "Sembolik Bağlantıları İzle"
+
+#: menu.c:248
+msgid "Resize Window"
+msgstr "Pencereyi Boyutlandır"
+
+#: menu.c:251
+msgid "Close Window"
+msgstr "Pencereyi Kapat"
+
+#: menu.c:253
+msgid "Enter Path..."
+msgstr "Yolu Girin..."
+
+#: menu.c:254
+msgid "Shell Command..."
+msgstr "Kabuk Komutu..."
+
+#: menu.c:255
+msgid "Terminal Here"
+msgstr "Buraya Uçbirim"
+
+#: menu.c:256
+msgid "Switch to Terminal"
+msgstr "Uçbirim'e geç"
+
+#: menu.c:725
+msgid "You should Shift+Menu click over a file to send it somewhere"
+msgstr "Bir yere göndermek için Shift + Menu tuşlarına basmanız gerekir"
+
+#: menu.c:763
+msgid "Next Click"
+msgstr "Sonraki Tıklama"
+
+#: menu.c:785
+#, c-format
+msgid "%d items"
+msgstr "%d öğe"
+
+#: menu.c:873
+msgid "Open unmounted"
+msgstr "Bağlamadan aç"
+
+#: menu.c:876
+msgid "Show Target"
+msgstr "Hedefi Göster"
+
+#: menu.c:878
+msgid "Look Inside"
+msgstr "İçeriye Bak"
+
+#: menu.c:880
+msgid "Open As Text"
+msgstr "Metin Olarak Aç"
+
+#: menu.c:1051
+msgid ""
+"Extended attributes, used to store types, are not supported for this file or "
+"files.\n"
+"This may be due to lack of support from the filesystem or the C library, or "
+"it may simply be that the filesystem needs to be mounted with the right "
+"mount option ('user_xattr' on Linux)."
+msgstr ""
+"Türleri depolamak için kullanılan genişletilmiş öznitelikler bu dosya veya "
+"dosyalar için desteklenmez.\n"
+"Bunun nedeni dosya sisteminden veya C kitaplığından destek gelmemesi "
+"olabilir veya dosya sisteminin doğru bağlama seçeneğiyle (Linux'ta "
+"'user_xattr') bağlanması gerekebilir."
+
+#: menu.c:1057
+msgid "Setting type not supported for some of these files"
+msgstr "Bu dosyalardan bazıları için ayar türü desteklenmiyor"
+
+#: menu.c:1094
+msgid "_Relative link"
+msgstr "_Göreceli bağ"
+
+#: menu.c:1100
+msgid ""
+"If on, the symlink will store the path from the symlink to the target file. "
+"Use this if the symlink and the target will be moved together.\n"
+"If off, the path from the root directory is stored - use this if the symlink "
+"may move but the target will stay put."
+msgstr ""
+"Açıksa, sembolik bağlantı, sembolik bağlantıdan hedef dosyaya giden yolu "
+"depolar. Sembolik bağlantı ve hedef birlikte taşınacaksa bunu kullanın.\n"
+"Kapalıysa, kök dizinden gelen yol saklanır - sembolik bağlantı hareket "
+"edebilir ancak hedef yerinde kalacaksa bunu kullanın."
+
+#: menu.c:1170
+msgid "New pathname is not absolute"
+msgstr "Yeni yol adı mutlak değil"
+
+#: menu.c:1238
+#, c-format
+msgid "Symlink from '%s' already exists. Replace it with a link to '%s'?"
+msgstr "'%s' sembolik bağı zaten var. '%s' bağıyla değiştirilsin mi?"
+
+#: menu.c:1244
+msgid "_Replace"
+msgstr "_Değiştir"
+
+#: menu.c:1364 menu.c:1405 menu.c:1467
+msgid "Create"
+msgstr "Oluştur"
+
+#: menu.c:1365
+msgid "NewDir"
+msgstr "YeniDizin"
+
+#: menu.c:1406
+msgid "NewFile"
+msgstr "YeniDosya"
+
+#: menu.c:1424
+#, c-format
+msgid "Error creating file: could not find the template for %s"
+msgstr "Dosya oluşturulurken hata oluştu: %s için şablon bulunamadı"
+
+#: menu.c:1497
+#, c-format
+msgid ""
+"The `Send To' menu provides a quick way to send some files to an "
+"application. The applications listed are those in the following "
+"directories:\n"
+"\n"
+"%s\n"
+"%s\n"
+"The `Send To' menu may be opened by Shift+Menu clicking over a file.\n"
+"\n"
+"Advanced use:\n"
+"You can also create subdirectories called `.text_html', `.text', etc which "
+"will only be shown for files of that type. `.group' is shown only when "
+"multiple files are selected."
+msgstr ""
+"`Gönder' menüsü, bazı dosyaları bir uygulamaya hızlı gönderme yolunu sağlar. "
+"Listelenen uygulamalar aşağıdaki dizinlerde bulunan uygulamalardır:\n"
+"\n"
+"%s\n"
+"%s\n"
+"`Gönder' menüsü, bir dosyanın üzerinden tıklayarak Shift+Menü ile "
+"açılabilir.\n"
+"\n"
+"Gelişmiş kullanım:\n"
+"Yalnızca bu tür dosyalar için gösterilecek olan `.text_html',` .text' adlı "
+"alt dizinler de oluşturabilirsiniz. `.group '' yalnızca birden fazla dosya "
+"seçildiğinde gösterilir."
+
+#: menu.c:1508
+msgid ""
+"I'll show you your SendTo directory now; you should symlink (Ctrl+Shift "
+"drag) any applications you want into it."
+msgstr ""
+"Şimdi size SendTo dizininizi göstereceğim; içine istediğiniz herhangi bir "
+"uygulamayı sembolik olarak bağlamanız (Ctrl+Shift sürükleme) gerekir."
+
+#: menu.c:1511 menu.c:1551
+msgid "Your CHOICESPATH variable setting prevents customisations - sorry."
+msgstr "CHOICESPATH değişken ayarınız özelleştirmeleri engelliyor - üzgünüm."
+
+#: menu.c:1544
+#, c-format
+msgid ""
+"Any files placed in your Templates directories will appear on the `New' "
+"menu. Choosing one of them will make a copy of it as the new file.\n"
+"\n"
+"The following directories contain templates:\n"
+"\n"
+"%s\n"
+"%s\n"
+msgstr ""
+"Şablonlar dizinlerinize yerleştirilen tüm dosyalar 'Yeni' menüsünde "
+"görünecektir. Bunlardan birini seçmek, yeni dosya olarak onun bir kopyasını "
+"oluşturur.\n"
+"\n"
+"Aşağıdaki dizinler şablonlar içerir:\n"
+"\n"
+"%s\n"
+"%s\n"
+
+#: menu.c:1549
+msgid ""
+"I'll show you your Templates directory now; you should place any template "
+"files you want inside it."
+msgstr ""
+"Şimdi size Şablonlar dizininizi göstereceğim; içine istediğiniz herhangi bir "
+"şablon dosyasını yerleştirmelisiniz."
+
+#: menu.c:1666
+msgid "Customise"
+msgstr "Özelleştir"
+
+#: menu.c:1739
+msgid "This is already the canonical name for this directory."
+msgstr "Bu zaten bu dizinin standart adıdır."
+
+#: menu.c:1770
+msgid ""
+"You can't open a second view onto this directory because the `Unique "
+"Windows' option is turned on in the Options window."
+msgstr ""
+"Seçenekler penceresinde 'Benzersiz Windows' seçeneği açık olduğundan, bu "
+"dizine ikinci bir görünüm açamazsınız."
+
+#: menu.c:1896
+msgid "Copy ... ?"
+msgstr "Kopyala...?"
+
+#: menu.c:1899
+msgid "Rename ... ?"
+msgstr "Yeniden Adlandır...?"
+
+#: menu.c:1902
+msgid "Symlink ... ?"
+msgstr "Sembolik bağ...?"
+
+#: menu.c:1905
+msgid "Shift Open ... ?"
+msgstr "Shift Aç...?"
+
+#: menu.c:1908
+msgid "Properties of ... ?"
+msgstr "Özellikler...?"
+
+#: menu.c:1911
+msgid "Set type of ... ?"
+msgstr "Türü Ayarla...?"
+
+#: menu.c:1914
+msgid "Set run action for ... ?"
+msgstr "Çalıştırma eylemini ayarlayın...?"
+
+#: menu.c:1917
+msgid "Set icon for ... ?"
+msgstr "Simgeyi ayarla...?"
+
+#: menu.c:1920
+msgid "Send ... to ... ?"
+msgstr "Gönder...?"
+
+#: menu.c:1923
+msgid "DELETE ... ?"
+msgstr "SİL... ?"
+
+#: menu.c:1926
+msgid "Count the size of ... ?"
+msgstr "Boyutunu say ...?"
+
+#: menu.c:1929
+msgid "Set permissions on ... ?"
+msgstr "İzinleri değiştir...?"
+
+#: menu.c:1932
+msgid "Search inside ... ?"
+msgstr "İçinde ara...?"
+
+#: menu.c:1996
+msgid "You cannot do this to more than one item at a time"
+msgstr "Bunu aynı anda birden fazla öğeye yapamazsınız"
+
+#: menu.c:2028
+msgid "Rename"
+msgstr "Adlandır"
+
+#: menu.c:2033
+msgid "Symlink"
+msgstr "Sembolik bağ"
+
+#: menu.c:2062
+msgid ""
+"User-definable shortcuts are disabled by default in Gtk2, and you have not "
+"enabled them. You can turn this feature on by:\n"
+"\n"
+"1) using an XSettings manager, such as ROX-Session or gnome-settings-daemon, "
+"or\n"
+"\n"
+"2) adding this line to ~/.gtkrc-2.0:\n"
+"\tgtk-can-change-accels = 1\n"
+"\t(this only works if NOT using XSETTINGS)"
+msgstr ""
+"Kullanıcı tanımlı kısayollar, Gtk2'de varsayılan olarak devre dışıdır ve siz "
+"bunları etkinleştirmediniz. Bu özelliği şu şekilde açabilirsiniz:\n"
+"\n"
+"1) ROX-Session veya gnome-settings-daemon gibi bir XSettings yöneticisi "
+"kullanarak veya\n"
+"\n"
+"2) bu satırı ~/.gtkrc-2.0'a ekleyerek:\n"
+"\tgtk-can-change-accels = 1\n"
+"\t(bu yalnızca XSETTINGS KULLANILMAZSA çalışır)"
+
+#: menu.c:2073
+msgid ""
+"To set a keyboard short-cut for a menu item:\n"
+"\n"
+"- Open the menu over a filer window,\n"
+"- Move the pointer over the item you want to use,\n"
+"- Press the key you want attached to it.\n"
+"\n"
+"The key will appear next to the menu item and you can just press that key "
+"without opening the menu in future."
+msgstr ""
+"Bir menü öğesi için bir klavye kısayolu ayarlamak için:\n"
+"\n"
+"- Bir dosyalayıcı penceresi üzerinden menüyü açın,\n"
+"- İşaretçiyi kullanmak istediğiniz öğenin üzerine getirin,\n"
+"- Eklemek istediğiniz tuşa basın.\n"
+"\n"
+"tuşu menü öğesinin yanında görünür ve ileride menüyü açmadan o tuşa "
+"basabilirsiniz."
+
+#: menu.c:2088
+msgid "Set keyboard shortcuts"
+msgstr "Klavye kısayolu ayarla"
+
+#: minibuffer.c:129
+msgid "Goto:"
+msgstr "Git:"
+
+#: minibuffer.c:130
+msgid "Shell:"
+msgstr "Kabuk:"
+
+#: minibuffer.c:131
+msgid "Select If:"
+msgstr "Seç Eğer:"
+
+#: minibuffer.c:132
+msgid "Select Named:"
+msgstr "İsimle seç:"
+
+#: minibuffer.c:133
+msgid "Pattern:"
+msgstr "Kalıp:"
+
+#: minibuffer.c:269
+msgid ""
+"Enter the name of a file and I'll display it for you. Press Tab to fill in "
+"the longest match. Escape to close the minibuffer."
+msgstr ""
+"Bir dosyanın adını girin, sizin için göstereyim. En uzun eşleşmeyi doldurmak "
+"için Sekme tuşuna basın. Escape Minibuffer'ı kapatır."
+
+#: minibuffer.c:275
+msgid ""
+"Enter a shell command to execute. Click on a file to add it to the buffer."
+msgstr ""
+"Çalıştırmak için bir kabuk komutu girin. Arabelleğe eklemek için bir dosyaya "
+"tıklayın."
+
+#: minibuffer.c:280
+msgid ""
+"Enter a file name pattern to select all matching files:\n"
+"\n"
+"? means any character\n"
+"* means zero or more characters\n"
+"[aA] means 'a' or 'A'\n"
+"[a-z] means any character from a to z (lowercase)\n"
+"*.png means any name ending in '.png'"
+msgstr ""
+"Eşleşen tüm dosyaları seçmek için bir dosya adı kalıbı girin:\n"
+"\n"
+"? herhangi bir karakter anlamına gelir\n"
+"* sıfır veya daha fazla karakter anlamına gelir\n"
+"[aA] 'a' veya 'A' anlamına gelir\n"
+"[a-z], a'dan z'ye kadar herhangi bir karakter anlamına gelir (küçük harf)\n"
+"*.png, '.png' ile biten herhangi bir ad anlamına gelir"
+
+#: minibuffer.c:292
+msgid ""
+"Enter a pattern to match for files to be shown.  An empty filter turns the "
+"filter off."
+msgstr ""
+"Gösterilecek dosyalar için eşleşecek bir model girin. Boş bir filtre, "
+"filtreyi kapatır."
+
+#: minibuffer.c:912
+msgid "Invalid Find condition"
+msgstr "Geçersiz Bul koşulu"
+
+#: mount.c:103
+#, c-format
+msgid "File system table \"%s\" not found, cannot monitor system mounts"
+msgstr ""
+"\"%s\" dosya sistemi tablosu bulunamadı, sistem bağlantılarını izleyemiyor"
+
+#: mount.c:393
+#, c-format
+msgid "%s total, %s used, %s free (%.1f %%)"
+msgstr "Toplam %s, kullanılan %s, boş %s (%.1f %%)"
+
+#: options.c:275
+msgid "ROX-Filer has converted your Options file to the new XML format"
+msgstr "ROX-Filer, Seçenekler dosyanızı yeni XML biçimine dönüştürdü"
+
+#: options.c:535 options.c:1256
+msgid "(use default)"
+msgstr "(varsayılanı kullan)"
+
+#: options.c:805
+#, c-format
+msgid "Internal error: %s unreadable"
+msgstr "Dahili hata: %s okunamıyor"
+
+#: options.c:914
+msgid "Options"
+msgstr "Seçenekler"
+
+#: options.c:959
+msgid "_Revert"
+msgstr "_Geri Döndür"
+
+#: options.c:965
+msgid "Restore all choices to how they were when the Options box was opened."
+msgstr "Seçenekler kutusu açıldığında tüm seçenekleri eski haline getirin."
+
+#: options.c:980
+#, c-format
+msgid ""
+"Choices will be saved as:\n"
+"%s"
+msgstr ""
+"Seçenekler şu şekilde kaydedilecektir:\n"
+"%s"
+
+#: options.c:988
+msgid "(saving disabled by CHOICESPATH)"
+msgstr "(kaydetme CHOICESPATH tarafından devre dışı bırakıldı)"
+
+#: options.c:1161 usericons.c:452
+#, c-format
+msgid "Error saving %s: %s"
+msgstr "%s kaydedilirken hata: %s"
+
+#: options.c:1793
+msgid "Missing '='"
+msgstr "'=' eksik"
+
+#: panel.c:325
+#, c-format
+msgid "Unable to replace '%s'"
+msgstr "'%s' değiştirilemiyor"
+
+#: panel.c:329
+#, c-format
+msgid "Unable to save '%s'"
+msgstr "'%s' kaydedilemedi"
+
+#: panel.c:532
+msgid "Your old panel file has been converted to the new XML format."
+msgstr "Eski panel dosyanız yeni XML biçimine dönüştürüldü."
+
+#: panel.c:640
+msgid ""
+"You have tried to close a panel via the window manager - I usually find that "
+"this is accidental... really close?"
+msgstr ""
+"Pencere yöneticisi aracılığıyla bir paneli kapatmayı denediniz - Genelde "
+"bunun yanlışlıkla olduğunu görüyorum... gerçekten yakın mı?"
+
+#: panel.c:741
+msgid "Missing < or > in panel config file"
+msgstr "Panel yapılandırma dosyasında < veya > eksik"
+
+#: panel.c:1613
+#, c-format
+msgid "Error saving panel %s: %s"
+msgstr "Panel %s kaydedilirken hata: %s"
+
+#: panel.c:1938
+msgid "Applet quit without ever creating a widget!"
+msgstr "Applet, hiç bir widget oluşturmadan kapanıyor!"
+
+#: panel.c:2034
+#, c-format
+msgid ""
+"Error running applet:\n"
+"%s"
+msgstr ""
+"Uygulamayı çalıştırırken hata:\n"
+"%s"
+
+#: panel.c:2690
+msgid "Are you sure you want to remove this panel from the desktop?"
+msgstr "Bu paneli masaüstünden kaldırmak istediğinizden emin misiniz?"
+
+#: panel.c:2693 panel.c:2720
+msgid "Remove Panel"
+msgstr "Paneli Kaldır"
+
+#: panel.c:2716
+msgid "Panel Options..."
+msgstr "Panel Seçenekleri..."
+
+#: panel.c:2801
+#, c-format
+msgid "Xinerama monitor %d unavailable"
+msgstr "Xinerama monitörü %d kullanılamıyor"
+
+#: panel.c:2836
+msgid "Top"
+msgstr "Üst"
+
+#: panel.c:2838
+msgid "Bottom"
+msgstr "Alt"
+
+#: panel.c:2840
+msgid "Left"
+msgstr "Sol"
+
+#: panel.c:2842
+msgid "Right"
+msgstr "Sağ"
+
+#: panel.c:2844
+msgid "Default"
+msgstr "Varsayılan"
+
+#: panel.c:2848
+msgid "Unknown side"
+msgstr "Bilinmeyen taraf"
+
+#: pinboard.c:354
+msgid "Your old pinboard file has been converted to the new XML format."
+msgstr "Eski pinboard dosyanız yeni XML biçimine dönüştürüldü."
+
+#: pinboard.c:711
+msgid ""
+"The backdrop handler must be an application directory. Drag an application "
+"directory into the Set Backdrop dialog box, or (for programmers) pass it to "
+"the SOAP SetBackdropApp method."
+msgstr ""
+"Arka plan işleyicisi bir uygulama dizini olmalıdır. Bir uygulama dizinini "
+"Arka Planı Ayarla iletişim kutusuna sürükleyin veya (programcılar için) onu "
+"SOAP SetBackdropApp yöntemine iletin."
+
+#: pinboard.c:730
+msgid ""
+"You can only set the backdrop to an image or to a program which knows how to "
+"manage ROX-Filer's backdrop.\n"
+"\n"
+"Programmers: the application's AppInfo.xml must contain the CanSetBackdrop "
+"element, as described in ROX-Filer's manual."
+msgstr ""
+"Arka planı yalnızca bir görüntüye veya ROX-Filer'ın arka planını nasıl "
+"yöneteceğini bilen bir programa ayarlayabilirsiniz.\n"
+"\n"
+"Programcılar: uygulamanın AppInfo.xml dosyası, ROX-Filer'ın kılavuzunda "
+"açıklandığı gibi CanSetBackdrop öğesini içermelidir."
+
+#: pinboard.c:750
+msgid "Set backdrop"
+msgstr "Arkaplanı ayarla"
+
+#: pinboard.c:761
+msgid "Choose a style and drag an image in:"
+msgstr "Bir stil seçin ve bir görseli şuraya sürükleyin:"
+
+#: pinboard.c:774
+msgid "Centre the image without scaling it"
+msgstr "Görüntüyü ölçeklendirmeden ortalayın"
+
+#: pinboard.c:775
+msgid "Centre"
+msgstr "Orta"
+
+#: pinboard.c:776
+msgid "Scale the image to fit the backdrop area, without distorting it"
+msgstr "Görüntüyü bozmadan arka plan alanına sığacak şekilde ölçeklendirin"
+
+#: pinboard.c:778
+msgid "Scale"
+msgstr "Ölçeklendir"
+
+#: pinboard.c:779
+msgid ""
+"Scale the image to fit the backdrop area, regardless of image dimensions - "
+"overscale"
+msgstr ""
+"Görüntü boyutlarından bağımsız olarak görüntüyü arka plan alanına sığacak "
+"şekilde ölçeklendirin - aşırı ölçeklendirme"
+
+#: pinboard.c:781
+msgid "Fit"
+msgstr "Sığdır"
+
+#: pinboard.c:782
+msgid "Stretch the image to fill the backdrop area"
+msgstr "Resmi arka plan alanını dolduracak şekilde uzatın"
+
+#: pinboard.c:783
+msgid "Stretch"
+msgstr "Uzat"
+
+#: pinboard.c:784
+msgid "Tile the image over the backdrop area"
+msgstr "Görüntüyü arka plan alanı üzerine döşeyin"
+
+#: pinboard.c:785
+msgid "Tile"
+msgstr "Döşe"
+
+#: pinboard.c:790
+msgid "Drop an image here"
+msgstr "Buraya bir resim bırakın"
+
+#: pinboard.c:851
+msgid ""
+"No pinboard was in use... the 'Default' pinboard has been selected. Use 'rox "
+"-p=Default' to turn it on in future."
+msgstr ""
+"Pano kullanımda değildi... Varsayılan pano seçildi. Gelecekte açmak için "
+"'rox -p=Default' kullanın."
+
+#: pinboard.c:945
+msgid ""
+"Only files (and certain applications) can be used to set the background "
+"image."
+msgstr ""
+"Arka plan görüntüsünü ayarlamak için yalnızca dosyalar (ve belirli "
+"uygulamalar) kullanılabilir."
+
+#: pinboard.c:1605
+msgid "Missing '>' in icon label"
+msgstr "Simge etiketinde '>' eksik"
+
+#: pinboard.c:1614
+msgid "Missing ',' after icon label"
+msgstr "Simge etiketinden sonra ',' eksik"
+
+#: pinboard.c:1702
+#, c-format
+msgid "Error saving pinboard %s: %s"
+msgstr "Pinboard %s kaydedilirken hata oluştu: %s"
+
+#: pinboard.c:2247
+msgid "Backdrop..."
+msgstr "Arkaplan..."
+
+#: pinboard.c:2250
+msgid "Add Panel"
+msgstr "Panel Ekle"
+
+#: pinboard.c:2344
+#, c-format
+msgid ""
+"Error loading backdrop image:\n"
+"%s\n"
+"Backdrop removed."
+msgstr ""
+"Arka plan resmi yüklenirken hata oluştu:\n"
+"%s\n"
+"Arka plan kaldırıldı."
+
+#: pixmaps.c:999
+#, c-format
+msgid ""
+"Can't delete thumbnails in %s:\n"
+"%s"
+msgstr ""
+"%s içindeki önizlemeler silinemiyor:\n"
+"%s"
+
+#: pixmaps.c:1020
+msgid "There are no thumbnails to delete"
+msgstr "Silinecek önizleme yok"
+
+#: pixmaps.c:1033
+msgid "Purge thumbnails disk cache"
+msgstr "Önizleme önbelleğini temizle"
+
+#: remote.c:722
+#, c-format
+msgid "Unknown style '%s'"
+msgstr "Bilinmeyen stil '%s'"
+
+#: remote.c:744
+#, c-format
+msgid "Unknown details type '%s'"
+msgstr "Bilinmeyen ayrıntılar türü '%s'"
+
+#: remote.c:772
+#, c-format
+msgid "Unknown sorting type '%s'"
+msgstr "Bilinmeyen sıralama türü '%s'"
+
+#: remote.c:1248
+#, c-format
+msgid "Attempt to invoke unknown SOAP method '%s'"
+msgstr "Bilinmeyen SOAP yöntemi '%s' çağrılmaya çalışıldı"
+
+#: run.c:99 run.c:152
+#, c-format
+msgid "Program %s not found - deleted?"
+msgstr "%s programı bulunamadı - silindi mi?"
+
+#: run.c:302
+#, c-format
+msgid "File doesn't exist, or I can't access it: %s"
+msgstr "Dosya mevcut değil veya dosyaya erişemiyorum: %s"
+
+#: run.c:307
+#, c-format
+msgid "I don't know how to open '%s'"
+msgstr "'%s'yi nasıl açacağımı bilmiyorum"
+
+#: run.c:338
+#, c-format
+msgid "'%s' is not a valid URI"
+msgstr "'%s' geçerli bir URI değil"
+
+#: run.c:349
+#, c-format
+msgid "%s not accessable"
+msgstr "%s erişilemez"
+
+#: run.c:357
+#, c-format
+msgid "Non-local URL %s"
+msgstr "Yerel olmayan URL %s"
+
+#: run.c:374
+#, c-format
+msgid "%s: no handler for %s"
+msgstr "%s: %s için işleyici yok"
+
+#: run.c:394
+msgid ""
+"Application:\n"
+"This is an application directory - you can run it as a program, or open it "
+"(hold down Shift while you open it). Most applications provide their own "
+"help here, but this one doesn't."
+msgstr ""
+"Uygulama:\n"
+"Bu bir uygulama dizini - onu bir program olarak çalıştırabilir veya "
+"açabilirsiniz (açarken Shift tuşunu basılı tutun). Çoğu uygulama burada "
+"kendi yardımını bulundurur, ancak bu uygulamada yok."
+
+#: run.c:478
+#, c-format
+msgid "Could not send data to program: %s"
+msgstr "Programa veri gönderilemedi: %s"
+
+#: run.c:508
+#, c-format
+msgid "Could not read link: %s"
+msgstr "Bağ okunamadı: %s"
+
+#: run.c:536
+#, c-format
+msgid "Broken symlink (or you don't have permission to follow it): %s"
+msgstr "Bozuk sembolik bağlantı (veya onu takip etme izniniz yok): %s"
+
+#: run.c:573
+#, c-format
+msgid ""
+"No run action specified for files of this type (%s/%s) - you can set a run "
+"action by choosing `Set Run Action' from the File menu, or you can just drag "
+"the file to an application.%s"
+msgstr ""
+"Bu tür (%s/%s) dosyaları için çalıştırma eylemi belirtilmedi - Dosya "
+"menüsünden `Çalıştırma Eylemini Ayarla'yı seçerek bir çalıştırma eylemi "
+"ayarlayabilir veya dosyayı bir uygulamaya sürükleyebilirsiniz.%s"
+
+#: run.c:579
+msgid ""
+"\n"
+"\n"
+"Note: If this is a computer program which you want to run, you need to set "
+"the execute bit by choosing Permissions from the File menu."
+msgstr ""
+"\n"
+"\n"
+"Not: Bu, çalıştırmak istediğiniz bir bilgisayar programıysa, Dosya "
+"menüsünden İzinler'i seçerek yürütme bitini ayarlamanız gerekir."
+
+#: run.c:753
+#, c-format
+msgid ""
+"Executable '%s' is world-writeable! Refusing to run. Please change the "
+"permissions now (this problem may have been caused by a bug in earlier "
+"versions of the filer).\n"
+"\n"
+"Having (non-symlink) run actions world-writeable means that other people who "
+"use your computer can replace your run actions with malicious versions.\n"
+"\n"
+"If you trust everyone who could write to these files then you needn't worry. "
+"Otherwise, you should check, or even just delete, all the existing run "
+"actions."
+msgstr ""
+"Yürütülebilir '%s' herkes tarafından yazılabilir! Çalıştırma reddediliyor. "
+"Lütfen izinleri şimdi değiştirin (bu sorun Dosyalayıcının önceki "
+"sürümlerindeki bir hatadan kaynaklanmış olabilir).\n"
+"\n"
+"Çalıştırma eylemlerinin (simge bağlantısı olmayan) herkes tarafından "
+"yazılabilir olması, bilgisayarınızı kullanan diğer kişilerin çalıştırma "
+"eylemlerinizi kötü amaçlı sürümlerle değiştirebileceği anlamına gelir.\n"
+"\n"
+"Bu dosyalara yazabilecek herkese güveniyorsanız endişelenmenize gerek yok. "
+"Aksi takdirde, mevcut tüm çalıştırma eylemlerini kontrol etmeli, hatta "
+"silmelisiniz."
+
+#: run.c:766
+msgid "go-w (Fix security problem)"
+msgstr "go-w (Güvenlik sorununu düzeltin)"
+
+#: support.c:272
+msgid "B"
+msgstr "B"
+
+#: support.c:351
+msgid "byte"
+msgstr "bayt"
+
+#: support.c:1596 support.c:1650
+#, c-format
+msgid "Failed to open and stat file '%s': %s"
+msgstr "'%s' dosyası açılamadı ve stat yapılamadı: %s"
+
+#: support.c:1607 support.c:1661
+#, c-format
+msgid "Failed to mmap file '%s': %s"
+msgstr "'%s' dosyası mmap yapılamadı: %s"
+
+#: toolbar.c:113
+msgid "Close"
+msgstr "Kapat"
+
+#: toolbar.c:113
+msgid "Close filer window"
+msgstr "Dosya penceresini kapat"
+
+#: toolbar.c:117
+msgid "Up"
+msgstr "Yukarı"
+
+#: toolbar.c:117
+msgid "Change to parent directory"
+msgstr "Üst dizine geç"
+
+#: toolbar.c:121
+msgid "Home"
+msgstr "Ev"
+
+#: toolbar.c:121
+msgid "Change to home directory"
+msgstr "Ana dizine geç"
+
+#: toolbar.c:125
+msgid "Bookmarks"
+msgstr "Yer imleri"
+
+#: toolbar.c:125
+msgid "Bookmarks menu"
+msgstr "Yer imleri menüsü"
+
+#: toolbar.c:129
+msgid "Scan"
+msgstr "Tara"
+
+#: toolbar.c:129
+msgid "Rescan directory contents"
+msgstr "Dizin içeriğini yeniden tara"
+
+#: toolbar.c:133
+msgid "Change icon size"
+msgstr "Simge boyutunu değiştir"
+
+#: toolbar.c:137
+msgid "Automatic size mode"
+msgstr "Otomatik boyut modu"
+
+#: toolbar.c:141
+msgid "Show extra details"
+msgstr "Ekstra ayrıntıları göster"
+
+#: toolbar.c:145
+msgid "Sort"
+msgstr "Sırala"
+
+#: toolbar.c:145
+msgid "Change sort criteria"
+msgstr "Sıralama ölçütünü değiştir"
+
+#: toolbar.c:149
+msgid "Hidden"
+msgstr "Gizli"
+
+#: toolbar.c:149
+msgid ""
+"Left: Show/hide hidden files\n"
+"Right: Show/hide thumbnails"
+msgstr ""
+"Sol: Gizli dosyaları göster/gizle\n"
+"Sağ: Küçük resimleri göster/gizle"
+
+#: toolbar.c:154
+msgid "Select all/invert selection"
+msgstr "Tümünü seç/seçimi ters çevir"
+
+#: toolbar.c:158
+msgid "Show ROX-Filer help"
+msgstr "ROX-Filer yardımını göster"
+
+#: toolbar.c:221
+#, c-format
+msgid " (%u hidden)"
+msgstr " (%u gizli)"
+
+#: toolbar.c:229 tips:58
+msgid "items"
+msgstr "öğe"
+
+#: toolbar.c:229
+msgid "item"
+msgstr "öğe"
+
+#: toolbar.c:232
+#, c-format
+msgid "No items%s"
+msgstr "Öğe yok%s"
+
+#: toolbar.c:251
+#, c-format
+msgid "%u selected (%s)"
+msgstr "%u seçili (%s)"
+
+#: toolbar.c:445
+msgid "Sort by name"
+msgstr "Ada göre sırala"
+
+#: toolbar.c:445
+msgid "Sort by type"
+msgstr "Türe göre sırala"
+
+#: toolbar.c:445
+msgid "Sort by date"
+msgstr "Tarihe göre sırala"
+
+#: toolbar.c:446
+msgid "Sort by size"
+msgstr "Boyuta göre sırala"
+
+#: toolbar.c:446
+msgid "Sort by owner"
+msgstr "Sahibe göre sırala"
+
+#: toolbar.c:446
+msgid "Sort by group"
+msgstr "Gruba göre sırala"
+
+#: toolbar.c:480
+msgid "ascending"
+msgstr "artan"
+
+#: toolbar.c:480
+msgid "descending"
+msgstr "azalan"
+
+#: type.c:214
+msgid "Sym link"
+msgstr "Sembolik bağ"
+
+#: type.c:216
+msgid "Mount point"
+msgstr "Bağlama noktası"
+
+#: type.c:218
+msgid "App dir"
+msgstr "Uyg. dizini"
+
+#: type.c:225
+msgid "Dir"
+msgstr "Dizin"
+
+#: type.c:227
+msgid "Char dev"
+msgstr "Krkter aygıtı"
+
+#: type.c:229
+msgid "Block dev"
+msgstr "Blok aygıtı"
+
+#: type.c:231
+msgid "Pipe"
+msgstr "Boru"
+
+#: type.c:233
+msgid "Socket"
+msgstr "Soket"
+
+#: type.c:235
+msgid "Door"
+msgstr "Door"
+
+#: type.c:238
+msgid "Unknown"
+msgstr "Bilinmeyen"
+
+#: type.c:554
+msgid ""
+"Enter a shell command which will load \"$@\" into a suitable program. Eg:\n"
+"\n"
+"gimp \"$@\""
+msgstr ""
+"Uygun bir programa \"$@\" yükleyecek bir kabuk komutu girin. Örneğin:\n"
+"\n"
+"gimp \"$@\""
+
+#: type.c:735
+msgid "This is not a program! Give me an application instead!"
+msgstr "Bu bir program değil! Bunun yerine bana bir uygulama verin!"
+
+#: type.c:795
+msgid "No run action defined"
+msgstr "Çalıştırma eylemi tanımlanmadı"
+
+#: type.c:799
+#, c-format
+msgid "Error in handler %s: %s"
+msgstr "%s işleyicisinde hata: %s"
+
+#: type.c:814
+#, c-format
+msgid "Invalid application %s (bad AppRun)"
+msgstr "Geçersiz uygulama %s (hatalı AppRun)"
+
+#: type.c:825
+#, c-format
+msgid "Non-executable %s"
+msgstr "Çalıştırılamaz %s"
+
+#: type.c:858
+msgid "Set run action"
+msgstr "Çalıştır eylemini ayarla"
+
+#: type.c:864
+msgid ""
+"If a handler for the specific type isn't set up, use this as the default."
+msgstr ""
+"Belirli tür için bir işleyici kurulmamışsa, bunu varsayılan olarak kullanın."
+
+#: type.c:866
+#, c-format
+msgid "Set default for all `%s/<anything>'"
+msgstr "Tüm `%s/<anything>' için varsayılanı ayarla"
+
+#: type.c:870
+msgid "Use this application for all files with this MIME type."
+msgstr "Bu MIME türündeki tüm dosyalar için bu uygulamayı kullanın."
+
+#: type.c:872
+#, c-format
+msgid "Only for the type `%s' (%s/%s)"
+msgstr "Yalnızca `%s' türü için (%s/%s)"
+
+#: type.c:878
+msgid "Drop a suitable application here"
+msgstr "Buraya uygun bir uygulama bırakın"
+
+#: type.c:893
+msgid "OR"
+msgstr "YADA"
+
+#: type.c:900
+msgid "Enter a shell command:"
+msgstr "Bir kabuk komutu girin:"
+
+#: type.c:929
+msgid "_Use Command"
+msgstr "_ Komut Kullan"
+
+#: type.c:959
+msgid ""
+"A run action already exists and is quite a big program - are you sure you "
+"want to delete it?"
+msgstr ""
+"Bir çalıştırma eylemi zaten var ve oldukça büyük bir program - onu silmek "
+"istediğinizden emin misiniz?"
+
+#: type.c:970
+#, c-format
+msgid "Can't remove %s: %s"
+msgstr "%s kaldırılamıyor: %s"
+
+#: type.c:1007
+msgid "Choices saving is disabled by CHOICESPATH variable"
+msgstr ""
+"Seçimleri kaydetme, CHOICESPATH değişkeni tarafından devre dışı bırakıldı"
+
+#: type.c:1309
+#, c-format
+msgid ""
+"Failed to create symlink '%s':\n"
+"%s"
+msgstr ""
+"'%s' sembolik bağı oluşturulamadı:\n"
+"%s"
+
+#: usericons.c:179
+msgid "The pathname you gave does not exist. The icon has not been changed."
+msgstr "Verdiğiniz yol adı mevcut değil. Simge değiştirilmedi."
+
+#: usericons.c:189 usericons.c:618
+msgid ""
+"Unable to load image file -- maybe it's not in a format I understand, or "
+"maybe the permissions are wrong?\n"
+"The icon has not been changed."
+msgstr ""
+"Resim dosyası yüklenemiyor -- belki anladığım bir biçimde değil veya izinler "
+"yanlış olabilir?\n"
+"Simge değiştirilmedi."
+
+#: usericons.c:235
+#, c-format
+msgid "Really delete icon '%s'?"
+msgstr "'%s' simgesi gerçekten silinsin mi?"
+
+#: usericons.c:239
+#, c-format
+msgid ""
+"Can't delete '%s':\n"
+"%s"
+msgstr ""
+"'%s' silinemiyor:\n"
+"%s"
+
+#: usericons.c:272
+msgid "Set icon"
+msgstr "Simge ayarla"
+
+#: usericons.c:281
+msgid ""
+"Use a copy of the image as the default for all files of these MIME types."
+msgstr ""
+"Bu MIME türlerinin tüm dosyaları için görüntünün bir kopyasını varsayılan "
+"olarak kullanın."
+
+#: usericons.c:283
+#, c-format
+msgid "Set icon for all `%s/<anything>'"
+msgstr "Tüm `%s/<anything>' için simge ayarla"
+
+#: usericons.c:288
+msgid "Use a copy of the image for all files of this MIME type."
+msgstr "Bu MIME türündeki tüm dosyalar için görüntünün bir kopyasını kullanın."
+
+#: usericons.c:290
+#, c-format
+msgid "For all files of type `%s' (%s/%s)"
+msgstr "`%s' (%s/%s) türündeki tüm dosyalar için"
+
+#: usericons.c:296
+msgid ""
+"Add the file and image filenames to your personal list. The setting will be "
+"lost if the image or the file is moved."
+msgstr ""
+"Dosya ve resim dosya adlarını kişisel listenize ekleyin. Görüntü veya dosya "
+"taşınırsa ayar kaybolacaktır."
+
+#: usericons.c:299
+#, c-format
+msgid "Only for the file `%s'"
+msgstr "Yalnızca `%s' dosyası için"
+
+#: usericons.c:307
+msgid ""
+"Copy the image inside the directory, as a hidden file called '.DirIcon'. All "
+"users will then see the icon, and you can move the directory around safely. "
+"This is usually the best option if you can write to the directory."
+msgstr ""
+"Görüntüyü dizinin içine '.DirIcon' adlı gizli bir dosya olarak kopyalayın. "
+"Ardından tüm kullanıcılar simgeyi görecek ve dizini güvenle hareket "
+"ettirebileceksiniz. Dizine yazabiliyorsanız, bu genellikle en iyi seçenektir."
+
+#: usericons.c:313
+msgid "Copy image into directory"
+msgstr "Resmi dizine kopyala"
+
+#: usericons.c:319
+msgid "Drop an icon file here"
+msgstr "Buraya bir simge dosyası bırakın"
+
+#: usericons.c:589
+msgid "Setting icon disabled by CHOICESPATH"
+msgstr "Simge ayarlama CHOICESPATH tarafından devre dışı bırakıldı"
+
+#: usericons.c:633
+#, c-format
+msgid ""
+"Error creating image '%s':\n"
+"%s"
+msgstr ""
+"'%s' resmi oluşturulurken hata:\n"
+"%s"
+
+#: view_details.c:957
+msgid "Mono font"
+msgstr "Mono yazı tipi"
+
+#: view_details.c:958
+msgid "Font for displaying mono-spaced text"
+msgstr "Tek aralıklı metni görüntülemek için yazı tipi"
+
+#: view_details.c:1057
+msgid "_Name"
+msgstr "_Ad"
+
+#: view_details.c:1060
+msgid "_Type"
+msgstr "_Tür"
+
+#: view_details.c:1063
+msgid "_Permissions"
+msgstr "_İzinler"
+
+#: view_details.c:1068
+msgid "_Owner"
+msgstr "_Sahip"
+
+#: view_details.c:1070
+msgid "_Group"
+msgstr "_Grup"
+
+#: view_details.c:1072
+msgid "_Size"
+msgstr "_Boyut"
+
+#: view_details.c:1078
+msgid "Last _Modified"
+msgstr "Son _Değiştirme"
+
+#: tips:1
+msgid "Filer windows"
+msgstr "Dosya penceresi"
+
+#: tips:2
+msgid "Auto-resize filer windows"
+msgstr "Dosyalayıcı pencereleri otomatik boyutlandır"
+
+#: tips:3
+msgid "Never automatically resize"
+msgstr "Asla otomatik boyutlandırma"
+
+#: tips:4
+msgid ""
+"You'll have to resize windows manually, using the window manager, the "
+"`Resize Window' menu entry or by double-clicking on the window background."
+msgstr ""
+"Pencere yöneticisini kullanarak, 'Pencereyi Boyutlandır' menü girişini "
+"kullanarak veya pencere arka planına çift tıklayarak pencereleri manuel "
+"olarak yeniden boyutlandırmanız gerekecektir."
+
+#: tips:5
+msgid "Resize when changing the display style"
+msgstr "Ekran stilini değiştirirken yeniden boyutlandır"
+
+#: tips:6
+msgid ""
+"Changing the size of the icons or which details are displayed will resize "
+"the window for you."
+msgstr ""
+"Simgelerin boyutunu veya görüntülenen ayrıntıları değiştirmek pencereyi "
+"sizin için boyutlandırır."
+
+#: tips:7
+msgid "Always resize"
+msgstr "Her zaman boyutlandır"
+
+#: tips:8
+msgid ""
+"The filer will resize windows whenever it seems useful (that is, when "
+"changing directory or display style)."
+msgstr ""
+"Dosyalayıcı, yararlı göründüğünde (yani, dizini veya görüntüleme stilini "
+"değiştirirken) pencereleri boyutlandıracaktır."
+
+#: tips:9
+msgid "Largest window size:"
+msgstr "En geniş pencere boyutu:"
+
+#: tips:10
+msgid "%"
+msgstr "%"
+
+#: tips:11
+msgid ""
+"The largest size, as a percentage of the screen size, that the auto-resizer "
+"will resize a window to."
+msgstr ""
+"Otomatik boyutlandırıcının bir pencereyi boyutlandıracağı ekran boyutunun "
+"yüzdesi olarak en büyük boyut."
+
+#: tips:12
+msgid "Window behaviour"
+msgstr "Pencere davranışı"
+
+#: tips:13
+msgid "Short titlebar flags"
+msgstr "Kısa başlık çubuğu işaretleri"
+
+#: tips:14
+msgid ""
+"Use single letters instead of words for Scanning, All and Thumbs indicators "
+"in the titlebar."
+msgstr ""
+"Başlık çubuğundaki Taranıyor, Tümü ve Önizleme göstergeleri için sözcük "
+"yerine tek harf kullanın."
+
+#: tips:15
+msgid "Unique windows"
+msgstr "Eşsiz pencereler"
+
+#: tips:16
+msgid ""
+"If you open a directory and that directory is already displayed in another "
+"window, then this option causes the other window to be closed."
+msgstr ""
+"Bir dizini açarsanız ve o dizin zaten başka bir pencerede gösteriliyorsa, bu "
+"seçenek diğer pencerenin kapanmasına neden olur."
+
+#: tips:17
+msgid "New window on button 1"
+msgstr "1. düğmede yeni pencere"
+
+#: tips:18
+msgid ""
+"Clicking with mouse button 1 (usually the left button) opens a directory in "
+"a new window with this turned on. Clicking with the button-2 (middle) will "
+"reuse the current window."
+msgstr ""
+"Bu açıksa 1. fare düğmesini (genellikle sol düğme) tıklamak, yeni bir "
+"pencerede bir dizin açar.2. düğmeye (orta) tıklandığında mevcut pencere "
+"yeniden kullanılacaktır."
+
+#: tips:19
+msgid "Single-click navigation"
+msgstr "Tek tıkla gezinme"
+
+#: tips:20 tips:116
+msgid ""
+"Clicking on an item opens it with this on. Hold down Control to select the "
+"item instead. If off, clicking once selects an item; double click to open "
+"things."
+msgstr ""
+"Bir öğeye tıklamak onu bununla açar. Bunun yerine öğeyi seçmek için "
+"Kontrol'ü basılı tutun. Kapalıysa, bir kez tıklandığında bir öğe seçilir; "
+"şeyleri açmak için çift tıklayın."
+
+#: tips:21
+msgid "Double-click on background resizes"
+msgstr "Arka plan çift tıklamak boyutlandırır"
+
+#: tips:22
+msgid ""
+"If on then double clicking on the window background resizes the window, just "
+"like clicking on the Automatic size mode button in the toolbar."
+msgstr ""
+"Açıksa, pencere arka planına çift tıklamak, tıpkı araç çubuğundaki Otomatik "
+"boyut modu düğmesine tıklamak gibi pencereyi yeniden boyutlandırır."
+
+#: tips:23
+msgid "Sorting"
+msgstr "Sıralama"
+
+#: tips:24
+msgid "Directories come first (for sort by name)"
+msgstr "Dizinler önce gelir (ada göre sıralamak için)"
+
+#: tips:25
+msgid ""
+"If this is on then directories will always appear before anything else when "
+"sorting by name."
+msgstr ""
+"Bu açıksa, ada göre sıralanırken dizinler her zaman her şeyden önce görünür."
+
+#: tips:26
+msgid "Capitalised names first (for sort by name)"
+msgstr "Önce büyük harfli adlar (ada göre sıralama için)"
+
+#: tips:27
+msgid ""
+"If on, all filenames starting with a capital letter come before filenames "
+"starting with lowercase ones."
+msgstr ""
+"Açıksa, büyük harfle başlayan tüm dosya adları, küçük harfle başlayan dosya "
+"adlarından önce gelir."
+
+#: tips:29
+msgid "Default settings for new windows"
+msgstr "Yeni pencereler için varsayılan ayarlar"
+
+#: tips:30
+msgid "Inherit options from source window"
+msgstr "Kaynak penceresinden seçenekleri devral"
+
+#: tips:31
+msgid ""
+"If this is on then display options for a new window are inherited from the "
+"source window if possible, otherwise they are set to the defaults below."
+msgstr ""
+"Bu açıksa, yeni bir pencere için görüntüleme seçenekleri mümkünse kaynak "
+"pencereden devralınır, aksi halde aşağıdaki varsayılanlara ayarlanır."
+
+#: tips:32
+msgid "View type:"
+msgstr "Türü göster:"
+
+#: tips:35
+msgid "Sort by:"
+msgstr "Sıra ölçütü:"
+
+#: tips:37 tips:54
+msgid "Type"
+msgstr "Tür"
+
+#: tips:38
+msgid "Date"
+msgstr "Tarih"
+
+#: tips:40
+msgid "Show hidden files"
+msgstr "Gizlileri göster"
+
+#: tips:41
+msgid ""
+"If this is on then files whose names start with a dot are shown too, "
+"otherwise they are hidden."
+msgstr ""
+"Bu açıksa, adları nokta ile başlayan dosyalar da gösterilir, aksi halde "
+"gizlenirler."
+
+#: tips:42
+msgid "Show extended attribute indicator"
+msgstr "Genişletilmiş öznitelik göstergesini göster"
+
+#: tips:43
+msgid ""
+"If this is on then files which have one or more extended attributes set will "
+"have an emblem added to indicate this."
+msgstr ""
+"Bu açıksa, bir veya daha fazla genişletilmiş özniteliği ayarlanmış dosyalara "
+"bunu belirtmek için bir amblem eklenir."
+
+#: tips:44
+msgid "Icon View"
+msgstr "Simge Görünümü"
+
+#: tips:45
+msgid "Default size:"
+msgstr "Varsayılan boyut:"
+
+#: tips:46
+msgid "Huge Icons"
+msgstr "Dev Simge"
+
+#: tips:47 tips:215
+msgid "Large Icons"
+msgstr "Büyük Simge"
+
+#: tips:48 tips:214
+msgid "Small Icons"
+msgstr "Küçük Simge"
+
+#: tips:50
+msgid "Default details:"
+msgstr "Varsayılan ayrıntılar:"
+
+#: tips:51
+msgid "No details"
+msgstr "Ayrıntı yok"
+
+#: tips:56
+msgid "Automatic small icons:"
+msgstr "Otomatik küçük simge:"
+
+#: tips:57
+msgid "Change at:"
+msgstr "Değiştir:"
+
+#: tips:59
+msgid ""
+"When automatic icon sizing is selected: If the directory contains this many "
+"items then it will be shown using Small Icons, otherwise Large Icons will be "
+"used."
+msgstr ""
+"Otomatik simge boyutlandırma seçildiğinde: Dizin bu kadar çok öğe içeriyorsa "
+"Küçük Simge kullanılarak gösterilecektir, aksi halde Büyük Simge "
+"kullanılacaktır."
+
+#: tips:60
+msgid "Max width (Large icons):"
+msgstr "En fazla genişlik (Büyük simge):"
+
+#: tips:61 tips:64
+msgid "pixels"
+msgstr "piksel"
+
+#: tips:62
+msgid ""
+"Text wider than this is broken onto two lines in Large Icons mode. In Huge "
+"Icons mode, text is wrapped when 50% wider than this."
+msgstr ""
+"Bundan daha geniş olan metin, Büyük Simge modunda iki satıra bölünür. Büyük "
+"Simge modunda, bundan %50 daha geniş olduğunda metin sarılır."
+
+#: tips:63
+msgid "(Small Icons):"
+msgstr "(Küçük Simge):"
+
+#: tips:65
+msgid "Maximum width for the text beside a Small Icon."
+msgstr "Küçük Simgenin yanındaki metin için en fazla genişlik."
+
+#: tips:66
+msgid "Order small icons vertically"
+msgstr "Küçük simgeleri dikey olarak sırala"
+
+#: tips:67
+msgid ""
+"If this option is on, then small icons are arranged in columns, not rows."
+msgstr ""
+"Bu seçenek açıksa, küçük simgeler satırlar yerine sütunlar halinde "
+"düzenlenir."
+
+#: tips:68
+msgid "Order large icons vertically"
+msgstr "Büyük simgeleri dikey olarak sırala"
+
+#: tips:69
+msgid ""
+"If this option is on, then large icons are arranged in columns, not rows."
+msgstr ""
+"Bu seçenek açıksa, büyük simgeler satırlar halinde değil, sütunlar halinde "
+"düzenlenir."
+
+#: tips:71
+msgid "Show column headings"
+msgstr "Sütun başlıklarını göster"
+
+#: tips:72
+msgid "If this is on then column headings will be shown in the list view."
+msgstr "Bu açıksa, sütun başlıkları liste görünümünde gösterilecektir."
+
+#: tips:73
+msgid "Show full type"
+msgstr "Tam türü göster"
+
+#: tips:74
+msgid ""
+"If this is on then the full description of each object's type will be show "
+"rather than a short summary of its basic type."
+msgstr ""
+"Bu açıksa, temel türünün kısa bir özeti yerine her nesnenin türünün tam "
+"açıklaması gösterilecektir."
+
+#: tips:75
+msgid "Tools/Minibuffer"
+msgstr "Araçlar/Mini arabellek"
+
+#: tips:76
+msgid "Toolbar"
+msgstr "Araç Çubuğu"
+
+#: tips:77
+msgid "Toolbar type:"
+msgstr "Araç çubuğu türü:"
+
+#: tips:78
+msgid "No toolbar"
+msgstr "Araç çubuğu yok"
+
+#: tips:79
+msgid "Icons only"
+msgstr "Sadece simge"
+
+#: tips:80
+msgid "Text under icons"
+msgstr "Simge altında metin"
+
+#: tips:81
+msgid "Text beside icons"
+msgstr "Simge yanında metin"
+
+#: tips:82
+msgid "Show totals of items"
+msgstr "Öğelerin toplamını göster"
+
+#: tips:83
+msgid ""
+"Show the number of items displayed in a filer window, as well as the number "
+"of hidden items (if any). When there's a selection, show the number of "
+"selected items and their combined size."
+msgstr ""
+"Bir dosyalayıcı penceresinde görüntülenen öğelerin sayısını ve ayrıca "
+"(varsa) gizli öğelerin sayısını gösterin. Bir seçim olduğunda, seçili "
+"öğelerin sayısını ve bunların birleşik boyutunu gösterin."
+
+#: tips:84
+msgid "Select the buttons you want on the bar:"
+msgstr "Çubukta istediğiniz düğmeleri seçin:"
+
+#: tips:85
+msgid "Width of toolbar sets minimum width of window"
+msgstr "Araç çubuğunun genişliği, minimum pencere genişliğini ayarlar"
+
+#: tips:86
+msgid ""
+"Each filer window is constrained to be wide enough to show the whole of the "
+"toolbar"
+msgstr ""
+"Her dosyalayıcı penceresi, araç çubuğunun tamamını gösterecek kadar geniş "
+"olacak şekilde sınırlandırılmıştır"
+
+#: tips:87
+msgid "Minibuffer"
+msgstr "Mini arabellek"
+
+#: tips:88
+msgid "Beep if Tab-completion fails"
+msgstr "Sekme tamamlama başarısız olursa bip sesi"
+
+#: tips:89
+msgid ""
+"When using the `Enter Path...' minibuffer and Tab is pressed, beep if "
+"nothing happens (eg, because there are several possibilities and the next "
+"letter varies)."
+msgstr ""
+"`Yolu Gir...' minibuffer kullanılırken ve Sekme tuşuna basıldığında, hiçbir "
+"şey olmazsa bip sesi çıkarır (örneğin, birkaç olasılık vardır ve bir sonraki "
+"harf değişir)."
+
+#: tips:90
+msgid "Beep if there are several matches"
+msgstr "Birkaç eşleşme varsa bip sesi"
+
+#: tips:91
+msgid ""
+"When using the `Enter Path...' minibuffer and Tab is pressed, beep if there "
+"is more than one matching file, even though some more letters were added."
+msgstr ""
+"`Yol Gir...' minibuffer kullanılırken ve Sekme tuşuna basıldığında, birkaç "
+"harf daha eklenmiş olsa bile birden fazla eşleşen dosya varsa bip sesi "
+"çıkarır."
+
+#: tips:94
+msgid ""
+"When thumbnails are turned on, each image file in a directory is loaded and "
+"a small thumbnail of it is shown."
+msgstr ""
+"Önizleme açıldığında, bir dizindeki her resim dosyası yüklenir ve bunun "
+"küçük bir küçük resmi gösterilir."
+
+#: tips:95
+msgid "Show image thumbnails"
+msgstr "Resim önizlemeleri göster"
+
+#: tips:96
+msgid ""
+"This is the default setting for new windows. Use the Display menu to turn "
+"thumbnails on and off for individual windows."
+msgstr ""
+"Bu, yeni pencereler için varsayılan ayardır. Tek tek pencereler için küçük "
+"resimleri açmak ve kapatmak için Görüntü menüsünü kullanın."
+
+#: tips:97
+msgid "Video thumbnails"
+msgstr "Video önizlemeleri"
+
+#: tips:98
+msgid "Thumbnails cache"
+msgstr "Önizleme önbelleği"
+
+#: tips:99
+msgid ""
+"To speed things up, the generated thumbnails are stored in the hidden ~/."
+"thumbnails directory. Click here to remove all the cached thumbnails. They "
+"will be created again as needed."
+msgstr ""
+"İşleri hızlandırmak için, oluşturulan küçük resimler gizli ~/.thumbnails "
+"dizininde saklanır. Önbelleğe alınmış tüm küçük resimleri kaldırmak için "
+"burayı tıklayın. Gerektiğinde yeniden oluşturulacaklar."
+
+#: tips:100
+msgid "Manage thumbnails"
+msgstr "Önizlemeleri yönet"
+
+#: tips:101 tips:158
+msgid "Pinboard"
+msgstr "Pinboard"
+
+#: tips:102
+msgid ""
+"When using a pinboard, you can drag files and applications onto the desktop "
+"background to create shortcuts to them."
+msgstr ""
+"Bir pinboard kullanırken, kısayollar oluşturmak için dosyaları ve "
+"uygulamaları masaüstü arka planına sürükleyebilirsiniz."
+
+#: tips:103 tips:211
+msgid "Appearance"
+msgstr "Görünüm"
+
+#: tips:104
+msgid "Foreground:"
+msgstr "Ön plan:"
+
+#: tips:105
+msgid "Text shadow:"
+msgstr "Yazı gölgesi:"
+
+#: tips:106
+msgid "Background:"
+msgstr "Arka plan:"
+
+#: tips:107
+msgid "No shadow"
+msgstr "Gölge yok"
+
+#: tips:108
+msgid "Thin"
+msgstr "İnce"
+
+#: tips:109
+msgid "Thick"
+msgstr "Kalın"
+
+#: tips:110
+msgid "Use custom font:"
+msgstr "Özel yazı tipi kullan:"
+
+#: tips:111
+msgid "The font used for the text displayed under the icons"
+msgstr "Simge altında görüntülenen metin için kullanılan yazı tipi"
+
+#: tips:112
+msgid "Fast scaling of images"
+msgstr "Resimlerin hızlı ölçeklenmesi"
+
+#: tips:113
+msgid ""
+"Choose between the fast or slow method of scaling backdrop images.  The slow "
+"method can give better results."
+msgstr ""
+"Arka plan görüntülerini ölçeklendirmenin hızlı veya yavaş yöntemi arasında "
+"seçim yapın. Yavaş yöntem daha kaliteli sonuç verebilir."
+
+#: tips:114
+msgid "Pinboard behaviour"
+msgstr "Pinboard davranışı"
+
+#: tips:115
+msgid "Single-click to open"
+msgstr "Açmak için tek tıklama"
+
+#: tips:117
+msgid "Keep icons within screen limits"
+msgstr "Simgeleri ekran sınırları içinde tutun"
+
+#: tips:118
+msgid ""
+"If this is set, pinboard icons are always kept completely within screen "
+"limits, including the label."
+msgstr ""
+"Bu ayarlanırsa pano simgeleri, etiket de dahil olmak üzere her zaman tamamen "
+"ekran sınırları içinde tutulur."
+
+#: tips:119
+msgid "Icon grid step:"
+msgstr "Simge ızgara adımı:"
+
+#: tips:120
+msgid "Fine"
+msgstr "Dar"
+
+#: tips:121
+msgid "Use a 2-pixel grid for positioning icons on the desktop."
+msgstr ""
+"Masaüstündeki simgeleri konumlandırmak için 2 piksellik bir ızgara kullanın."
+
+#: tips:122
+msgid "Medium"
+msgstr "Orta"
+
+#: tips:123
+msgid "Use a 16-pixel grid for positioning icons on the desktop."
+msgstr ""
+"Masaüstündeki simgeleri konumlandırmak için 16 piksellik bir ızgara kullanın."
+
+#: tips:124
+msgid "Coarse"
+msgstr "Geniş"
+
+#: tips:125
+msgid "Use a 32-pixel grid for positioning icons on the desktop."
+msgstr ""
+"Masaüstündeki simgeleri konumlandırmak için 32 piksellik bir ızgara kullanın."
+
+#: tips:126 tips:128
+msgid "Iconified windows"
+msgstr "Simgeleştirilmiş pencereler"
+
+#: tips:127
+msgid ""
+"Most window managers provide a way to iconify (or 'minimise') windows, and "
+"various programs, including ROX-Filer, can be used to display the iconified "
+"windows."
+msgstr ""
+"Çoğu pencere yöneticisi, pencereleri simgeleştirmek (veya 'küçültmek') için "
+"bir yol sağlar ve simgeleştirilmiş pencereleri görüntülemek için ROX-Filer "
+"dahil olmak üzere çeşitli programlar kullanılabilir."
+
+#: tips:129
+msgid "Show iconified windows"
+msgstr "Simgeleştirilmiş pencereleri göster"
+
+#: tips:130
+msgid ""
+"If this option is on, the filer will show each iconified window as a small "
+"button on the pinboard. Requires a compatible window manager, and the "
+"pinboard must be in use."
+msgstr ""
+"Bu seçenek açıksa dosyalayıcı, simgeleştirilmiş her pencereyi pinboardda "
+"küçük bir düğme olarak gösterecektir. Uyumlu bir pencere yöneticisi "
+"gerektirir ve pinboard kullanımda olmalıdır."
+
+#: tips:131
+msgid "Show per workspace"
+msgstr "Her çalışma alanı için göster"
+
+#: tips:132
+msgid ""
+"If this option is on, the filer will only show iconified windows associated "
+"with the current workspace."
+msgstr ""
+"Bu seçenek açıksa, dosyalayıcı yalnızca geçerli çalışma alanıyla ilişkili "
+"simgeleştirilmiş pencereleri gösterir."
+
+#: tips:133
+msgid "Iconify to the"
+msgstr "Simgeleri"
+
+#: tips:134
+msgid "top-left"
+msgstr "üst-sola"
+
+#: tips:135
+msgid "top-right"
+msgstr "üst-sağa"
+
+#: tips:136
+msgid "bottom-left"
+msgstr "alt-sola"
+
+#: tips:137
+msgid "bottom-right"
+msgstr "alt-sağa"
+
+#: tips:138
+msgid ", going"
+msgstr "yerleştir , ve"
+
+#: tips:139
+msgid "horizontally"
+msgstr "yatay sırala"
+
+#: tips:140
+msgid "vertically"
+msgstr "dikey sırala"
+
+#: tips:141
+msgid ""
+"Sometimes the filer doesn't know about your desktop furniture and puts "
+"iconified windows under (for example) the Gnome panel. You can define a top "
+"or bottom margin to avoid placing the icons there. The filer already knows "
+"about its own panel."
+msgstr ""
+"Bazen dosyalayıcı, masaüstü dizaynını bilmez ve simgeleştirilmiş pencereleri "
+"(örneğin) Gnome panelinin altına koyar. Simgelerin oraya yerleştirilmesini "
+"önlemek için bir üst veya alt kenar boşluğu tanımlayabilirsiniz. Dosyalayıcı "
+"zaten kendi panelini biliyor."
+
+#: tips:142
+msgid "Top margin"
+msgstr "Üst sınır"
+
+#: tips:143
+msgid "Height of no-go area at top of screen."
+msgstr "Ekranın üst kısmındaki yasak alanın yüksekliği."
+
+#: tips:144
+msgid "Bottom margin"
+msgstr "Alt sınır"
+
+#: tips:145
+msgid "Height of no-go area at bottom of screen."
+msgstr "Ekranın alt kısmındaki yasak alanın yüksekliği."
+
+#: tips:146
+msgid "Left margin"
+msgstr "Sol sınır"
+
+#: tips:147
+msgid "Width of no-go area at left of screen."
+msgstr "Ekranın sol kısmındaki yasak alanın yüksekliği."
+
+#: tips:148
+msgid "Right margin"
+msgstr "Sağ sınır"
+
+#: tips:149
+msgid "Width of no-go area at right of screen."
+msgstr "Ekranın sağ kısmındaki yasak alanın yüksekliği."
+
+#: tips:150
+msgid "Desktop"
+msgstr "Masaüstü"
+
+#: tips:151
+msgid ""
+"When run by a session manager program (such as ROX-Session) the filer can "
+"open up a panel and/or the pinboard.  Here you configure which."
+msgstr ""
+"Bir oturum yöneticisi programı (ROX-Session gibi) tarafından "
+"çalıştırıldığında dosyalayıcı bir panel ve/veya pinboard açabilir. Burada "
+"hangisi olduğunu yapılandırırsınız."
+
+#: tips:152
+msgid "Panel only"
+msgstr "Sadece panel"
+
+#: tips:153
+msgid "Only a panel is shown."
+msgstr "Sadece panel gösterilir."
+
+#: tips:154
+msgid "Pinboard only"
+msgstr "Sadece pinboard"
+
+#: tips:155
+msgid "Only the pinboard is shown."
+msgstr "Sadece pinboard gösterilir."
+
+#: tips:156
+msgid "Panel and pinboard"
+msgstr "Panel ve pinboard"
+
+#: tips:157
+msgid "Both a panel and a pinboard are shown."
+msgstr "Her ikisi de gösterilir."
+
+#: tips:159
+msgid "Enter the name of the pinboard to show here."
+msgstr "Burada gösterilecek pinboard adını girin."
+
+#: tips:160
+msgid "Changes here take effect the next time the filer is run."
+msgstr ""
+"Buradaki değişiklikler, dosyalayıcının bir sonraki çalıştırılışında etkili "
+"olur."
+
+#: tips:161
+msgid ""
+"The session manager activates these options by\n"
+"using the -S or --rox-session argument to rox."
+msgstr ""
+"Oturum yöneticisi bu seçenekleri şu şekilde etkinleştirir:\n"
+"rox için -S veya --rox-session bağımsız değişkenini kullanarak."
+
+#: tips:162
+msgid "Action windows"
+msgstr "Eylem pencereleri"
+
+#: tips:163
+msgid ""
+"Action windows appear when you start a background\n"
+"operation, such as copying or deleting some files."
+msgstr ""
+"Bazı dosyaları kopyalamak veya silmek gibi bir arka plan\n"
+"işlemi başlattığınızda eylem pencereleri görünür."
+
+#: tips:164
+msgid "Auto-start (Quiet) these actions"
+msgstr "Bu eylemleri otomatik başlat (Sessiz)"
+
+#: tips:166
+msgid "Copy files without confirming first."
+msgstr "Önce onaylamadan dosyaları kopyalayın."
+
+#: tips:168
+msgid "Move files without confirming first."
+msgstr "Önce onaylamadan dosyaları taşıyın."
+
+#: tips:170
+msgid "Create links to files without confirming first."
+msgstr "Önce onaylamadan dosyalara bağlantılar oluşturun."
+
+#: tips:172
+msgid "Delete files without confirming first."
+msgstr "Önce onaylamadan dosyaları silin."
+
+#: tips:173
+msgid "Mount"
+msgstr "Bağla"
+
+#: tips:174
+msgid "Mount and unmount filesystems without confirming first."
+msgstr "Önce onaylamadan dosya sistemlerini bağlayın ve ayırın."
+
+#: tips:175
+msgid "Default settings"
+msgstr "Varsayılan ayarlar"
+
+#: tips:177
+msgid "Don't confirm deletion of non-writeable items."
+msgstr "Yazılamaz öğelerin silinmesini onaylamayın."
+
+#: tips:179
+msgid "Don't display so much information in the message area."
+msgstr "Mesaj alanında çok fazla bilgi gösterme."
+
+#: tips:181
+msgid "Also change contents of subdirectories."
+msgstr "Alt dizinlerin içeriğini de değiştirin."
+
+#: tips:184
+msgid "Mount commands"
+msgstr "Bağlama komutları"
+
+#: tips:185
+msgid "Mount command"
+msgstr "Bağlama komutu"
+
+#: tips:186
+msgid "The command used to mount a filesystem. If unsure, use \"mount\"."
+msgstr ""
+"Bir dosya sistemini bağlamak için kullanılan komut. Emin değilseniz, "
+"\"mount\" kullanın."
+
+#: tips:187
+msgid "Unmount command"
+msgstr "Ayırma komutu"
+
+#: tips:188
+msgid ""
+"The command used to unmount a filesystem. If unsure, use \"umount\" (yes, "
+"without the first \"n\")."
+msgstr ""
+"Bir dosya sisteminin bağlantısını kesmek için kullanılan komut. Emin "
+"değilseniz, \"umount\" kullanın (evet, ilk n olmadan)."
+
+#: tips:189
+msgid "Eject command"
+msgstr "Çıkarma komutu"
+
+#: tips:190
+msgid "The command used to eject removable media. If unsure, use \"eject\"."
+msgstr ""
+"Çıkarılabilir medyayı çıkarmak için kullanılan komut. Emin değilseniz, "
+"\"eject\"i kullanın."
+
+#: tips:191
+msgid "Drag and Drop"
+msgstr "Sürükle ve Bırak"
+
+#: tips:192
+msgid "Dragging to icons"
+msgstr "Simgelere sürükleme"
+
+#: tips:193
+msgid "Allow dragging to icons in filer windows"
+msgstr "Dosya pencerelerinde simgelere sürüklemeye izin ver"
+
+#: tips:194
+msgid ""
+"When this is on you can drag a file over a sub-directory or program in a "
+"filer window. The item will highlight when you do this and dropping the file "
+"will put it into that directory, or load it into the program."
+msgstr ""
+"Bu açıkken, bir dosyayı bir dosyalayıcı penceresindeki bir alt dizine veya "
+"programa sürükleyebilirsiniz. Bunu yaptığınızda öğe vurgulanacak ve dosyayı "
+"bıraktığınızda onu o dizine koyacak veya programa yükleyecektir."
+
+#: tips:195
+msgid "Directories spring open"
+msgstr "Dizinler sıçrayarak açılır"
+
+#: tips:196
+msgid ""
+"This option, which requires the above option to be turned on too, causes the "
+"highlighted directory to 'spring open' after the file is held over it for a "
+"short while."
+msgstr ""
+"Yukarıdaki seçeneğin de açık olmasını gerektiren bu seçenek, dosya üzerinde "
+"kısa bir süre tutulduktan sonra vurgulanan dizinin 'yaylanarak açılmasına' "
+"neden olur."
+
+#: tips:197
+msgid "Spring delay:"
+msgstr "Sıçrama gecikmesi:"
+
+#: tips:198
+msgid "ms"
+msgstr "ms"
+
+#: tips:199
+msgid ""
+"This option sets how long, in ms, you must hold a file over a directory "
+"before it will spring open. The above option must be turned on for this to "
+"have any effect."
+msgstr ""
+"Bu seçenek, bir dosyayı birdenbire açılmadan önce bir dizin üzerinde ne "
+"kadar süre tutmanız gerektiğini ms cinsinden ayarlar. Bunun herhangi bir "
+"etkisinin olması için yukarıdaki seçeneğin açık olması gerekir."
+
+#: tips:200
+msgid "When dragging files with the left mouse button"
+msgstr "Farenin sol tuşuyla dosyaları sürüklerken"
+
+#: tips:201 tips:205
+msgid "Show a menu of possible actions"
+msgstr "Olası eylemlerin bir menüsünü göster"
+
+#: tips:202
+msgid "Copy the files"
+msgstr "Dosyaları kopyala"
+
+#: tips:203
+msgid ""
+"Note that you can still get the menu to appear, by dragging with Alt held "
+"down."
+msgstr ""
+"Alt tuşunu basılı tutarak sürükleyerek menünün görünmesini "
+"sağlayabileceğinizi unutmayın."
+
+#: tips:204
+msgid "When dragging files with the middle mouse button"
+msgstr "Orta fare düğmesiyle dosyaları sürüklerken"
+
+#: tips:206
+msgid "Move the files"
+msgstr "Dosyaları taşı"
+
+#: tips:207
+msgid ""
+"Note that you can still get the menu to appear, by dragging with the left "
+"button and holding down the Alt key."
+msgstr ""
+"Sol düğmeyle sürükleyip Alt tuşunu basılı tutarak menünün görünmesini "
+"sağlayabileceğinizi unutmayın."
+
+#: tips:208
+msgid "Download handler"
+msgstr "İndirme işleyicisi"
+
+#: tips:209
+msgid ""
+"When you drag a file from a web browser or other remote source, this program "
+"will be run to download it. $1 is the URI dragged to the filer, and the "
+"current directory is the destination. Eg:\n"
+"xterm -e wget $1"
+msgstr ""
+"Bir web tarayıcısından veya başka bir uzak kaynaktan bir dosyayı "
+"sürüklediğinizde, bu program dosyayı indirmek için çalıştırılır. $1 "
+"dosyalayıcıya sürüklenen URI'dir ve geçerli dizin hedeftir. Örneğin:\n"
+"xterm -e wget $1"
+
+#: tips:210
+msgid "Menus"
+msgstr "Menüler"
+
+#: tips:212
+msgid "Size of icons in menus:"
+msgstr "Menüdeki simge boyutu:"
+
+#: tips:213
+msgid "No Icons"
+msgstr "Simge Yok"
+
+#: tips:216
+msgid "Same as current window"
+msgstr "Şimdiki pencereyle aynı"
+
+#: tips:217
+msgid "Same as default"
+msgstr "Varsayılanla aynı"
+
+#: tips:218
+msgid "Behaviour"
+msgstr "Davranış"
+
+#: tips:219
+msgid "File menu on right-click"
+msgstr "Sağ tıklama ile dosya menüsü"
+
+#: tips:220
+msgid ""
+"Show the File menu instead of the main menu when right-clicking with files "
+"selected (the main menu can be accessed by holding down Control)."
+msgstr ""
+"Dosyalar seçiliyken sağ tıkladığınızda ana menü yerine dosya menüsünü "
+"gösterin (ana menüye Kontrol tuşu basılı tutularak erişilebilir)."
+
+#: tips:221
+msgid "Terminal emulator program"
+msgstr "Uçbirim uygulaması"
+
+#: tips:222
+msgid "The program to launch when you choose `Terminal Here' from the menu."
+msgstr "Menüden `Buraya Uçbirim'i seçtiğinizde başlayacak program."
+
+#: tips:223
+msgid "Keyboard shortcuts"
+msgstr "Klavye kısayolları"
+
+#: tips:225
+msgid "MIME types"
+msgstr "MIME türleri"
+
+#: tips:226
+msgid ""
+"The filer uses a set of rules to work out the correct MIME type for each "
+"regular file, and then chooses a suitable icon for that type."
+msgstr ""
+"Dosyalayıcı, her normal dosya için doğru MIME türünü bulmak üzere bir dizi "
+"kural kullanır ve ardından bu tür için uygun bir simge seçer."
+
+#: tips:227
+msgid "Edit MIME rules"
+msgstr "MIME kurallarını düzenle"
+
+#: tips:228
+msgid "Themes"
+msgstr "Temalar"
+
+#: tips:229
+msgid "Icon theme"
+msgstr "Simge teması"
+
+#: tips:230
+msgid "Themes should be placed inside the ~/.icons directory."
+msgstr "Temalar ~/.icons dizinine yerleştirilmelidir."
+
+#: tips:231
+msgid ""
+"Use the 'Set Icon...' dialog box to set the icon for each MIME type. Note "
+"that icons set this way override those from the selected theme."
+msgstr ""
+"Her MIME türü için simge ayarlamak üzere 'Simge Ayarla...' iletişim kutusunu "
+"kullanın. Bu şekilde ayarlanan simgelerin, seçilen temadaki simgeleri "
+"geçersiz kıldığını unutmayın."
+
+#: tips:232
+msgid "Colours"
+msgstr "Renkler"
+
+#: tips:233
+msgid "File type colours"
+msgstr "Dosya türü renkleri"
+
+#: tips:234
+msgid "Colour files based on their types"
+msgstr "Dosyaları türlerine göre renklendir"
+
+#: tips:235
+msgid "Filenames (and details) are coloured according to the file's type."
+msgstr "Dosya adları (ve ayrıntılar), dosyanın türüne göre renklendirilir."
+
+#: tips:236
+msgid "Directory:"
+msgstr "Dizin:"
+
+#: tips:237
+msgid "Regular file:"
+msgstr "Boş dosya:"
+
+#: tips:238
+msgid "Pipe:"
+msgstr "Boru:"
+
+#: tips:239
+msgid "Socket:"
+msgstr "Soket:"
+
+#: tips:241
+msgid ""
+"Error, such as a symlink which points to a non-existant file, or a file "
+"which the filer does not have permission to examine."
+msgstr ""
+"Var olmayan bir dosyaya veya dosyalayıcının inceleme iznine sahip olmadığı "
+"bir dosyaya işaret eden bir sembolik bağ gibi hata."
+
+#: tips:242
+msgid "Character device:"
+msgstr "Karakter aygıtı:"
+
+#: tips:243
+msgid "Block device:"
+msgstr "Blok aygıtı:"
+
+#: tips:244
+msgid "Door:"
+msgstr "Kapı:"
+
+#: tips:245
+msgid ""
+"Door files are a bit like sockets or pipes, and have only been seen on "
+"Solaris."
+msgstr ""
+"Kapı dosyaları biraz soket veya boru gibidir ve yalnızca Solaris'te "
+"görülmüştür."
+
+#: tips:246
+msgid "Executable file:"
+msgstr "Çalıştırılır dosya:"
+
+#: tips:247
+msgid "Application directory:"
+msgstr "Uygulama dizini:"
+
+#: tips:248
+msgid "Unknown type:"
+msgstr "Bilinmeyen tür:"
+
+#: tips:249
+msgid "Compatibility"
+msgstr "Uyumluluk"
+
+#: tips:250
+msgid "Command line program"
+msgstr "Komut satırı programı"
+
+#: tips:251
+msgid "Make script"
+msgstr "Komut dosyası oluştur"
+
+#: tips:252
+msgid "Window manager problems"
+msgstr "Pencere yöneticisi sorunları"
+
+#: tips:253
+msgid "Override window manager control of the pinboard and panels"
+msgstr "Pencere yöneticisinin pinboard ve panel kontrolünü geçersiz kıl"
+
+#: tips:254
+msgid ""
+"Some window managers don't support the new Extended Window Manager Hints "
+"system, and so treat the pinboard and panels like normal windows. Turn this "
+"on to fix problems such as the pinboard coming to the front when you click "
+"on it, titlebars and other decorations appearing around windows, or having "
+"them appear in window-select lists."
+msgstr ""
+"Bazı pencere yöneticileri, yeni Genişletilmiş Pencere Yöneticisi İpuçları "
+"sistemini desteklemez ve bu nedenle pinboard ve panellere normal pencereler "
+"gibi davranır. Üzerine tıkladığınızda pinboardun öne gelmesi, pencerelerin "
+"etrafında görünen başlık çubukları ve diğer süslemeler veya bunların pencere "
+"seçim listelerinde görünmesi gibi sorunları gidermek için bunu açın."
+
+#: tips:255
+msgid "Pass all backdrop mouse clicks to window manager"
+msgstr "Tüm arka plan fare tıklamalarını pencere yöneticisine iletin"
+
+#: tips:256
+msgid ""
+"Normally, right clicking on the desktop background will open the pinboard "
+"menu and left clicking will clear the selection. Turn this on to forward the "
+"events to your window manager instead. Clicks on icons will not be forwarded."
+msgstr ""
+"Normal olarak, masaüstü arka planına sağ tıklamak pinboard menüsünü açar ve "
+"sol tıklamak seçimi temizler. Bunun yerine olayları pencere yöneticinize "
+"iletmek için bunu açın. Simgelere yapılan tıklamalar yönlendirilmeyecektir."
+
+#: tips:257
+msgid "Blackbox root menus hack"
+msgstr "Blackbox kök menüleri hilesi"
+
+#: tips:258
+msgid ""
+"Blackbox, Fluxbox and similar window managers do not yet work well with the "
+"ROX-Filer pinboard. This option enables some workarounds. These window "
+"managers are expected to change their behaviour in new versions so that this "
+"isn't necessary."
+msgstr ""
+"Blackbox, Fluxbox ve benzeri pencere yöneticileri henüz ROX-Filer pinboard "
+"ile iyi çalışmıyor. Bu seçenek bazı geçici çözümler sağlar. Bu pencere "
+"yöneticilerinin yeni sürümlerde davranışlarını değiştirmeleri beklenir, "
+"böylece buna gerek kalmaz."
+
+#: tips:259
+msgid "Panel is a 'dock'"
+msgstr "Panel bir 'dock'tur"
+
+#: tips:260
+msgid ""
+"Makes sure panels stay against screen edges. Disable this option if the "
+"panel stays above other windows against your wishes. Requires a restart to "
+"take effect."
+msgstr ""
+"Panellerin ekran kenarlarına karşı kalmasını sağlar. Panel istekleriniz "
+"dışında diğer pencerelerin üzerinde kalırsa bu seçeneği devre dışı bırakın. "
+"Etkinleşmesi için yeniden başlatma gerekir."
+
+#: tips:261
+msgid "Panel stays on top"
+msgstr "Panel üstte kalır"
+
+#: tips:262
+msgid ""
+"Keeps the panel above other windows. Enable this option to make sure the "
+"dock option works correctly in some versions of compiz. May require a "
+"restart to take effect."
+msgstr ""
+"Paneli diğer pencerelerin üzerinde tutar. Dock seçeneğinin Compiz'in bazı "
+"sürümlerinde doğru çalıştığından emin olmak için bu seçeneği etkinleştirin. "
+"Etkilenmesi için bir yeniden başlatma gerektirebilir."
+
+#: tips:263
+msgid "Panel confined to work area"
+msgstr "Çalışma alanıyla sınırlı panel"
+
+#: tips:264
+msgid ""
+"Keeps the panel confined to the work area specified by the Extended Window "
+"Manager Specification. Applies to new panels."
+msgstr ""
+"Paneli, Genişletilmiş Pencere Yöneticisi Spesifikasyonu tarafından "
+"belirlenen çalışma alanıyla sınırlı tutar. Yeni paneller için geçerlidir."
+
+#: tips:265
+msgid "Drag and drop"
+msgstr "Sürükle ve bırak"
+
+#: tips:266
+msgid "Don't use hostnames"
+msgstr "Ana makine adlarını kullanmayın"
+
+#: tips:267
+msgid ""
+"Some older applications don't support XDND fully and may need to have this "
+"option turned on. Use this if dragging files to an application shows a + "
+"sign on the pointer but the drop doesn't work."
+msgstr ""
+"Bazı eski uygulamalar XDND'yi tam olarak desteklemez ve bu seçeneğin açık "
+"olması gerekebilir. Dosyaları bir uygulamaya sürüklerken işaretçide + "
+"işareti görünüyorsa ancak bırakma çalışmıyorsa bunu kullanın."
+
+#: tips:268
+msgid "Extended attributes"
+msgstr "Genişletilmiş özellikler"
+
+#: tips:269
+msgid "Don't use extended attributes"
+msgstr "Genişletilmiş özellikleri kullanma"
+
+#: tips:270
+msgid ""
+"This disables the use of extended attributes available in newer operating "
+"systems and file systems.  With this option set the 'Set Type' menu entry is "
+"disabled, the MIME type of the file is only derived from the file name and "
+"the properties window does not report extended attributes."
+msgstr ""
+"Bu, daha yeni işletim sistemlerinde ve dosya sistemlerinde bulunan "
+"genişletilmiş özniteliklerin kullanımını devre dışı bırakır. Bu seçenek "
+"ayarlandığında 'Türü Ayarla' menü girişi devre dışı bırakılır, dosyanın MIME "
+"türü yalnızca dosya adından türetilir ve özellikler penceresi genişletilmiş "
+"öznitelikleri bildirmez."
+
+#: ../Templates.ui.h:1
+msgid "ROX-Filer log viewer"
+msgstr "ROX-Filer günlük görüntüleyici"
+
+#: ../Templates.ui.h:2
+msgid "Recently performed actions..."
+msgstr "Son gerçekleştirilen eylemler..."
+
+#: ../Templates.ui.h:3
+msgid "Open Directory"
+msgstr "Dizin Aç"
+
+#: ../Templates.ui.h:4
+msgid "Panel Options"
+msgstr "Panel seçenekleri"
+
+#: ../Templates.ui.h:5
+msgid "Image and Text"
+msgstr "Görüntü ve Metin"
+
+#: ../Templates.ui.h:6
+msgid "Every icon on this panel is shown with an image and some text."
+msgstr "Bu paneldeki her simge, bir resim ve biraz metinle gösterilir."
+
+#: ../Templates.ui.h:7
+msgid "Image only for applications"
+msgstr "Yalnızca uygulamalar için görüntü"
+
+#: ../Templates.ui.h:8
+msgid ""
+"Applications in this panel have just an image, everything else has both an "
+"image and text."
+msgstr ""
+"Bu paneldeki uygulamaların sadece bir resmi var, diğer her şeyin hem resmi "
+"hem de metni var."
+
+#: ../Templates.ui.h:9
+msgid "Image only"
+msgstr "Sadece resim"
+
+#: ../Templates.ui.h:10
+msgid "Only the image is shown for icons in this panel."
+msgstr "Bu paneldeki simgeler için yalnızca görüntü gösterilir."
+
+#: ../Templates.ui.h:11
+msgid "Panel width"
+msgstr "Panel genişiği"
+
+#: ../Templates.ui.h:12
+msgid "The size of this panel."
+msgstr "Bu panelin boyutu."
+
+#: ../Templates.ui.h:13
+msgid "px"
+msgstr "px"
+
+#: ../Templates.ui.h:14
+msgid "Do not cover panel"
+msgstr "Paneli örtme"
+
+#: ../Templates.ui.h:15
+msgid ""
+"Ask the window manager not to cover this panel when maximising windows, "
+"otherwise leave just 2 pixels at the edge of the screen to allow auto-"
+"raising. Some window managers may not honour this setting."
+msgstr ""
+"Pencere yöneticisinden pencereleri büyütürken bu paneli kapatmamasını "
+"isteyin, aksi takdirde otomatik yükseltmeye izin vermek için ekranın "
+"kenarında yalnızca 2 piksel bırakın. Bazı pencere yöneticileri bu ayarı "
+"dikkate almayabilir."
+
+#: ../Templates.ui.h:16
+msgid "<b>Panel style</b>"
+msgstr "<b>Panel stili</b>"
+
+#: ../Templates.ui.h:17
+msgid "Confine to Xinerama monitor"
+msgstr "Xinerama monitörüyle sınırla"
+
+#: ../Templates.ui.h:18
+msgid ""
+"If you use multiple monitors with Xinerama, use this option to confine the "
+"panel to one monitor."
+msgstr ""
+"Xinerama ile birden çok monitör kullanıyorsanız paneli tek bir monitörle "
+"sınırlamak için bu seçeneği kullanın."
+
+#: ../Templates.ui.h:19
+msgid ""
+"The monitor this panel is confined to when using Xinerama. The numbering "
+"starts from zero."
+msgstr ""
+"Xinerama kullanılırken bu panelin sınırlandırıldığı monitör. Numaralandırma "
+"sıfırdan başlar."
+
+#: ../Templates.ui.h:20
+msgid "<b>Xinerama</b>"
+msgstr "<b>Xinerama</b>"
+
+#: ../Templates.ui.h:21
+msgid "Right edge"
+msgstr "Sağ sınır"
+
+#: ../Templates.ui.h:22
+msgid "Left edge"
+msgstr "Sol sınır"
+
+#: ../Templates.ui.h:23
+msgid "Bottom edge"
+msgstr "Alt sınır"
+
+#: ../Templates.ui.h:24
+msgid "Top edge"
+msgstr "Üst sınır"
+
+#: ../Templates.ui.h:25
+msgid "<b>Position</b>"
+msgstr "<b>Konum</b>"
+
+#~ msgid "Choices migration"
+#~ msgstr "Seçimler aktarılıyor"
+
+#~ msgid ""
+#~ "Enter the name of the panel to show here. This option is now only used "
+#~ "when upgrading from an old version."
+#~ msgstr ""
+#~ "Burada gösterilecek panelin adını girin. Bu seçenek artık yalnızca eski "
+#~ "sürümden yükseltme yaparken kullanılır."
+
+#~ msgid "GNOME-VFS library"
+#~ msgstr "GNOME-VFS kütüphanesi"
+
+#~ msgid "No (need 2.8.0 or later)"
+#~ msgstr "Hayır (2.8.0 veya üstü gerekir)"
+
+#~ msgid "Open AVFS"
+#~ msgstr "AVFS'yi açın"
+
+#~ msgid "Open With..."
+#~ msgstr "Şununla Aç..."
+
+#~ msgid "Save Display Settings..."
+#~ msgstr "Ekran Ayarlarını Kaydet..."
